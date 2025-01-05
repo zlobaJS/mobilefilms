@@ -26,6 +26,10 @@ body {
   margin: 0;
   padding: 0;
   background-color: #141414;
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+  min-height: 100vh;
+  min-height: -webkit-fill-available;
 }
 
 h1 {
@@ -121,4 +125,8 @@ button:focus-visible {
 .backdrop-slider .swiper-button-next:hover,
 .backdrop-slider .swiper-button-prev:hover {
   background: rgba(0, 0, 0, 0.7);
+}
+
+html {
+  height: -webkit-fill-available;
 }

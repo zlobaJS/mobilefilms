@@ -134,7 +134,16 @@ function AppRoutes() {
               transition={{ duration: 0.1 }}
               key="home"
             >
-              <Box sx={{ minHeight: "100vh", backgroundColor: "#141414" }}>
+              <Box
+                sx={{
+                  minHeight: "100vh",
+                  backgroundColor: "#141414",
+                  paddingTop: "env(safe-area-inset-top)",
+                  paddingBottom: "env(safe-area-inset-bottom)",
+                  paddingLeft: "env(safe-area-inset-left)",
+                  paddingRight: "env(safe-area-inset-right)",
+                }}
+              >
                 <BackdropSlider
                   movies={movies.popular}
                   onMovieSelect={handleMovieSelect}

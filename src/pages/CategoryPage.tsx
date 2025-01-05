@@ -165,6 +165,10 @@ export const CategoryPage = () => {
           backgroundColor: "#141414",
           py: 4,
           position: "relative",
+          paddingTop: "max(1rem, env(safe-area-inset-top))",
+          paddingBottom: "max(1rem, env(safe-area-inset-bottom))",
+          paddingLeft: "env(safe-area-inset-left)",
+          paddingRight: "env(safe-area-inset-right)",
         }}
       >
         <Container maxWidth="xl">
