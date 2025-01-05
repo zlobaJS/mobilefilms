@@ -11,6 +11,11 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
+  --sat: env(safe-area-inset-top);
+  --sab: env(safe-area-inset-bottom);
+  --sal: env(safe-area-inset-left);
+  --sar: env(safe-area-inset-right);
 }
 
 a {
@@ -137,4 +142,19 @@ html {
   height: 100dvh;
   display: flex;
   flex-direction: column;
+}
+
+/* Добавляем поддержку для iPhone notch area */
+@supports (padding-top: env(safe-area-inset-top)) {
+  .dialog-content {
+    padding-top: 0 !important; /* Отключаем стандартный padding */
+    margin-top: calc(
+      -1 * env(safe-area-inset-top)
+    ); /* Негативный отступ для контента */
+  }
+
+  .backdrop-image {
+    margin-top: calc(-1 * env(safe-area-inset-top));
+    padding-top: env(safe-area-inset-top);
+  }
 }

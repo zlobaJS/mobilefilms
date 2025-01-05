@@ -266,54 +266,29 @@ export const MovieDetails = ({
           bgcolor: "#141414",
           backgroundImage: "none",
           margin: 0,
-          height: "100dvh",
+          height: '100dvh',
           overflowY: "auto",
-          paddingTop: "env(safe-area-inset-top)",
-          paddingBottom: "env(safe-area-inset-bottom)",
-          paddingLeft: "env(safe-area-inset-left)",
-          paddingRight: "env(safe-area-inset-right)",
+          padding: 0, // Убираем padding
         },
       }}
     >
-      {/* Крестик для закрытия всего диалога (виден только когда плеер скрыт) */}
-      {!showPlayer && (
-        <IconButton
-          onClick={onClose}
-          sx={{
-            position: "fixed",
-            top: 16,
-            right: 16,
-            zIndex: 1301,
-            color: "white",
-            bgcolor: "rgba(0,0,0,0.5)",
-            "&:hover": {
-              bgcolor: "rgba(0,0,0,0.7)",
-            },
-          }}
-        >
-          <CloseIcon />
-        </IconButton>
-      )}
-
-      {showPlayer ? (
-        <Box
-          sx={{
-            width: "100%",
-            height: "100%",
-            position: "fixed",
-            top: 0,
-            left: 0,
-            zIndex: 1300,
-          }}
-        >
-          {/* Крестик для закрытия только плеера (возврат к деталям) */}
+      <Box
+        className="dialog-content"
+        sx={{
+          height: '100dvh',
+          position: 'relative',
+          overflowY: 'auto',
+          WebkitOverflowScrolling: 'touch',
+        }}
+      >
+        {!showPlayer && (
           <IconButton
-            onClick={() => setShowPlayer(false)} // Теперь только закрывает плеер
+            onClick={onClose}
             sx={{
               position: "fixed",
-              top: 16,
-              right: 16,
-              zIndex: 1302,
+              top: 'env(safe-area-inset-top, 16px)', // Учитываем notch
+              right: 'env(safe-area-inset-right, 16px)',
+              zIndex: 1301,
               color: "white",
               bgcolor: "rgba(0,0,0,0.5)",
               "&:hover": {
@@ -323,29 +298,21 @@ export const MovieDetails = ({
           >
             <CloseIcon />
           </IconButton>
-          <KinoboxPlayer
-            tmdbId={currentMovie?.id || 0}
-            title={currentMovie?.title || ""}
-            onMediaUrl={handleMediaUrl}
-          />
-        </Box>
-      ) : (
+        )}
+
+        {/* Backdrop image with notch area support */}
         <Box
+          className="backdrop-image"
           sx={{
             position: "relative",
             width: "100%",
-            opacity: 0,
-            animation: "fadeIn 0.6s ease-out forwards",
-            "@keyframes fadeIn": {
-              "0%": {
-                opacity: 0,
-                transform: "translateY(20px)",
-              },
-              "100%": {
-                opacity: 1,
-                transform: "translateY(0)",
-              },
-            },
+            height: { xs: "40vh", sm: "60vh" },
+            backgroundImage: `url(${imageUrl(
+              currentMovie?.backdrop_path || currentMovie?.poster_path || "",
+              backdropSize
+            )})`,
+            backgroundSize: "cover",
+            backgroundPosition: { xs: "center 15%", sm: "center top" },
           }}
         >
           <Box
@@ -1061,6 +1028,6 @@ export const MovieDetails = ({
           </Box>
         </Box>
       )}
-    </Dialog>
+    </Box>
   );
 };
