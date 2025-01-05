@@ -147,14 +147,29 @@ html {
 /* Добавляем поддержку для iPhone notch area */
 @supports (padding-top: env(safe-area-inset-top)) {
   .dialog-content {
-    padding-top: 0 !important; /* Отключаем стандартный padding */
-    margin-top: calc(
-      -1 * env(safe-area-inset-top)
-    ); /* Негативный отступ для контента */
+    padding-top: env(safe-area-inset-top) !important;
+    margin-top: calc(-1 * env(safe-area-inset-top));
   }
 
   .backdrop-image {
     margin-top: calc(-1 * env(safe-area-inset-top));
-    padding-top: env(safe-area-inset-top);
   }
+
+  .backdrop-image img {
+    transform: translateY(calc(-1 * env(safe-area-inset-top)));
+  }
+}
+
+/* Обновляем базовые стили */
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  min-height: -webkit-fill-available;
+}
+
+#root {
+  height: 100%;
+  min-height: -webkit-fill-available;
 }

@@ -266,24 +266,19 @@ export const MovieDetails = ({
           bgcolor: "#141414",
           backgroundImage: "none",
           margin: 0,
-          height: "100dvh",
+          height: "100%",
           overflowY: "auto",
           padding: 0,
-          "@supports (padding-top: env(safe-area-inset-top))": {
-            paddingTop: 0,
-            paddingBottom: 0,
-          },
         },
       }}
     >
       <Box
         className="dialog-content"
         sx={{
-          height: "100dvh",
+          height: "100%",
           position: "relative",
           overflowY: "auto",
           WebkitOverflowScrolling: "touch",
-          marginTop: "calc(-1 * env(safe-area-inset-top))",
         }}
       >
         {!showPlayer && (
@@ -328,7 +323,6 @@ export const MovieDetails = ({
                   width: "100%",
                   height: { xs: "40vh", sm: "60vh" },
                   overflow: "hidden",
-                  marginTop: "env(safe-area-inset-top)",
                 }}
               >
                 <Box
