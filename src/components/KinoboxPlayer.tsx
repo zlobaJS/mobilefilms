@@ -44,19 +44,9 @@ export const KinoboxPlayer = ({
                     kodik: { enable: false },
                     videocdn: { enable: false },
                   },
-                  onSource: (data: any) => {
-                    if (data.url && onMediaUrl) {
-                      onMediaUrl(data.url);
-                    }
-                  },
                 });
               }
             },
-          },
-          onSource: (data: any) => {
-            if (data.url && onMediaUrl) {
-              onMediaUrl(data.url);
-            }
           },
           options: {
             loader: true,
@@ -80,7 +70,7 @@ export const KinoboxPlayer = ({
       ref={containerRef}
       style={{
         width: "100%",
-        height: "100vh",
+        height: "100dvh",
         position: "fixed",
         top: 0,
         left: 0,

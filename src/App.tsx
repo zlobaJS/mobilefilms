@@ -133,10 +133,11 @@ function AppRoutes() {
               exit={{ opacity: 1 }}
               transition={{ duration: 0.1 }}
               key="home"
+              style={{ minHeight: "100dvh" }}
             >
               <Box
                 sx={{
-                  minHeight: "100vh",
+                  minHeight: "100dvh",
                   backgroundColor: "#141414",
                   paddingTop: "env(safe-area-inset-top)",
                   paddingBottom: "env(safe-area-inset-bottom)",

@@ -26,10 +26,9 @@ body {
   margin: 0;
   padding: 0;
   background-color: #141414;
-  padding-top: env(safe-area-inset-top);
-  padding-bottom: env(safe-area-inset-bottom);
-  min-height: 100vh;
-  min-height: -webkit-fill-available;
+  min-height: 100dvh;
+  height: 100dvh;
+  overflow-x: hidden;
 }
 
 h1 {
@@ -128,5 +127,14 @@ button:focus-visible {
 }
 
 html {
+  height: 100dvh;
   height: -webkit-fill-available;
+}
+
+/* Добавляем новые стили для поддержки iPhone */
+#root {
+  min-height: 100dvh;
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
 }

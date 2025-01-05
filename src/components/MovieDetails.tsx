@@ -266,7 +266,7 @@ export const MovieDetails = ({
           bgcolor: "#141414",
           backgroundImage: "none",
           margin: 0,
-          height: "100vh",
+          height: "100dvh",
           overflowY: "auto",
           paddingTop: "env(safe-area-inset-top)",
           paddingBottom: "env(safe-area-inset-bottom)",
