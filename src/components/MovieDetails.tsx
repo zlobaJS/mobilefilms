@@ -269,6 +269,10 @@ export const MovieDetails = ({
           height: "100dvh",
           overflowY: "auto",
           padding: 0,
+          "@supports (padding-top: env(safe-area-inset-top))": {
+            paddingTop: 0,
+            paddingBottom: 0,
+          },
         },
       }}
     >
@@ -279,6 +283,7 @@ export const MovieDetails = ({
           position: "relative",
           overflowY: "auto",
           WebkitOverflowScrolling: "touch",
+          marginTop: "calc(-1 * env(safe-area-inset-top))",
         }}
       >
         {!showPlayer && (
@@ -323,6 +328,7 @@ export const MovieDetails = ({
                   width: "100%",
                   height: { xs: "40vh", sm: "60vh" },
                   overflow: "hidden",
+                  marginTop: "env(safe-area-inset-top)",
                 }}
               >
                 <Box
@@ -341,6 +347,8 @@ export const MovieDetails = ({
                     objectPosition: { xs: "center 15%", sm: "center top" },
                     opacity: isBackdropLoaded ? 1 : 0,
                     transition: "opacity 0.3s ease-out",
+                    transform:
+                      "translateY(calc(-1 * env(safe-area-inset-top)))",
                   }}
                   onLoad={() => setIsBackdropLoaded(true)}
                 />
@@ -353,6 +361,8 @@ export const MovieDetails = ({
                     height: "100%",
                     background: `linear-gradient(to bottom, rgba(0,0,0,${scrollOpacity}) 0%, rgba(20,20,20,1) 100%)`,
                     transition: "background 0.2s ease",
+                    transform:
+                      "translateY(calc(-1 * env(safe-area-inset-top)))",
                   }}
                 />
               </Box>
