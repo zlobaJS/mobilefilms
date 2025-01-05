@@ -266,19 +266,19 @@ export const MovieDetails = ({
           bgcolor: "#141414",
           backgroundImage: "none",
           margin: 0,
-          height: '100dvh',
+          height: "100dvh",
           overflowY: "auto",
-          padding: 0, // Убираем padding
+          padding: 0,
         },
       }}
     >
       <Box
         className="dialog-content"
         sx={{
-          height: '100dvh',
-          position: 'relative',
-          overflowY: 'auto',
-          WebkitOverflowScrolling: 'touch',
+          height: "100dvh",
+          position: "relative",
+          overflowY: "auto",
+          WebkitOverflowScrolling: "touch",
         }}
       >
         {!showPlayer && (
@@ -286,8 +286,8 @@ export const MovieDetails = ({
             onClick={onClose}
             sx={{
               position: "fixed",
-              top: 'env(safe-area-inset-top, 16px)', // Учитываем notch
-              right: 'env(safe-area-inset-right, 16px)',
+              top: "env(safe-area-inset-top, 16px)",
+              right: "env(safe-area-inset-right, 16px)",
               zIndex: 1301,
               color: "white",
               bgcolor: "rgba(0,0,0,0.5)",
@@ -300,734 +300,743 @@ export const MovieDetails = ({
           </IconButton>
         )}
 
-        {/* Backdrop image with notch area support */}
         <Box
-          className="backdrop-image"
           sx={{
             position: "relative",
             width: "100%",
-            height: { xs: "40vh", sm: "60vh" },
-            backgroundImage: `url(${imageUrl(
-              currentMovie?.backdrop_path || currentMovie?.poster_path || "",
-              backdropSize
-            )})`,
-            backgroundSize: "cover",
-            backgroundPosition: { xs: "center 15%", sm: "center top" },
+            minHeight: "100%",
+            bgcolor: "#141414",
           }}
         >
-          <Box
-            sx={{
-              position: "relative",
-              width: "100%",
-              height: { xs: "40vh", sm: "60vh" },
-              "&::after": {
-                content: '""',
-                position: "absolute",
-                left: 0,
-                top: 0,
-                width: "100%",
-                height: "100%",
-                background: `linear-gradient(to bottom, 
-                  rgba(0,0,0,${scrollOpacity}) 0%, 
-                  rgba(20,20,20,1) 100%)`,
-                transition: "background 0.2s ease",
-              },
-            }}
-          >
-            <Box
-              component="img"
-              src={imageUrl(
-                currentMovie?.backdrop_path || currentMovie?.poster_path || "",
-                backdropSize
-              )}
-              alt={currentMovie?.title}
-              onLoad={() => setIsBackdropLoaded(true)}
-              sx={{
-                width: "100%",
-                height: "100%",
-                objectFit: "cover",
-                objectPosition: { xs: "center 15%", sm: "center top" },
-                position: "absolute",
-                top: 0,
-                left: 0,
-                opacity: 0,
-                transition: "opacity 0.6s ease-out",
-                ...(isBackdropLoaded && {
-                  opacity: 1,
-                }),
-              }}
+          {showPlayer ? (
+            <KinoboxPlayer
+              tmdbId={currentMovie?.id || 0}
+              title={currentMovie?.title}
+              onMediaUrl={handleMediaUrl}
             />
-          </Box>
-
-          <Box
-            sx={{
-              position: "relative",
-              mt: { xs: -10, sm: -20 },
-              px: 2,
-              color: "white",
-              display: "flex",
-              justifyContent: "center",
-              opacity: 0,
-              animation: "fadeInUp 0.8s ease-out forwards",
-              "@keyframes fadeInUp": {
-                "0%": {
-                  opacity: 0,
-                  transform: "translateY(40px)",
-                },
-                "100%": {
-                  opacity: 1,
-                  transform: "translateY(0)",
-                },
-              },
-            }}
-          >
-            <Box
-              sx={{
-                maxWidth: "1200px",
-                width: "100%",
-              }}
-            >
-              {logo ? (
+          ) : (
+            <Box>
+              <Box
+                className="backdrop-image"
+                sx={{
+                  position: "relative",
+                  width: "100%",
+                  height: { xs: "40vh", sm: "60vh" },
+                  overflow: "hidden",
+                }}
+              >
+                <Box
+                  component="img"
+                  src={imageUrl(
+                    currentMovie?.backdrop_path ||
+                      currentMovie?.poster_path ||
+                      "",
+                    backdropSize
+                  )}
+                  alt={currentMovie?.title}
+                  sx={{
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "cover",
+                    objectPosition: { xs: "center 15%", sm: "center top" },
+                    opacity: isBackdropLoaded ? 1 : 0,
+                    transition: "opacity 0.3s ease-out",
+                  }}
+                  onLoad={() => setIsBackdropLoaded(true)}
+                />
                 <Box
                   sx={{
-                    display: "flex",
-                    justifyContent: { xs: "center", sm: "flex-start" },
+                    position: "absolute",
+                    left: 0,
+                    top: 0,
                     width: "100%",
-                    minHeight: "80px",
+                    height: "100%",
+                    background: `linear-gradient(to bottom, rgba(0,0,0,${scrollOpacity}) 0%, rgba(20,20,20,1) 100%)`,
+                    transition: "background 0.2s ease",
                   }}
-                >
-                  <Box
-                    component="img"
-                    src={imageUrl(logo, "w500")}
-                    alt={currentMovie?.title}
-                    sx={{
-                      maxHeight: "80px",
-                      maxWidth: "100%",
-                      objectFit: "contain",
-                      mb: 2,
-                      filter: "brightness(1.2)",
+                />
+              </Box>
+
+              <Box
+                sx={{
+                  position: "relative",
+                  mt: { xs: -10, sm: -20 },
+                  px: 2,
+                  color: "white",
+                  display: "flex",
+                  justifyContent: "center",
+                  opacity: 0,
+                  animation: "fadeInUp 0.8s ease-out forwards",
+                  "@keyframes fadeInUp": {
+                    "0%": {
                       opacity: 0,
-                      animation: "fadeIn 0.6s ease-out 0.3s forwards",
-                      "@keyframes fadeIn": {
-                        to: { opacity: 1 },
-                      },
-                    }}
-                  />
-                </Box>
-              ) : (
-                <Typography
-                  variant="h4"
-                  sx={{
-                    fontWeight: "bold",
-                    mb: 2,
-                    fontSize: { xs: "1.5rem", sm: "2rem" },
-                    textAlign: { xs: "center", sm: "left" },
-                    opacity: 0,
-                    animation: "fadeIn 0.6s ease-out 0.3s forwards",
-                  }}
-                >
-                  {currentMovie?.title}
-                </Typography>
-              )}
-
-              <Box
-                sx={{
-                  display: "flex",
-                  flexWrap: "wrap",
-                  gap: "8px",
-                  mb: 2,
-                  alignItems: "center",
-                  justifyContent: { xs: "center", sm: "flex-start" },
-                  width: "100%",
-                  textAlign: { xs: "center", sm: "left" },
-                  opacity: 0,
-                  animation: "fadeIn 0.6s ease-out 0.5s forwards",
+                      transform: "translateY(40px)",
+                    },
+                    "100%": {
+                      opacity: 1,
+                      transform: "translateY(0)",
+                    },
+                  },
                 }}
               >
-                {/* Рейтинг */}
-                {currentMovie?.vote_average &&
-                  currentMovie.vote_average > 0 && (
+                <Box
+                  sx={{
+                    maxWidth: "1200px",
+                    width: "100%",
+                  }}
+                >
+                  {logo ? (
                     <Box
                       sx={{
                         display: "flex",
-                        alignItems: "center",
-                        gap: "4px",
-                        flexShrink: 0, // Предотвращаем сжатие элемента
-                      }}
-                    >
-                      <Typography
-                        sx={{
-                          fontSize: "0.9rem",
-                          color: getRatingColor(currentMovie?.vote_average),
-                        }}
-                      >
-                        {currentMovie?.vote_average.toFixed(1)}
-                      </Typography>
-                      {currentMovie?.vote_count &&
-                        currentMovie?.vote_count > 0 && (
-                          <>
-                            <Typography
-                              sx={{
-                                color: "#888",
-                                fontSize: "0.9rem",
-                              }}
-                            >
-                              •
-                            </Typography>
-                            <Typography
-                              sx={{
-                                color: "#888",
-                                fontSize: "0.9rem",
-                              }}
-                            >
-                              {formatVoteCount(currentMovie?.vote_count)} оценок
-                            </Typography>
-                          </>
-                        )}
-                    </Box>
-                  )}
-
-                {/* Страны производства */}
-                {details?.production_countries &&
-                  details.production_countries.length > 0 && (
-                    <Box
-                      sx={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "4px",
-                        flexWrap: "wrap", // Разрешаем перенос внутри блока стран
                         justifyContent: { xs: "center", sm: "flex-start" },
-                      }}
-                    >
-                      {details.production_countries.map(
-                        (country: ProductionCountry, index: number) => (
-                          <Box
-                            key={country.iso_3166_1}
-                            sx={{
-                              display: "flex",
-                              alignItems: "center",
-                              gap: "4px",
-                            }}
-                          >
-                            {country.iso_3166_1 && (
-                              <Box
-                                component="span"
-                                sx={{
-                                  width: "16px",
-                                  display: "inline-block",
-                                  verticalAlign: "middle",
-                                  "& > svg": {
-                                    width: "100%",
-                                  },
-                                }}
-                              >
-                                {(() => {
-                                  const CountryFlag =
-                                    Flags[
-                                      country.iso_3166_1 as keyof typeof Flags
-                                    ];
-                                  return CountryFlag ? <CountryFlag /> : null;
-                                })()}
-                              </Box>
-                            )}
-                            <Typography
-                              sx={{
-                                color: "#888",
-                                fontSize: "0.9rem",
-                              }}
-                            >
-                              {translateCountry(country.name)}
-                            </Typography>
-                            {index <
-                              details.production_countries.length - 1 && (
-                              <Typography
-                                sx={{
-                                  color: "#888",
-                                  fontSize: "0.9rem",
-                                }}
-                              >
-                                •
-                              </Typography>
-                            )}
-                          </Box>
-                        )
-                      )}
-                    </Box>
-                  )}
-
-                {/* Год */}
-                {currentMovie?.release_date && (
-                  <Typography
-                    sx={{
-                      color: "#888",
-                      fontSize: "0.9rem",
-                      flexShrink: 0,
-                    }}
-                  >
-                    {new Date(currentMovie?.release_date).getFullYear()}
-                  </Typography>
-                )}
-
-                {/* Продолжительность */}
-                {typeof details?.runtime === "number" &&
-                  details.runtime > 0 && (
-                    <Typography
-                      sx={{
-                        color: "#888",
-                        fontSize: "0.9rem",
-                        flexShrink: 0,
-                      }}
-                    >
-                      {formatRuntime(details.runtime)}
-                    </Typography>
-                  )}
-
-                {/* Жанры */}
-                {details?.genres && (
-                  <Typography
-                    sx={{
-                      color: "#888",
-                      fontSize: "0.9rem",
-                      textAlign: { xs: "center", sm: "left" },
-                    }}
-                  >
-                    {details.genres
-                      .map((genre: Genre) => genre.name)
-                      .join(", ")}
-                  </Typography>
-                )}
-              </Box>
-
-              <Box
-                sx={{
-                  display: "flex",
-                  gap: 2,
-                  mb: 3,
-                  justifyContent: { xs: "center", sm: "flex-start" },
-                  width: "100%",
-                  opacity: 0,
-                  animation: "fadeIn 0.6s ease-out 0.7s forwards",
-                }}
-              >
-                <Button
-                  variant="contained"
-                  onClick={() => setShowPlayer(true)}
-                  sx={{
-                    bgcolor: "#ff6600",
-                    color: "white",
-                    "&:hover": { bgcolor: "#ff8533" },
-                    borderRadius: 2,
-                    px: 4,
-                  }}
-                >
-                  Смотреть онлайн
-                </Button>
-                <IconButton
-                  sx={{
-                    bgcolor: "#1f1f1f",
-                    color: "white",
-                    "&:hover": { bgcolor: "#333" },
-                  }}
-                >
-                  <DownloadIcon />
-                </IconButton>
-              </Box>
-
-              <Box
-                sx={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  maxWidth: 400,
-                  mb: 3,
-                }}
-              >
-                <IconButton
-                  sx={{
-                    color: "#888",
-                    flexDirection: "column",
-                    gap: 0.5,
-                  }}
-                >
-                  <StarBorderIcon />
-                  <Typography variant="caption">Оценить</Typography>
-                </IconButton>
-                <IconButton
-                  sx={{
-                    color: "#888",
-                    flexDirection: "column",
-                    gap: 0.5,
-                  }}
-                >
-                  <ShareIcon />
-                  <Typography variant="caption">Буду смотреть</Typography>
-                </IconButton>
-                <IconButton
-                  sx={{
-                    color: "#888",
-                    flexDirection: "column",
-                    gap: 0.5,
-                  }}
-                >
-                  <ShareIcon />
-                  <Typography variant="caption">Добавить</Typography>
-                </IconButton>
-                <IconButton
-                  sx={{
-                    color: "#888",
-                    flexDirection: "column",
-                    gap: 0.5,
-                  }}
-                >
-                  <MoreHorizIcon />
-                  <Typography variant="caption">Еще</Typography>
-                </IconButton>
-              </Box>
-
-              {/* Описание фильма */}
-              {currentMovie?.overview && (
-                <Box sx={{ mb: 4 }}>
-                  <Typography
-                    variant="h6"
-                    sx={{
-                      color: "white",
-                      mb: 2,
-                      fontSize: { xs: "1rem", sm: "1.1rem" },
-                      fontWeight: 500,
-                    }}
-                  >
-                    Описание
-                  </Typography>
-                  <Typography
-                    sx={{
-                      color: "#888",
-                      fontSize: "0.9rem",
-                      maxWidth: "800px",
-                    }}
-                  >
-                    {currentMovie?.overview}
-                  </Typography>
-                </Box>
-              )}
-
-              {/* Секция с актерами */}
-              {cast.length > 0 && (
-                <Box sx={{ mb: 4 }}>
-                  <Typography
-                    variant="h6"
-                    sx={{
-                      color: "white",
-                      mb: 2,
-                      fontSize: { xs: "1rem", sm: "1.1rem" },
-                      fontWeight: 500,
-                    }}
-                  >
-                    В главных ролях
-                  </Typography>
-                  <Swiper
-                    slidesPerView={"auto"}
-                    spaceBetween={8}
-                    style={{ padding: "4px" }}
-                  >
-                    {cast.map((actor) => (
-                      <SwiperSlide
-                        key={actor.id}
-                        style={{
-                          width: "auto",
-                        }}
-                      >
-                        <Box
-                          sx={{
-                            width: { xs: "100px", sm: "120px", md: "140px" },
-                            cursor: "pointer",
-                            "&:hover": {
-                              opacity: 0.8,
-                            },
-                          }}
-                        >
-                          <Box
-                            sx={{
-                              width: "100%",
-                              paddingBottom: "100%",
-                              position: "relative",
-                              borderRadius: 1,
-                              overflow: "hidden",
-                              bgcolor: "#1f1f1f",
-                              mb: 1,
-                            }}
-                          >
-                            {actor.profile_path ? (
-                              <Box
-                                component="img"
-                                src={imageUrl(actor.profile_path, "w185")}
-                                alt={actor.name}
-                                sx={{
-                                  position: "absolute",
-                                  top: 0,
-                                  left: 0,
-                                  width: "100%",
-                                  height: "100%",
-                                  objectFit: "cover",
-                                }}
-                              />
-                            ) : (
-                              <Box
-                                sx={{
-                                  position: "absolute",
-                                  top: 0,
-                                  left: 0,
-                                  width: "100%",
-                                  height: "100%",
-                                  display: "flex",
-                                  alignItems: "center",
-                                  justifyContent: "center",
-                                  color: "#666",
-                                }}
-                              >
-                                No photo
-                              </Box>
-                            )}
-                          </Box>
-                          <Typography
-                            sx={{
-                              color: "white",
-                              fontSize: { xs: "0.8rem", sm: "0.9rem" },
-                              fontWeight: 500,
-                              mb: 0.5,
-                              overflow: "hidden",
-                              textOverflow: "ellipsis",
-                              whiteSpace: "nowrap",
-                            }}
-                          >
-                            {actor.name}
-                          </Typography>
-                          <Typography
-                            sx={{
-                              color: "#888",
-                              fontSize: { xs: "0.75rem", sm: "0.8rem" },
-                              overflow: "hidden",
-                              textOverflow: "ellipsis",
-                              whiteSpace: "nowrap",
-                            }}
-                          >
-                            {actor.character}
-                          </Typography>
-                        </Box>
-                      </SwiperSlide>
-                    ))}
-                  </Swiper>
-                </Box>
-              )}
-
-              {/* Коллекция */}
-              {details?.belongs_to_collection && (
-                <>
-                  <Box sx={{ mb: 4 }}>
-                    <Typography
-                      variant="h6"
-                      sx={{
-                        color: "white",
-                        mb: 2,
-                        fontSize: { xs: "1rem", sm: "1.1rem" },
-                        fontWeight: 500,
-                      }}
-                    >
-                      Коллекция
-                    </Typography>
-                    <Box
-                      onClick={handleCollectionClick}
-                      sx={{
-                        position: "relative",
                         width: "100%",
-                        height: { xs: "150px", sm: "200px", md: "250px" },
-                        borderRadius: 2,
-                        overflow: "hidden",
-                        cursor: "pointer",
-                        "&:hover": {
-                          "& .collection-overlay": {
-                            background: "rgba(0,0,0,0.5)",
-                          },
-                          "& .collection-title": {
-                            transform: "scale(1.05)",
-                          },
-                        },
+                        minHeight: "80px",
                       }}
                     >
                       <Box
                         component="img"
-                        src={imageUrl(
-                          details.belongs_to_collection.backdrop_path ||
-                            details.belongs_to_collection.poster_path,
-                          "w1280"
-                        )}
-                        alt={details.belongs_to_collection.name}
+                        src={imageUrl(logo, "w500")}
+                        alt={currentMovie?.title}
                         sx={{
-                          width: "100%",
-                          height: "100%",
-                          objectFit: "cover",
-                        }}
-                      />
-                      <Box
-                        className="collection-overlay"
-                        sx={{
-                          position: "absolute",
-                          top: 0,
-                          left: 0,
-                          right: 0,
-                          bottom: 0,
-                          background: "rgba(0,0,0,0.7)",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          transition: "background 0.3s ease",
-                        }}
-                      >
-                        <Typography
-                          className="collection-title"
-                          sx={{
-                            color: "white",
-                            textAlign: "center",
-                            fontSize: {
-                              xs: "1.2rem",
-                              sm: "1.5rem",
-                              md: "1.8rem",
-                            },
-                            fontWeight: "bold",
-                            px: 3,
-                            transition: "transform 0.3s ease",
-                          }}
-                        >
-                          {details.belongs_to_collection.name}
-                        </Typography>
-                      </Box>
-                    </Box>
-                  </Box>
-
-                  {/* Модальное окно с фильмами коллекции */}
-                  <Dialog
-                    open={showCollection}
-                    onClose={() => setShowCollection(false)}
-                    maxWidth="md"
-                    fullWidth
-                    TransitionProps={{
-                      timeout: 500,
-                      enter: true,
-                      exit: true,
-                    }}
-                    PaperProps={{
-                      sx: {
-                        bgcolor: "#141414",
-                        borderRadius: 2,
-                        boxShadow: "0 8px 32px rgba(0,0,0,0.5)",
-                      },
-                    }}
-                  >
-                    <Box
-                      sx={{
-                        bgcolor: "#141414",
-                        color: "white",
-                        p: 3,
-                        position: "relative",
-                      }}
-                    >
-                      {/* Кнопка закрытия */}
-                      <IconButton
-                        onClick={() => setShowCollection(false)}
-                        sx={{
-                          position: "absolute",
-                          right: 8,
-                          top: 8,
-                          color: "white",
-                          "&:hover": {
-                            bgcolor: "rgba(255,255,255,0.1)",
-                          },
-                        }}
-                      >
-                        <CloseIcon />
-                      </IconButton>
-
-                      <Typography variant="h5" sx={{ mb: 3, pr: 4 }}>
-                        {details.belongs_to_collection.name}
-                      </Typography>
-
-                      {/* Остальной контент */}
-                      <Grid
-                        container
-                        spacing={2}
-                        sx={{
+                          maxHeight: "80px",
+                          maxWidth: "100%",
+                          objectFit: "contain",
+                          mb: 2,
+                          filter: "brightness(1.2)",
                           opacity: 0,
-                          animation: "fadeIn 0.6s ease-out forwards",
+                          animation: "fadeIn 0.6s ease-out 0.3s forwards",
                           "@keyframes fadeIn": {
                             to: { opacity: 1 },
                           },
                         }}
-                      >
-                        {collectionMovies.map((movie) => (
-                          <Grid
-                            item
-                            xs={6}
-                            sm={4}
-                            md={3}
-                            key={movie.id}
-                            onClick={() => handleCollectionMovieClick(movie.id)}
+                      />
+                    </Box>
+                  ) : (
+                    <Typography
+                      variant="h4"
+                      sx={{
+                        fontWeight: "bold",
+                        mb: 2,
+                        fontSize: { xs: "1.5rem", sm: "2rem" },
+                        textAlign: { xs: "center", sm: "left" },
+                        opacity: 0,
+                        animation: "fadeIn 0.6s ease-out 0.3s forwards",
+                      }}
+                    >
+                      {currentMovie?.title}
+                    </Typography>
+                  )}
+
+                  <Box
+                    sx={{
+                      display: "flex",
+                      flexWrap: "wrap",
+                      gap: "8px",
+                      mb: 2,
+                      alignItems: "center",
+                      justifyContent: { xs: "center", sm: "flex-start" },
+                      width: "100%",
+                      textAlign: { xs: "center", sm: "left" },
+                      opacity: 0,
+                      animation: "fadeIn 0.6s ease-out 0.5s forwards",
+                    }}
+                  >
+                    {/* Рейтинг */}
+                    {currentMovie?.vote_average &&
+                      currentMovie.vote_average > 0 && (
+                        <Box
+                          sx={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "4px",
+                            flexShrink: 0, // Предотвращаем сжатие элемента
+                          }}
+                        >
+                          <Typography
                             sx={{
-                              cursor: "pointer",
-                              transition: "transform 0.2s",
-                              "&:hover": {
-                                transform: "scale(1.02)",
-                              },
+                              fontSize: "0.9rem",
+                              color: getRatingColor(currentMovie?.vote_average),
+                            }}
+                          >
+                            {currentMovie?.vote_average.toFixed(1)}
+                          </Typography>
+                          {currentMovie?.vote_count &&
+                            currentMovie?.vote_count > 0 && (
+                              <>
+                                <Typography
+                                  sx={{
+                                    color: "#888",
+                                    fontSize: "0.9rem",
+                                  }}
+                                >
+                                  •
+                                </Typography>
+                                <Typography
+                                  sx={{
+                                    color: "#888",
+                                    fontSize: "0.9rem",
+                                  }}
+                                >
+                                  {formatVoteCount(currentMovie?.vote_count)}{" "}
+                                  оценок
+                                </Typography>
+                              </>
+                            )}
+                        </Box>
+                      )}
+
+                    {/* Страны производства */}
+                    {details?.production_countries &&
+                      details.production_countries.length > 0 && (
+                        <Box
+                          sx={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "4px",
+                            flexWrap: "wrap", // Разрешаем перенос внутри блока стран
+                            justifyContent: { xs: "center", sm: "flex-start" },
+                          }}
+                        >
+                          {details.production_countries.map(
+                            (country: ProductionCountry, index: number) => (
+                              <Box
+                                key={country.iso_3166_1}
+                                sx={{
+                                  display: "flex",
+                                  alignItems: "center",
+                                  gap: "4px",
+                                }}
+                              >
+                                {country.iso_3166_1 && (
+                                  <Box
+                                    component="span"
+                                    sx={{
+                                      width: "16px",
+                                      display: "inline-block",
+                                      verticalAlign: "middle",
+                                      "& > svg": {
+                                        width: "100%",
+                                      },
+                                    }}
+                                  >
+                                    {(() => {
+                                      const CountryFlag =
+                                        Flags[
+                                          country.iso_3166_1 as keyof typeof Flags
+                                        ];
+                                      return CountryFlag ? (
+                                        <CountryFlag />
+                                      ) : null;
+                                    })()}
+                                  </Box>
+                                )}
+                                <Typography
+                                  sx={{
+                                    color: "#888",
+                                    fontSize: "0.9rem",
+                                  }}
+                                >
+                                  {translateCountry(country.name)}
+                                </Typography>
+                                {index <
+                                  details.production_countries.length - 1 && (
+                                  <Typography
+                                    sx={{
+                                      color: "#888",
+                                      fontSize: "0.9rem",
+                                    }}
+                                  >
+                                    •
+                                  </Typography>
+                                )}
+                              </Box>
+                            )
+                          )}
+                        </Box>
+                      )}
+
+                    {/* Год */}
+                    {currentMovie?.release_date && (
+                      <Typography
+                        sx={{
+                          color: "#888",
+                          fontSize: "0.9rem",
+                          flexShrink: 0,
+                        }}
+                      >
+                        {new Date(currentMovie?.release_date).getFullYear()}
+                      </Typography>
+                    )}
+
+                    {/* Продолжительность */}
+                    {typeof details?.runtime === "number" &&
+                      details.runtime > 0 && (
+                        <Typography
+                          sx={{
+                            color: "#888",
+                            fontSize: "0.9rem",
+                            flexShrink: 0,
+                          }}
+                        >
+                          {formatRuntime(details.runtime)}
+                        </Typography>
+                      )}
+
+                    {/* Жанры */}
+                    {details?.genres && (
+                      <Typography
+                        sx={{
+                          color: "#888",
+                          fontSize: "0.9rem",
+                          textAlign: { xs: "center", sm: "left" },
+                        }}
+                      >
+                        {details.genres
+                          .map((genre: Genre) => genre.name)
+                          .join(", ")}
+                      </Typography>
+                    )}
+                  </Box>
+
+                  <Box
+                    sx={{
+                      display: "flex",
+                      gap: 2,
+                      mb: 3,
+                      justifyContent: { xs: "center", sm: "flex-start" },
+                      width: "100%",
+                      opacity: 0,
+                      animation: "fadeIn 0.6s ease-out 0.7s forwards",
+                    }}
+                  >
+                    <Button
+                      variant="contained"
+                      onClick={() => setShowPlayer(true)}
+                      sx={{
+                        bgcolor: "#ff6600",
+                        color: "white",
+                        "&:hover": { bgcolor: "#ff8533" },
+                        borderRadius: 2,
+                        px: 4,
+                      }}
+                    >
+                      Смотреть онлайн
+                    </Button>
+                    <IconButton
+                      sx={{
+                        bgcolor: "#1f1f1f",
+                        color: "white",
+                        "&:hover": { bgcolor: "#333" },
+                      }}
+                    >
+                      <DownloadIcon />
+                    </IconButton>
+                  </Box>
+
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      maxWidth: 400,
+                      mb: 3,
+                    }}
+                  >
+                    <IconButton
+                      sx={{
+                        color: "#888",
+                        flexDirection: "column",
+                        gap: 0.5,
+                      }}
+                    >
+                      <StarBorderIcon />
+                      <Typography variant="caption">Оценить</Typography>
+                    </IconButton>
+                    <IconButton
+                      sx={{
+                        color: "#888",
+                        flexDirection: "column",
+                        gap: 0.5,
+                      }}
+                    >
+                      <ShareIcon />
+                      <Typography variant="caption">Буду смотреть</Typography>
+                    </IconButton>
+                    <IconButton
+                      sx={{
+                        color: "#888",
+                        flexDirection: "column",
+                        gap: 0.5,
+                      }}
+                    >
+                      <ShareIcon />
+                      <Typography variant="caption">Добавить</Typography>
+                    </IconButton>
+                    <IconButton
+                      sx={{
+                        color: "#888",
+                        flexDirection: "column",
+                        gap: 0.5,
+                      }}
+                    >
+                      <MoreHorizIcon />
+                      <Typography variant="caption">Еще</Typography>
+                    </IconButton>
+                  </Box>
+
+                  {/* Описание фильма */}
+                  {currentMovie?.overview && (
+                    <Box sx={{ mb: 4 }}>
+                      <Typography
+                        variant="h6"
+                        sx={{
+                          color: "white",
+                          mb: 2,
+                          fontSize: { xs: "1rem", sm: "1.1rem" },
+                          fontWeight: 500,
+                        }}
+                      >
+                        Описание
+                      </Typography>
+                      <Typography
+                        sx={{
+                          color: "#888",
+                          fontSize: "0.9rem",
+                          maxWidth: "800px",
+                        }}
+                      >
+                        {currentMovie?.overview}
+                      </Typography>
+                    </Box>
+                  )}
+
+                  {/* Секция с актерами */}
+                  {cast.length > 0 && (
+                    <Box sx={{ mb: 4 }}>
+                      <Typography
+                        variant="h6"
+                        sx={{
+                          color: "white",
+                          mb: 2,
+                          fontSize: { xs: "1rem", sm: "1.1rem" },
+                          fontWeight: 500,
+                        }}
+                      >
+                        В главных ролях
+                      </Typography>
+                      <Swiper
+                        slidesPerView={"auto"}
+                        spaceBetween={8}
+                        style={{ padding: "4px" }}
+                      >
+                        {cast.map((actor) => (
+                          <SwiperSlide
+                            key={actor.id}
+                            style={{
+                              width: "auto",
                             }}
                           >
                             <Box
                               sx={{
-                                position: "relative",
-                                paddingTop: "150%",
-                                borderRadius: 1,
-                                overflow: "hidden",
-                                mb: 1,
+                                width: {
+                                  xs: "100px",
+                                  sm: "120px",
+                                  md: "140px",
+                                },
+                                cursor: "pointer",
+                                "&:hover": {
+                                  opacity: 0.8,
+                                },
                               }}
                             >
                               <Box
-                                component="img"
-                                src={imageUrl(movie.poster_path, "w342")}
-                                alt={movie.title}
                                 sx={{
-                                  position: "absolute",
-                                  top: 0,
-                                  left: 0,
                                   width: "100%",
-                                  height: "100%",
-                                  objectFit: "cover",
+                                  paddingBottom: "100%",
+                                  position: "relative",
+                                  borderRadius: 1,
+                                  overflow: "hidden",
+                                  bgcolor: "#1f1f1f",
+                                  mb: 1,
                                 }}
-                              />
+                              >
+                                {actor.profile_path ? (
+                                  <Box
+                                    component="img"
+                                    src={imageUrl(actor.profile_path, "w185")}
+                                    alt={actor.name}
+                                    sx={{
+                                      position: "absolute",
+                                      top: 0,
+                                      left: 0,
+                                      width: "100%",
+                                      height: "100%",
+                                      objectFit: "cover",
+                                    }}
+                                  />
+                                ) : (
+                                  <Box
+                                    sx={{
+                                      position: "absolute",
+                                      top: 0,
+                                      left: 0,
+                                      width: "100%",
+                                      height: "100%",
+                                      display: "flex",
+                                      alignItems: "center",
+                                      justifyContent: "center",
+                                      color: "#666",
+                                    }}
+                                  >
+                                    No photo
+                                  </Box>
+                                )}
+                              </Box>
+                              <Typography
+                                sx={{
+                                  color: "white",
+                                  fontSize: { xs: "0.8rem", sm: "0.9rem" },
+                                  fontWeight: 500,
+                                  mb: 0.5,
+                                  overflow: "hidden",
+                                  textOverflow: "ellipsis",
+                                  whiteSpace: "nowrap",
+                                }}
+                              >
+                                {actor.name}
+                              </Typography>
+                              <Typography
+                                sx={{
+                                  color: "#888",
+                                  fontSize: { xs: "0.75rem", sm: "0.8rem" },
+                                  overflow: "hidden",
+                                  textOverflow: "ellipsis",
+                                  whiteSpace: "nowrap",
+                                }}
+                              >
+                                {actor.character}
+                              </Typography>
                             </Box>
-                            <Typography
-                              sx={{
-                                fontSize: "0.9rem",
-                                fontWeight: 500,
-                                mb: 0.5,
-                              }}
-                            >
-                              {movie.title}
-                            </Typography>
-                            <Typography
-                              sx={{
-                                fontSize: "0.8rem",
-                                color: "#888",
-                              }}
-                            >
-                              {new Date(movie.release_date).getFullYear()}
-                            </Typography>
-                          </Grid>
+                          </SwiperSlide>
                         ))}
-                      </Grid>
+                      </Swiper>
                     </Box>
-                  </Dialog>
-                </>
-              )}
+                  )}
+
+                  {/* Коллекция */}
+                  {details?.belongs_to_collection && (
+                    <>
+                      <Box sx={{ mb: 4 }}>
+                        <Typography
+                          variant="h6"
+                          sx={{
+                            color: "white",
+                            mb: 2,
+                            fontSize: { xs: "1rem", sm: "1.1rem" },
+                            fontWeight: 500,
+                          }}
+                        >
+                          Коллекция
+                        </Typography>
+                        <Box
+                          onClick={handleCollectionClick}
+                          sx={{
+                            position: "relative",
+                            width: "100%",
+                            height: { xs: "150px", sm: "200px", md: "250px" },
+                            borderRadius: 2,
+                            overflow: "hidden",
+                            cursor: "pointer",
+                            "&:hover": {
+                              "& .collection-overlay": {
+                                background: "rgba(0,0,0,0.5)",
+                              },
+                              "& .collection-title": {
+                                transform: "scale(1.05)",
+                              },
+                            },
+                          }}
+                        >
+                          <Box
+                            component="img"
+                            src={imageUrl(
+                              details.belongs_to_collection.backdrop_path ||
+                                details.belongs_to_collection.poster_path,
+                              "w1280"
+                            )}
+                            alt={details.belongs_to_collection.name}
+                            sx={{
+                              width: "100%",
+                              height: "100%",
+                              objectFit: "cover",
+                            }}
+                          />
+                          <Box
+                            className="collection-overlay"
+                            sx={{
+                              position: "absolute",
+                              top: 0,
+                              left: 0,
+                              right: 0,
+                              bottom: 0,
+                              background: "rgba(0,0,0,0.7)",
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              transition: "background 0.3s ease",
+                            }}
+                          >
+                            <Typography
+                              className="collection-title"
+                              sx={{
+                                color: "white",
+                                textAlign: "center",
+                                fontSize: {
+                                  xs: "1.2rem",
+                                  sm: "1.5rem",
+                                  md: "1.8rem",
+                                },
+                                fontWeight: "bold",
+                                px: 3,
+                                transition: "transform 0.3s ease",
+                              }}
+                            >
+                              {details.belongs_to_collection.name}
+                            </Typography>
+                          </Box>
+                        </Box>
+                      </Box>
+
+                      {/* Модальное окно с фильмами коллекции */}
+                      <Dialog
+                        open={showCollection}
+                        onClose={() => setShowCollection(false)}
+                        maxWidth="md"
+                        fullWidth
+                        TransitionProps={{
+                          timeout: 500,
+                          enter: true,
+                          exit: true,
+                        }}
+                        PaperProps={{
+                          sx: {
+                            bgcolor: "#141414",
+                            borderRadius: 2,
+                            boxShadow: "0 8px 32px rgba(0,0,0,0.5)",
+                          },
+                        }}
+                      >
+                        <Box
+                          sx={{
+                            bgcolor: "#141414",
+                            color: "white",
+                            p: 3,
+                            position: "relative",
+                          }}
+                        >
+                          {/* Кнопка закрытия */}
+                          <IconButton
+                            onClick={() => setShowCollection(false)}
+                            sx={{
+                              position: "absolute",
+                              right: 8,
+                              top: 8,
+                              color: "white",
+                              "&:hover": {
+                                bgcolor: "rgba(255,255,255,0.1)",
+                              },
+                            }}
+                          >
+                            <CloseIcon />
+                          </IconButton>
+
+                          <Typography variant="h5" sx={{ mb: 3, pr: 4 }}>
+                            {details.belongs_to_collection.name}
+                          </Typography>
+
+                          {/* Остальной контент */}
+                          <Grid
+                            container
+                            spacing={2}
+                            sx={{
+                              opacity: 0,
+                              animation: "fadeIn 0.6s ease-out forwards",
+                              "@keyframes fadeIn": {
+                                to: { opacity: 1 },
+                              },
+                            }}
+                          >
+                            {collectionMovies.map((movie) => (
+                              <Grid
+                                item
+                                xs={6}
+                                sm={4}
+                                md={3}
+                                key={movie.id}
+                                onClick={() =>
+                                  handleCollectionMovieClick(movie.id)
+                                }
+                                sx={{
+                                  cursor: "pointer",
+                                  transition: "transform 0.2s",
+                                  "&:hover": {
+                                    transform: "scale(1.02)",
+                                  },
+                                }}
+                              >
+                                <Box
+                                  sx={{
+                                    position: "relative",
+                                    paddingTop: "150%",
+                                    borderRadius: 1,
+                                    overflow: "hidden",
+                                    mb: 1,
+                                  }}
+                                >
+                                  <Box
+                                    component="img"
+                                    src={imageUrl(movie.poster_path, "w342")}
+                                    alt={movie.title}
+                                    sx={{
+                                      position: "absolute",
+                                      top: 0,
+                                      left: 0,
+                                      width: "100%",
+                                      height: "100%",
+                                      objectFit: "cover",
+                                    }}
+                                  />
+                                </Box>
+                                <Typography
+                                  sx={{
+                                    fontSize: "0.9rem",
+                                    fontWeight: 500,
+                                    mb: 0.5,
+                                  }}
+                                >
+                                  {movie.title}
+                                </Typography>
+                                <Typography
+                                  sx={{
+                                    fontSize: "0.8rem",
+                                    color: "#888",
+                                  }}
+                                >
+                                  {new Date(movie.release_date).getFullYear()}
+                                </Typography>
+                              </Grid>
+                            ))}
+                          </Grid>
+                        </Box>
+                      </Dialog>
+                    </>
+                  )}
+                </Box>
+              </Box>
             </Box>
-          </Box>
+          )}
         </Box>
-      )}
-    </Box>
+      </Box>
+    </Dialog>
   );
 };
