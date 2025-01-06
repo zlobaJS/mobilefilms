@@ -40,9 +40,9 @@ export const BackdropSlider = ({ movies }: BackdropSliderProps) => {
   return (
     <Box
       sx={{
-        mb: 4,
         position: "relative",
-        mt: "-env(safe-area-inset-top)",
+        marginTop: "-env(safe-area-inset-top)",
+        height: isMobile ? "70vh" : isTablet ? "75vh" : "80vh",
       }}
     >
       <Swiper
@@ -54,8 +54,7 @@ export const BackdropSlider = ({ movies }: BackdropSliderProps) => {
         loop={true}
         style={{
           width: "100%",
-          height: isMobile ? "70vh" : isTablet ? "75vh" : "80vh",
-          marginTop: "env(safe-area-inset-top)",
+          height: "100%",
         }}
       >
         {movies.slice(0, 10).map((movie) => (
@@ -65,8 +64,21 @@ export const BackdropSlider = ({ movies }: BackdropSliderProps) => {
                 position: "relative",
                 width: "100%",
                 height: "100%",
-                "&::after": {
-                  content: '""',
+              }}
+            >
+              <Box
+                component="img"
+                src={imageUrl(movie.backdrop_path, "original")}
+                alt={movie.title}
+                sx={{
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "cover",
+                  marginTop: "-env(safe-area-inset-top)",
+                }}
+              />
+              <Box
+                sx={{
                   position: "absolute",
                   left: 0,
                   top: 0,
@@ -80,19 +92,6 @@ export const BackdropSlider = ({ movies }: BackdropSliderProps) => {
                     rgba(20,20,20,1) 100%
                   )`,
                   zIndex: 1,
-                  marginTop: "env(safe-area-inset-top)",
-                },
-              }}
-            >
-              <Box
-                component="img"
-                src={imageUrl(movie.backdrop_path, "original")}
-                alt={movie.title}
-                sx={{
-                  width: "100%",
-                  height: "100%",
-                  objectFit: "cover",
-                  marginTop: "env(safe-area-inset-top)",
                 }}
               />
               <Box

@@ -70,13 +70,15 @@ function MobileNavigation() {
     <Box
       sx={{
         position: "fixed",
-        bottom: "env(safe-area-inset-bottom)",
+        bottom: 0,
         left: "50%",
         transform: "translateX(-50%)",
         width: "95%",
         maxWidth: "400px",
         zIndex: 1300,
         display: { xs: "block", sm: "none" },
+        pb: "env(safe-area-inset-bottom)",
+        mb: 1,
       }}
     >
       <BottomNavigation
