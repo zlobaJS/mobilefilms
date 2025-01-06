@@ -77,7 +77,6 @@ function MobileNavigation() {
         maxWidth: "400px",
         zIndex: 1300,
         display: { xs: "block", sm: "none" },
-        mb: 2,
       }}
     >
       <BottomNavigation
