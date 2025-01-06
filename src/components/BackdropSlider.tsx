@@ -37,7 +37,6 @@ export const BackdropSlider = ({ movies }: BackdropSliderProps) => {
           sm: "60vh",
         },
         overflow: "hidden",
-        mt: "-env(safe-area-inset-top)",
       }}
     >
       <Swiper
@@ -73,7 +72,6 @@ export const BackdropSlider = ({ movies }: BackdropSliderProps) => {
                     xs: "center 15%",
                     sm: "center top",
                   },
-                  marginTop: "env(safe-area-inset-top)",
                   transform: "scale(1.02)",
                 }}
               />
@@ -81,9 +79,9 @@ export const BackdropSlider = ({ movies }: BackdropSliderProps) => {
                 sx={{
                   position: "absolute",
                   left: 0,
-                  top: 0,
+                  top: "-env(safe-area-inset-top)",
                   width: "100%",
-                  height: "calc(100% + 120px)",
+                  height: "calc(100% + env(safe-area-inset-top) + 120px)",
                   background: `linear-gradient(
                     180deg,
                     rgba(20,20,20,0) 0%,
@@ -91,7 +89,7 @@ export const BackdropSlider = ({ movies }: BackdropSliderProps) => {
                     rgba(20,20,20,0.8) 80%,
                     rgba(20,20,20,1) 100%
                   )`,
-                  marginTop: "env(safe-area-inset-top)",
+                  zIndex: 1,
                 }}
               />
               <Box

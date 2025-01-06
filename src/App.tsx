@@ -260,7 +260,10 @@ function AppRoutes() {
                   sx={{
                     minHeight: "100dvh",
                     backgroundColor: "#141414",
-                    paddingTop: "env(safe-area-inset-top)",
+                    paddingTop:
+                      location.pathname === "/"
+                        ? 0
+                        : "env(safe-area-inset-top)",
                     paddingBottom: "env(safe-area-inset-bottom)",
                     paddingLeft: "env(safe-area-inset-left)",
                     paddingRight: "env(safe-area-inset-right)",
