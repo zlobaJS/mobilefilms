@@ -136,16 +136,16 @@ export const MovieCard = ({ movie, onMovieSelect }: MovieCardProps) => {
               position: "absolute",
               top: 8,
               left: 8,
-              bgcolor: "rgba(0,0,0,0.75)",
-              color:
+              bgcolor:
                 movie.vote_average >= 7
                   ? "#4CAF50"
-                  : movie.vote_average >= 5
-                  ? "#FFC107"
+                  : movie.vote_average >= 5.6
+                  ? "#888"
                   : "#FF5252",
-              padding: "4px 8px",
-              borderRadius: "8px",
-              fontSize: "14px",
+              color: "#fff",
+              padding: { xs: "2px 6px", sm: "4px 8px" },
+              borderRadius: { xs: "6px", sm: "8px" },
+              fontSize: { xs: "12px", sm: "14px" },
               fontWeight: "bold",
             }}
           >

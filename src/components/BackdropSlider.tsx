@@ -25,6 +25,7 @@ interface BackdropSliderProps {
 }
 
 export const BackdropSlider = ({ movies }: BackdropSliderProps) => {
+  const [randomMovies, setRandomMovies] = useState<Movie[]>([]);
   const [movieLogos, setMovieLogos] = useState<{
     [key: number]: string | null;
   }>({});
@@ -64,21 +65,27 @@ export const BackdropSlider = ({ movies }: BackdropSliderProps) => {
   };
 
   useEffect(() => {
+    const getRandomMovies = (sourceMovies: Movie[], count: number) => {
+      const shuffled = [...sourceMovies].sort(() => 0.5 - Math.random());
+      return shuffled.slice(0, count);
+    };
+
+    if (movies.length > 0) {
+      const selected = getRandomMovies(movies, 5);
+      setRandomMovies(selected);
+    }
+  }, [movies]);
+
+  useEffect(() => {
     const loadMovieAssets = async () => {
       setLoading(true);
       try {
-        const firstMovies = movies.slice(0, 3);
         await Promise.all(
-          firstMovies.map((movie) => {
+          randomMovies.map((movie) => {
             preloadImage(imageUrl(movie.backdrop_path, "original"), movie.id);
             return fetchMovieLogos(movie);
           })
         );
-
-        movies.slice(3, 10).forEach((movie) => {
-          preloadImage(imageUrl(movie.backdrop_path, "original"), movie.id);
-          fetchMovieLogos(movie);
-        });
       } catch (error) {
         console.error("Error loading movie assets:", error);
       } finally {
@@ -86,8 +93,10 @@ export const BackdropSlider = ({ movies }: BackdropSliderProps) => {
       }
     };
 
-    loadMovieAssets();
-  }, [movies]);
+    if (randomMovies.length > 0) {
+      loadMovieAssets();
+    }
+  }, [randomMovies]);
 
   if (loading) {
     return (
@@ -188,7 +197,7 @@ export const BackdropSlider = ({ movies }: BackdropSliderProps) => {
             }
           `}
         </style>
-        {movies.slice(0, 10).map((movie) => (
+        {randomMovies.map((movie) => (
           <SwiperSlide key={movie.id}>
             <Box
               sx={{
