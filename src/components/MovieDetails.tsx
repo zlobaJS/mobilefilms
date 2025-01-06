@@ -128,8 +128,8 @@ export const MovieDetails = ({
   const [currentMovie, setCurrentMovie] = useState(movie);
   const [isVisible, setIsVisible] = useState(false);
 
-  // Добавьте определение размера изображения в зависимости от устройства
-  const backdropSize = isMobile ? "w780" : "original";
+  // В начале компонента обновим определение размера изображения
+  const backdropSize = isMobile ? "w780" : "original"; // Увеличили размер для мобильных с w500 до w780
 
   // Выносим fetchData на уровень компонента
   const fetchData = async (movieData: any) => {
@@ -336,7 +336,7 @@ export const MovieDetails = ({
                   position: "relative",
                   width: "100%",
                   height: {
-                    xs: "calc(50vh + env(safe-area-inset-top))",
+                    xs: "calc(56.25vw + env(safe-area-inset-top) + 20px)",
                     sm: "60vh",
                   },
                   overflow: "hidden",
@@ -357,12 +357,13 @@ export const MovieDetails = ({
                     height: "100%",
                     objectFit: "cover",
                     objectPosition: {
-                      xs: "center 25%",
+                      xs: "center center",
                       sm: "center top",
                     },
                     opacity: isBackdropLoaded ? 1 : 0,
                     transition: "opacity 0.3s ease-out",
                     transform: "translateY(0)",
+                    backgroundColor: "#000",
                   }}
                   onLoad={() => setIsBackdropLoaded(true)}
                 />
