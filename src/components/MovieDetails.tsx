@@ -347,7 +347,7 @@ export const MovieDetails = ({
                     sm: "60vh",
                   },
                   overflow: "hidden",
-                  mt: 0,
+                  mt: "-env(safe-area-inset-top)",
                 }}
               >
                 <Box
@@ -356,7 +356,7 @@ export const MovieDetails = ({
                     currentMovie?.backdrop_path ||
                       currentMovie?.poster_path ||
                       "",
-                    backdropSize
+                    isMobile ? "w1280" : "original"
                   )}
                   alt={currentMovie?.title}
                   sx={{
@@ -364,13 +364,18 @@ export const MovieDetails = ({
                     height: "100%",
                     objectFit: "cover",
                     objectPosition: {
-                      xs: "center center",
+                      xs: "center 15%",
                       sm: "center top",
                     },
                     opacity: isBackdropLoaded ? 1 : 0,
                     transition: "opacity 0.3s ease-out",
-                    transform: "translateY(0)",
+                    transform: "scale(1.02)",
                     backgroundColor: "#000",
+                    imageRendering: "high-quality",
+                    WebkitBackfaceVisibility: "hidden",
+                    MozBackfaceVisibility: "hidden",
+                    backfaceVisibility: "hidden",
+                    marginTop: "env(safe-area-inset-top)",
                   }}
                   onLoad={() => setIsBackdropLoaded(true)}
                 />
@@ -390,7 +395,7 @@ export const MovieDetails = ({
                       rgb(20, 20, 20) 100%
                     )`,
                     transition: "background 0.2s ease",
-                    paddingTop: "env(safe-area-inset-top)",
+                    marginTop: "env(safe-area-inset-top)",
                   }}
                 />
               </Box>
