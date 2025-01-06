@@ -1,7 +1,6 @@
 import {
   Box,
   Typography,
-  Button,
   Dialog,
   IconButton,
   useTheme,
@@ -744,8 +743,6 @@ export const MovieDetails = ({
                               spaceBetween: 8,
                             },
                           }}
-                          preloadImages={false}
-                          updateOnWindowResize={false}
                           resistanceRatio={0.85}
                           threshold={5}
                         >
