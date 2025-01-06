@@ -385,12 +385,12 @@ export const MovieDetails = ({
                     width: "100%",
                     height: "calc(100% + 120px)",
                     background: `linear-gradient(
-                      rgba(103, 58, 183, 0.32) 0%,
+                      rgb(103 58 183 / 0%) 0%,
                       rgba(20, 20, 20, 0.2) 40%,
                       rgb(20 20 20) 65%,
-                      rgb(20, 20, 20) 80%,
-                      rgb(20, 20, 20) 90%,
-                      rgb(20, 20, 20) 100%
+                      rgb(20 20 20) 80%,
+                      rgb(20 20 20) 90%,
+                      rgb(20 20 20) 100%
                     )`,
                     transition: "background 0.2s ease",
                     marginTop: "env(safe-area-inset-top)",
