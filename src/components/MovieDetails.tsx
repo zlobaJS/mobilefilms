@@ -6,7 +6,7 @@ import {
   useTheme,
   useMediaQuery,
   Grid,
-  Slide,
+  Fade,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import StarBorderIcon from "@mui/icons-material/StarBorder";
@@ -266,7 +266,13 @@ export const MovieDetails = ({
       open={open}
       onClose={onClose}
       fullScreen
-      TransitionComponent={Slide}
+      TransitionComponent={Fade}
+      TransitionProps={{
+        timeout: {
+          enter: 300,
+          exit: 300,
+        },
+      }}
       PaperProps={{
         sx: {
           bgcolor: "#141414",
@@ -281,8 +287,14 @@ export const MovieDetails = ({
           left: 0,
           right: 0,
           bottom: 0,
-          padding: 0, // Убираем все отступы
-          overflow: "hidden", // Предотвращаем скролл на уровне Dialog
+          padding: 0,
+          overflow: "hidden",
+          opacity: 0,
+          animation: "fadeIn 0.3s ease-in-out forwards",
+          "@keyframes fadeIn": {
+            from: { opacity: 0 },
+            to: { opacity: 1 },
+          },
         },
       }}
     >
