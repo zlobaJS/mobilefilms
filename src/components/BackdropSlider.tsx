@@ -1,10 +1,4 @@
-import {
-  Box,
-  Button,
-  useTheme,
-  useMediaQuery,
-  Typography,
-} from "@mui/material";
+import { Box, Button, Typography } from "@mui/material";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay } from "swiper/modules";
 import { imageUrl } from "../api/tmdb";
@@ -28,10 +22,6 @@ interface BackdropSliderProps {
 }
 
 export const BackdropSlider = ({ movies }: BackdropSliderProps) => {
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-  const isTablet = useMediaQuery(theme.breakpoints.between("sm", "md"));
-
   const truncateOverview = (text: string, maxLength: number = 300) => {
     if (text.length <= maxLength) return text;
     return text.slice(0, maxLength) + "...";
