@@ -26,7 +26,6 @@ import * as Flags from "country-flag-icons/react/3x2";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { FreeMode } from "swiper/modules";
 import "swiper/css";
-import "swiper/css/free-mode";
 
 interface MovieDetailsProps {
   movie: {
