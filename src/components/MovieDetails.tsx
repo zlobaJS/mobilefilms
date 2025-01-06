@@ -336,7 +336,7 @@ export const MovieDetails = ({
                   position: "relative",
                   width: "100%",
                   height: {
-                    xs: "calc(56.25vw + env(safe-area-inset-top) + 20px)",
+                    xs: "calc(75vw + env(safe-area-inset-top) + 20px)",
                     sm: "60vh",
                   },
                   overflow: "hidden",
