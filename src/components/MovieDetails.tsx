@@ -13,6 +13,7 @@ import StarBorderIcon from "@mui/icons-material/StarBorder";
 import ShareIcon from "@mui/icons-material/Share";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import DownloadIcon from "@mui/icons-material/Download";
+import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import {
   imageUrl,
   getMovieImages,
@@ -261,8 +262,8 @@ export const MovieDetails = ({
     return "#FF5252";
   };
 
-  // Добавим лог перед рендерингом коллекции
-  console.log("Collection data:", movie.belongs_to_collection);
+  // Оптимизируем загрузку изображений для мобильных устройств
+  const imageSize = isMobile ? "w92" : "w185"; // Меньший размер изображений для мобильных
 
   return (
     <Dialog
@@ -382,18 +383,9 @@ export const MovieDetails = ({
                   color: "white",
                   display: "flex",
                   justifyContent: "center",
-                  opacity: 0,
-                  animation: "fadeInUp 0.8s ease-out forwards",
-                  "@keyframes fadeInUp": {
-                    "0%": {
-                      opacity: 0,
-                      transform: "translateY(40px)",
-                    },
-                    "100%": {
-                      opacity: 1,
-                      transform: "translateY(0)",
-                    },
-                  },
+                  opacity: isVisible ? 1 : 0,
+                  transform: isVisible ? "translateY(0)" : "translateY(40px)",
+                  transition: "opacity 0.8s ease-out, transform 0.8s ease-out",
                 }}
               >
                 <Box
@@ -421,11 +413,6 @@ export const MovieDetails = ({
                           objectFit: "contain",
                           mb: 2,
                           filter: "brightness(1.2)",
-                          opacity: 0,
-                          animation: "fadeIn 0.6s ease-out 0.3s forwards",
-                          "@keyframes fadeIn": {
-                            to: { opacity: 1 },
-                          },
                         }}
                       />
                     </Box>
@@ -437,8 +424,6 @@ export const MovieDetails = ({
                         mb: 2,
                         fontSize: { xs: "1.5rem", sm: "2rem" },
                         textAlign: { xs: "center", sm: "left" },
-                        opacity: 0,
-                        animation: "fadeIn 0.6s ease-out 0.3s forwards",
                       }}
                     >
                       {currentMovie?.title}
@@ -455,8 +440,6 @@ export const MovieDetails = ({
                       justifyContent: { xs: "center", sm: "flex-start" },
                       width: "100%",
                       textAlign: { xs: "center", sm: "left" },
-                      opacity: 0,
-                      animation: "fadeIn 0.6s ease-out 0.5s forwards",
                     }}
                   >
                     {/* Рейтинг */}
@@ -619,112 +602,100 @@ export const MovieDetails = ({
                   <Box
                     sx={{
                       display: "flex",
-                      gap: 2,
-                      mb: 3,
+                      gap: 1,
+                      mt: 3,
+                      mb: 4,
                       justifyContent: { xs: "center", sm: "flex-start" },
-                      width: "100%",
-                      opacity: 0,
-                      animation: "fadeIn 0.6s ease-out 0.7s forwards",
                     }}
                   >
-                    <Button
-                      variant="contained"
+                    {/* Кнопка Смотреть онлайн в виде иконки */}
+                    <IconButton
                       onClick={() => setShowPlayer(true)}
                       sx={{
-                        bgcolor: "#ff6600",
+                        background:
+                          "linear-gradient(45deg, #2196F3 30%, #21CBF3 90%)",
+                        boxShadow: "0 3px 5px 2px rgba(33, 203, 243, .3)",
                         color: "white",
-                        "&:hover": { bgcolor: "#ff8533" },
-                        borderRadius: 2,
-                        px: 4,
+                        width: 40,
+                        height: 40,
+                        transition: "all 0.3s ease",
+                        "&:hover": {
+                          background:
+                            "linear-gradient(45deg, #1976D2 30%, #00B4E5 90%)",
+                          boxShadow: "0 4px 8px 3px rgba(33, 203, 243, .4)",
+                          transform: "translateY(-1px)",
+                        },
+                        "&:active": {
+                          transform: "translateY(1px)",
+                        },
                       }}
                     >
-                      Смотреть онлайн
-                    </Button>
+                      <PlayArrowIcon />
+                    </IconButton>
+
                     <IconButton
                       sx={{
-                        bgcolor: "#1f1f1f",
                         color: "white",
-                        "&:hover": { bgcolor: "#333" },
+                        bgcolor: "rgba(255,255,255,0.1)",
+                        "&:hover": {
+                          bgcolor: "rgba(255,255,255,0.2)",
+                        },
+                      }}
+                    >
+                      <StarBorderIcon />
+                    </IconButton>
+
+                    <IconButton
+                      sx={{
+                        color: "white",
+                        bgcolor: "rgba(255,255,255,0.1)",
+                        "&:hover": {
+                          bgcolor: "rgba(255,255,255,0.2)",
+                        },
+                      }}
+                    >
+                      <ShareIcon />
+                    </IconButton>
+
+                    <IconButton
+                      sx={{
+                        color: "white",
+                        bgcolor: "rgba(255,255,255,0.1)",
+                        "&:hover": {
+                          bgcolor: "rgba(255,255,255,0.2)",
+                        },
                       }}
                     >
                       <DownloadIcon />
                     </IconButton>
-                  </Box>
 
-                  <Box
-                    sx={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      maxWidth: 400,
-                      mb: 3,
-                    }}
-                  >
                     <IconButton
                       sx={{
-                        color: "#888",
-                        flexDirection: "column",
-                        gap: 0.5,
-                      }}
-                    >
-                      <StarBorderIcon />
-                      <Typography variant="caption">Оценить</Typography>
-                    </IconButton>
-                    <IconButton
-                      sx={{
-                        color: "#888",
-                        flexDirection: "column",
-                        gap: 0.5,
-                      }}
-                    >
-                      <ShareIcon />
-                      <Typography variant="caption">Буду смотреть</Typography>
-                    </IconButton>
-                    <IconButton
-                      sx={{
-                        color: "#888",
-                        flexDirection: "column",
-                        gap: 0.5,
-                      }}
-                    >
-                      <ShareIcon />
-                      <Typography variant="caption">Добавить</Typography>
-                    </IconButton>
-                    <IconButton
-                      sx={{
-                        color: "#888",
-                        flexDirection: "column",
-                        gap: 0.5,
+                        color: "white",
+                        bgcolor: "rgba(255,255,255,0.1)",
+                        "&:hover": {
+                          bgcolor: "rgba(255,255,255,0.2)",
+                        },
                       }}
                     >
                       <MoreHorizIcon />
-                      <Typography variant="caption">Еще</Typography>
                     </IconButton>
                   </Box>
 
                   {/* Описание фильма */}
                   {currentMovie?.overview && (
-                    <Box sx={{ mb: 4 }}>
-                      <Typography
-                        variant="h6"
-                        sx={{
-                          color: "white",
-                          mb: 2,
-                          fontSize: { xs: "1rem", sm: "1.1rem" },
-                          fontWeight: 500,
-                        }}
-                      >
-                        Описание
-                      </Typography>
-                      <Typography
-                        sx={{
-                          color: "#888",
-                          fontSize: "0.9rem",
-                          maxWidth: "800px",
-                        }}
-                      >
-                        {currentMovie?.overview}
-                      </Typography>
-                    </Box>
+                    <Typography
+                      sx={{
+                        color: "#fff",
+                        fontSize: { xs: "0.9rem", sm: "1rem" },
+                        mb: 3,
+                        opacity: 0.8,
+                        textAlign: { xs: "center", sm: "left" },
+                        maxWidth: "800px",
+                      }}
+                    >
+                      {currentMovie.overview}
+                    </Typography>
                   )}
 
                   {/* Секция с актерами */}
@@ -746,7 +717,13 @@ export const MovieDetails = ({
                           modules={[FreeMode]}
                           slidesPerView="auto"
                           spaceBetween={8}
-                          freeMode={true}
+                          freeMode={{
+                            enabled: true,
+                            momentum: true,
+                            momentumRatio: 0.2,
+                            momentumVelocityRatio: 0.5,
+                          }}
+                          watchSlidesProgress={true}
                           style={{ padding: "4px" }}
                           breakpoints={{
                             0: {
@@ -766,6 +743,10 @@ export const MovieDetails = ({
                               spaceBetween: 8,
                             },
                           }}
+                          preloadImages={false}
+                          updateOnWindowResize={false}
+                          resistanceRatio={0.85}
+                          threshold={5}
                         >
                           {cast.map((actor) => (
                             <SwiperSlide key={actor.id}>
@@ -773,6 +754,8 @@ export const MovieDetails = ({
                                 sx={{
                                   cursor: "pointer",
                                   "&:hover": { opacity: 0.8 },
+                                  WebkitTapHighlightColor: "transparent",
+                                  transform: "translateZ(0)", // Включаем аппаратное ускорение
                                 }}
                               >
                                 <Box
@@ -784,13 +767,17 @@ export const MovieDetails = ({
                                     overflow: "hidden",
                                     bgcolor: "#1f1f1f",
                                     mb: 1,
+                                    willChange: "transform", // Оптимизация производительности
                                   }}
                                 >
                                   {actor.profile_path ? (
                                     <Box
                                       component="img"
                                       loading="lazy"
-                                      src={imageUrl(actor.profile_path, "w185")}
+                                      src={imageUrl(
+                                        actor.profile_path,
+                                        imageSize
+                                      )}
                                       alt={actor.name}
                                       sx={{
                                         position: "absolute",
@@ -799,6 +786,7 @@ export const MovieDetails = ({
                                         width: "100%",
                                         height: "100%",
                                         objectFit: "cover",
+                                        backfaceVisibility: "hidden", // Оптимизация производительности
                                       }}
                                     />
                                   ) : (
