@@ -163,12 +163,41 @@ export const MovieSlider = ({
               sx={{
                 display: "flex",
                 flexDirection: "column",
+                alignItems: "center",
                 height: "100%",
+                width: "100%",
               }}
             >
-              <Box sx={{ aspectRatio: "2/3", marginBottom: 1 }}>
-                <MovieCard movie={movie} onMovieSelect={onMovieSelect} />
+              <Box
+                sx={{
+                  aspectRatio: "2/3",
+                  width: "100%",
+                  marginBottom: 1,
+                }}
+              >
+                <MovieCard
+                  movie={movie}
+                  onMovieSelect={onMovieSelect}
+                  hideTitle
+                />
               </Box>
+              <Typography
+                variant="body2"
+                sx={{
+                  color: "white",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  whiteSpace: "nowrap",
+                  fontSize: { xs: "0.75rem", sm: "0.875rem" },
+                  opacity: 0.9,
+                  width: "100%",
+                  textAlign: "center",
+                  mt: 0.5,
+                  px: 1,
+                }}
+              >
+                {movie.title}
+              </Typography>
             </Box>
           </SwiperSlide>
         ))}

@@ -22,6 +22,7 @@ interface MovieCardProps {
     release_quality?: string;
   };
   onMovieSelect?: (movie: any) => void;
+  hideTitle?: boolean;
 }
 
 export const MovieCardSkeleton = () => {
@@ -67,7 +68,11 @@ export const MovieCardSkeleton = () => {
   );
 };
 
-export const MovieCard = ({ movie, onMovieSelect }: MovieCardProps) => {
+export const MovieCard = ({
+  movie,
+  onMovieSelect,
+  hideTitle,
+}: MovieCardProps) => {
   const theme = useTheme();
   const isDesktop = useMediaQuery(theme.breakpoints.up("md"));
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
@@ -153,24 +158,26 @@ export const MovieCard = ({ movie, onMovieSelect }: MovieCardProps) => {
             {movie.vote_average.toFixed(1)}
           </Box>
         )}
-        <Typography
-          variant="subtitle1"
-          sx={{
-            color: "white",
-            fontWeight: "500",
-            fontSize: { xs: "0.875rem", sm: "1rem" },
-            mt: 1,
-            px: 1,
-            textAlign: "center",
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-            display: "-webkit-box",
-            WebkitLineClamp: 1,
-            WebkitBoxOrient: "vertical",
-          }}
-        >
-          {movie.title}
-        </Typography>
+        {!hideTitle && (
+          <Typography
+            variant="subtitle1"
+            sx={{
+              color: "white",
+              fontWeight: "500",
+              fontSize: { xs: "0.875rem", sm: "1rem" },
+              mt: 1,
+              px: 1,
+              textAlign: "center",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              display: "-webkit-box",
+              WebkitLineClamp: 1,
+              WebkitBoxOrient: "vertical",
+            }}
+          >
+            {movie.title}
+          </Typography>
+        )}
       </Box>
 
       <MovieDetails
