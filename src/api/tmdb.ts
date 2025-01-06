@@ -65,83 +65,58 @@ export const clearCache = () => {
 };
 
 export const getMovies = {
-  popular: async (page = 1) => {
-    const data = await fetchTMDB("/movie/popular", { page: page.toString() });
-    return data;
-  },
-  trending: async (page = 1) => {
-    const data = await fetchTMDB("/movie/now_playing", {
-      page: page.toString(),
-      // region: "RU",
-      "vote_count.gte": "100",
-      append_to_response: "release_dates",
-    });
-    console.log("Now playing (trending) movies data:", data);
-    return data;
-  },
-  topRated: async (page = 1) => {
-    const data = await fetchTMDB("/discover/movie", {
-      page: page.toString(),
-      sort_by: "vote_average.desc",
-      "vote_count.gte": "1000",
-      "vote_average.gte": "7.5",
-    });
-    return data;
-  },
-  upcoming: async (page = 1) => {
-    const data = await fetchTMDB("/movie/upcoming", { page: page.toString() });
-    return data;
-  },
   nowPlaying: async (page = 1) => {
-    clearCache();
+    return await fetchTMDB("/movie/now_playing", { page: page.toString() });
+  },
 
-    const data = await fetchTMDB("/movie/now_playing", {
-      page: page.toString(),
-      // region: "RU",
-      "vote_count.gte": "10",
-      sort_by: "popularity.desc",
-    });
-    console.log("Now playing movies data:", data);
-    return data;
-  },
-  watchingToday: async (page = 1) => {
-    const data = await fetchTMDB("/movie/now_playing", {
-      page: page.toString(),
-      // region: "RU",
-      "vote_count.gte": "10",
-      sort_by: "popularity.desc",
-    });
-    return data;
-  },
   trendingToday: async (page = 1) => {
-    const data = await fetchTMDB("/trending/movie/day", {
-      page: page.toString(),
-    });
-    return data;
+    return await fetchTMDB("/trending/movie/day", { page: page.toString() });
   },
+
   trendingWeek: async (page = 1) => {
-    const data = await fetchTMDB("/trending/movie/week", {
-      page: page.toString(),
-    });
-    return data;
+    return await fetchTMDB("/trending/movie/week", { page: page.toString() });
   },
+
+  popular: async (page = 1) => {
+    return await fetchTMDB("/movie/popular", { page: page.toString() });
+  },
+
   byGenre: async (genreId: number, page = 1) => {
-    const data = await fetchTMDB("/discover/movie", {
-      page: page.toString(),
+    return await fetchTMDB("/discover/movie", {
       with_genres: genreId.toString(),
-      "vote_count.gte": "100",
-      sort_by: "popularity.desc",
-    });
-    return data;
-  },
-  byMultipleGenres: async (genreIds: number[], page = 1) => {
-    const data = await fetchTMDB("/discover/movie", {
       page: page.toString(),
-      with_genres: genreIds.join(","),
-      "vote_count.gte": "100",
-      sort_by: "popularity.desc",
     });
-    return data;
+  },
+
+  byCategory: async (category: string, page = 1) => {
+    switch (category) {
+      case "now-playing":
+        return await getMovies.nowPlaying(page);
+      case "trending-today":
+        return await getMovies.trendingToday(page);
+      case "trending-week":
+        return await getMovies.trendingWeek(page);
+      case "popular":
+        return await getMovies.popular(page);
+      case "horror":
+        return await getMovies.byGenre(GENRES.HORROR, page);
+      case "action":
+        return await getMovies.byGenre(GENRES.ACTION, page);
+      case "comedy":
+        return await getMovies.byGenre(GENRES.COMEDY, page);
+      case "scifi":
+        return await getMovies.byGenre(GENRES.SCIFI, page);
+      case "thriller":
+        return await getMovies.byGenre(GENRES.THRILLER, page);
+      case "western":
+        return await getMovies.byGenre(GENRES.WESTERN, page);
+      case "drama":
+        return await getMovies.byGenre(GENRES.DRAMA, page);
+      case "war":
+        return await getMovies.byGenre(GENRES.WAR, page);
+      default:
+        return await getMovies.popular(page);
+    }
   },
 };
 
@@ -178,14 +153,14 @@ export const getMovieCredits = async (movieId: number) => {
 };
 
 export const GENRES = {
-  ACTION: 28, // Боевик
-  COMEDY: 35, // Комедия
-  HORROR: 27, // Ужасы
-  SCIFI: 878, // Фантастика
-  THRILLER: 53, // Триллер
-  WESTERN: 37, // Вестерн
-  DRAMA: 18, // Драма
-  WAR: 10752, // Военный
+  ACTION: 28,
+  COMEDY: 35,
+  HORROR: 27,
+  SCIFI: 878,
+  THRILLER: 53,
+  WESTERN: 37,
+  DRAMA: 18,
+  WAR: 10752,
 };
 
 export const getCollection = async (collectionId: number) => {
