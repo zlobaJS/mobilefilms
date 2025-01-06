@@ -38,7 +38,13 @@ export const BackdropSlider = ({ movies }: BackdropSliderProps) => {
   };
 
   return (
-    <Box sx={{ mb: 4, position: "relative" }}>
+    <Box
+      sx={{
+        mb: 4,
+        position: "relative",
+        mt: "-env(safe-area-inset-top)",
+      }}
+    >
       <Swiper
         modules={[Autoplay]}
         autoplay={{
@@ -49,6 +55,7 @@ export const BackdropSlider = ({ movies }: BackdropSliderProps) => {
         style={{
           width: "100%",
           height: isMobile ? "70vh" : isTablet ? "75vh" : "80vh",
+          marginTop: "env(safe-area-inset-top)",
         }}
       >
         {movies.slice(0, 10).map((movie) => (
@@ -73,6 +80,7 @@ export const BackdropSlider = ({ movies }: BackdropSliderProps) => {
                     rgba(20,20,20,1) 100%
                   )`,
                   zIndex: 1,
+                  marginTop: "env(safe-area-inset-top)",
                 },
               }}
             >
@@ -84,6 +92,7 @@ export const BackdropSlider = ({ movies }: BackdropSliderProps) => {
                   width: "100%",
                   height: "100%",
                   objectFit: "cover",
+                  marginTop: "env(safe-area-inset-top)",
                 }}
               />
               <Box
