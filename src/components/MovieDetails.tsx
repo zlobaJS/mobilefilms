@@ -24,7 +24,9 @@ import { useEffect, useState } from "react";
 import { KinoboxPlayer } from "./KinoboxPlayer";
 import * as Flags from "country-flag-icons/react/3x2";
 import { Swiper, SwiperSlide } from "swiper/react";
+import { FreeMode } from "swiper/modules";
 import "swiper/css";
+import "swiper/css/free-mode";
 
 interface MovieDetailsProps {
   movie: {
@@ -125,6 +127,7 @@ export const MovieDetails = ({
   const [collectionMovies, setCollectionMovies] = useState<any[]>([]);
   const [showCollection, setShowCollection] = useState(false);
   const [currentMovie, setCurrentMovie] = useState(movie);
+  const [isVisible, setIsVisible] = useState(false);
 
   // Добавьте определение размера изображения в зависимости от устройства
   const backdropSize = isMobile ? "w780" : "original";
@@ -216,6 +219,17 @@ export const MovieDetails = ({
   useEffect(() => {
     setCurrentMovie(movie);
   }, [movie]);
+
+  useEffect(() => {
+    if (open) {
+      const timer = setTimeout(() => {
+        setIsVisible(true);
+      }, 300);
+      return () => clearTimeout(timer);
+    } else {
+      setIsVisible(false);
+    }
+  }, [open]);
 
   if (!movie) return null;
 
@@ -715,7 +729,7 @@ export const MovieDetails = ({
                   )}
 
                   {/* Секция с актерами */}
-                  {cast.length > 0 && (
+                  {cast.length > 0 && isVisible && (
                     <Box sx={{ mb: 4 }}>
                       <Typography
                         variant="h6"
@@ -728,102 +742,113 @@ export const MovieDetails = ({
                       >
                         В главных ролях
                       </Typography>
-                      <Swiper
-                        slidesPerView={"auto"}
-                        spaceBetween={8}
-                        style={{ padding: "4px" }}
-                      >
-                        {cast.map((actor) => (
-                          <SwiperSlide
-                            key={actor.id}
-                            style={{
-                              width: "auto",
-                            }}
-                          >
-                            <Box
-                              sx={{
-                                width: {
-                                  xs: "100px",
-                                  sm: "120px",
-                                  md: "140px",
-                                },
-                                cursor: "pointer",
-                                "&:hover": {
-                                  opacity: 0.8,
-                                },
-                              }}
-                            >
+                      <Box sx={{ position: "relative" }}>
+                        <Swiper
+                          modules={[FreeMode]}
+                          slidesPerView="auto"
+                          spaceBetween={8}
+                          freeMode={true}
+                          style={{ padding: "4px" }}
+                          breakpoints={{
+                            0: {
+                              slidesPerView: 3.2,
+                              spaceBetween: 8,
+                            },
+                            600: {
+                              slidesPerView: 4.2,
+                              spaceBetween: 8,
+                            },
+                            900: {
+                              slidesPerView: 6.2,
+                              spaceBetween: 8,
+                            },
+                            1200: {
+                              slidesPerView: 8.2,
+                              spaceBetween: 8,
+                            },
+                          }}
+                        >
+                          {cast.map((actor) => (
+                            <SwiperSlide key={actor.id}>
                               <Box
                                 sx={{
-                                  width: "100%",
-                                  paddingBottom: "100%",
-                                  position: "relative",
-                                  borderRadius: 1,
-                                  overflow: "hidden",
-                                  bgcolor: "#1f1f1f",
-                                  mb: 1,
+                                  cursor: "pointer",
+                                  "&:hover": { opacity: 0.8 },
                                 }}
                               >
-                                {actor.profile_path ? (
-                                  <Box
-                                    component="img"
-                                    src={imageUrl(actor.profile_path, "w185")}
-                                    alt={actor.name}
-                                    sx={{
-                                      position: "absolute",
-                                      top: 0,
-                                      left: 0,
-                                      width: "100%",
-                                      height: "100%",
-                                      objectFit: "cover",
-                                    }}
-                                  />
-                                ) : (
-                                  <Box
-                                    sx={{
-                                      position: "absolute",
-                                      top: 0,
-                                      left: 0,
-                                      width: "100%",
-                                      height: "100%",
-                                      display: "flex",
-                                      alignItems: "center",
-                                      justifyContent: "center",
-                                      color: "#666",
-                                    }}
-                                  >
-                                    No photo
-                                  </Box>
-                                )}
+                                <Box
+                                  sx={{
+                                    width: "100%",
+                                    paddingBottom: "100%",
+                                    position: "relative",
+                                    borderRadius: 1,
+                                    overflow: "hidden",
+                                    bgcolor: "#1f1f1f",
+                                    mb: 1,
+                                  }}
+                                >
+                                  {actor.profile_path ? (
+                                    <Box
+                                      component="img"
+                                      loading="lazy"
+                                      src={imageUrl(actor.profile_path, "w185")}
+                                      alt={actor.name}
+                                      sx={{
+                                        position: "absolute",
+                                        top: 0,
+                                        left: 0,
+                                        width: "100%",
+                                        height: "100%",
+                                        objectFit: "cover",
+                                      }}
+                                    />
+                                  ) : (
+                                    <Box
+                                      sx={{
+                                        position: "absolute",
+                                        top: 0,
+                                        left: 0,
+                                        width: "100%",
+                                        height: "100%",
+                                        display: "flex",
+                                        alignItems: "center",
+                                        justifyContent: "center",
+                                        color: "#666",
+                                      }}
+                                    >
+                                      No photo
+                                    </Box>
+                                  )}
+                                </Box>
+                                <Typography
+                                  sx={{
+                                    color: "white",
+                                    fontSize: { xs: "0.8rem", sm: "0.9rem" },
+                                    fontWeight: 500,
+                                    mb: 0.5,
+                                    overflow: "hidden",
+                                    textOverflow: "ellipsis",
+                                    whiteSpace: "nowrap",
+                                  }}
+                                >
+                                  {actor.name}
+                                </Typography>
+                                <Typography
+                                  sx={{
+                                    color: "#888",
+                                    fontSize: { xs: "0.75rem", sm: "0.8rem" },
+                                    overflow: "hidden",
+                                    textOverflow: "ellipsis",
+                                    whiteSpace: "nowrap",
+                                  }}
+                                >
+                                  {actor.character}
+                                </Typography>
                               </Box>
-                              <Typography
-                                sx={{
-                                  color: "white",
-                                  fontSize: { xs: "0.8rem", sm: "0.9rem" },
-                                  fontWeight: 500,
-                                  mb: 0.5,
-                                  overflow: "hidden",
-                                  textOverflow: "ellipsis",
-                                  whiteSpace: "nowrap",
-                                }}
-                              >
-                                {actor.name}
-                              </Typography>
-                              <Typography
-                                sx={{
-                                  color: "#888",
-                                  fontSize: { xs: "0.75rem", sm: "0.8rem" },
-                                  overflow: "hidden",
-                                  textOverflow: "ellipsis",
-                                  whiteSpace: "nowrap",
-                                }}
-                              >
-                                {actor.character}
-                              </Typography>
-                            </Box>
-                          </SwiperSlide>
-                        ))}
-                      </Swiper>
+                            </SwiperSlide>
+                          ))}
+                        </Swiper>
+                      </Box>
                     </Box>
                   )}
 

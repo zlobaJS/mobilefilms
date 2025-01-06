@@ -152,6 +152,12 @@ export const CategoryPage = () => {
     fetchCategoryMovies(page);
   }, [page, categoryId]);
 
+  useEffect(() => {
+    return () => {
+      setMovies([]);
+    };
+  }, []);
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
