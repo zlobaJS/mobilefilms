@@ -41,8 +41,13 @@ export const BackdropSlider = ({ movies }: BackdropSliderProps) => {
     <Box
       sx={{
         position: "relative",
-        marginTop: "-env(safe-area-inset-top)",
-        height: isMobile ? "70vh" : isTablet ? "75vh" : "80vh",
+        width: "100%",
+        height: {
+          xs: "calc(100vw * 0.75 + env(safe-area-inset-top) + 100px)",
+          sm: "60vh",
+        },
+        overflow: "hidden",
+        mt: "-env(safe-area-inset-top)",
       }}
     >
       <Swiper
@@ -74,7 +79,12 @@ export const BackdropSlider = ({ movies }: BackdropSliderProps) => {
                   width: "100%",
                   height: "100%",
                   objectFit: "cover",
-                  marginTop: "-env(safe-area-inset-top)",
+                  objectPosition: {
+                    xs: "center 15%",
+                    sm: "center top",
+                  },
+                  marginTop: "env(safe-area-inset-top)",
+                  transform: "scale(1.02)",
                 }}
               />
               <Box
@@ -83,7 +93,7 @@ export const BackdropSlider = ({ movies }: BackdropSliderProps) => {
                   left: 0,
                   top: 0,
                   width: "100%",
-                  height: "100%",
+                  height: "calc(100% + 120px)",
                   background: `linear-gradient(
                     180deg,
                     rgba(20,20,20,0) 0%,
@@ -91,7 +101,7 @@ export const BackdropSlider = ({ movies }: BackdropSliderProps) => {
                     rgba(20,20,20,0.8) 80%,
                     rgba(20,20,20,1) 100%
                   )`,
-                  zIndex: 1,
+                  marginTop: "env(safe-area-inset-top)",
                 }}
               />
               <Box
