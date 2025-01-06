@@ -273,32 +273,33 @@ export const MovieDetails = ({
       PaperProps={{
         sx: {
           bgcolor: "#141414",
-          height: "100%",
-          width: "100%",
+          height: "100vh",
+          width: "100vw",
           margin: 0,
-          maxHeight: "100%",
-          maxWidth: "100%",
+          maxHeight: "100vh",
+          maxWidth: "100vw",
           borderRadius: 0,
           position: "fixed",
           top: 0,
           left: 0,
           right: 0,
           bottom: 0,
-          // Разрешаем контенту заходить за края экрана
-          paddingTop: "env(safe-area-inset-top)",
-          paddingBottom: 0, // Убираем нижний отступ
-          paddingLeft: "env(safe-area-inset-left)",
-          paddingRight: "env(safe-area-inset-right)",
+          padding: 0, // Убираем все отступы
+          overflow: "hidden", // Предотвращаем скролл на уровне Dialog
         },
       }}
     >
       <Box
         className="dialog-content"
         sx={{
-          height: "100%",
+          height: "100vh",
+          width: "100vw",
           position: "relative",
           overflowY: "auto",
           WebkitOverflowScrolling: "touch",
+          // Убираем все отступы
+          margin: 0,
+          padding: 0,
         }}
       >
         {!showPlayer && (
