@@ -1,15 +1,19 @@
-import { useEffect, useRef } from "react";
+import { useRef, useEffect } from "react";
+import { IconButton } from "@mui/material";
+import CloseIcon from "@mui/icons-material/Close";
 
 interface KinoboxPlayerProps {
   tmdbId: number;
-  onMediaUrl?: (url: string) => void;
   title?: string;
+  onMediaUrl?: (url: string) => void;
+  onClose?: () => void;
 }
 
 export const KinoboxPlayer = ({
   tmdbId,
   title,
   onMediaUrl,
+  onClose,
 }: KinoboxPlayerProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -61,26 +65,46 @@ export const KinoboxPlayer = ({
     document.body.appendChild(script);
 
     return () => {
-      document.body.removeChild(script);
+      if (document.body.contains(script)) {
+        document.body.removeChild(script);
+      }
     };
   }, [tmdbId, title, onMediaUrl]);
 
   return (
-    <div
-      ref={containerRef}
-      style={{
-        width: "100%",
-        height: "100dvh",
-        position: "fixed",
-        top: 0,
-        left: 0,
-        backgroundColor: "#000",
-        zIndex: 1300,
-        paddingTop: "env(safe-area-inset-top)",
-        paddingBottom: "env(safe-area-inset-bottom)",
-        paddingLeft: "env(safe-area-inset-left)",
-        paddingRight: "env(safe-area-inset-right)",
-      }}
-    />
+    <>
+      <div
+        ref={containerRef}
+        style={{
+          width: "100%",
+          height: "100dvh",
+          position: "fixed",
+          top: 0,
+          left: 0,
+          backgroundColor: "#000",
+          zIndex: 1300,
+          paddingTop: "env(safe-area-inset-top)",
+          paddingBottom: "env(safe-area-inset-bottom)",
+          paddingLeft: "env(safe-area-inset-left)",
+          paddingRight: "env(safe-area-inset-right)",
+        }}
+      />
+      <IconButton
+        onClick={onClose}
+        sx={{
+          position: "fixed",
+          top: "env(safe-area-inset-top, 16px)",
+          right: "env(safe-area-inset-right, 16px)",
+          zIndex: 1400,
+          color: "white",
+          bgcolor: "rgba(0,0,0,0.5)",
+          "&:hover": {
+            bgcolor: "rgba(0,0,0,0.7)",
+          },
+        }}
+      >
+        <CloseIcon />
+      </IconButton>
+    </>
   );
 };

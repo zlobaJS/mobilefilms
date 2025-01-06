@@ -327,6 +327,7 @@ export const MovieDetails = ({
               tmdbId={currentMovie?.id || 0}
               title={currentMovie?.title}
               onMediaUrl={handleMediaUrl}
+              onClose={() => setShowPlayer(false)}
             />
           ) : (
             <Box>
