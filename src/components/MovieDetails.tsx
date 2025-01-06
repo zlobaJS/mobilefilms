@@ -312,6 +312,8 @@ export const MovieDetails = ({
               "&:hover": {
                 bgcolor: "rgba(0,0,0,0.7)",
               },
+              mt: "20px",
+              mr: "20px",
             }}
           >
             <CloseIcon />
