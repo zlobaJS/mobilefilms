@@ -336,7 +336,7 @@ export const MovieDetails = ({
                   position: "relative",
                   width: "100%",
                   height: {
-                    xs: "calc(40vh + env(safe-area-inset-top))",
+                    xs: "calc(50vh + env(safe-area-inset-top))",
                     sm: "60vh",
                   },
                   overflow: "hidden",
@@ -356,7 +356,10 @@ export const MovieDetails = ({
                     width: "100%",
                     height: "100%",
                     objectFit: "cover",
-                    objectPosition: { xs: "center 15%", sm: "center top" },
+                    objectPosition: {
+                      xs: "center 25%",
+                      sm: "center top",
+                    },
                     opacity: isBackdropLoaded ? 1 : 0,
                     transition: "opacity 0.3s ease-out",
                     transform: "translateY(0)",
