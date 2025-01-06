@@ -274,20 +274,21 @@ export const MovieDetails = ({
         sx: {
           bgcolor: "#141414",
           height: "100%",
-          // Добавляем поддержку safe-area для iOS
-          pb: "env(safe-area-inset-bottom, 0px)", // Контент будет заходить за status bar
-          position: "relative",
-          "&::after": {
-            content: '""',
-            position: "fixed",
-            left: 0,
-            right: 0,
-            bottom: 0,
-            height: "env(safe-area-inset-bottom, 0px)",
-            background: "transparent", // Прозрачный status bar
-            zIndex: 1000,
-            pointerEvents: "none", // Чтобы не мешать взаимодействию с контентом
-          },
+          width: "100%",
+          margin: 0,
+          maxHeight: "100%",
+          maxWidth: "100%",
+          borderRadius: 0,
+          position: "fixed",
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          // Разрешаем контенту заходить за края экрана
+          paddingTop: "env(safe-area-inset-top)",
+          paddingBottom: 0, // Убираем нижний отступ
+          paddingLeft: "env(safe-area-inset-left)",
+          paddingRight: "env(safe-area-inset-right)",
         },
       }}
     >
@@ -381,13 +382,12 @@ export const MovieDetails = ({
                     width: "100%",
                     height: "calc(100% + 120px)",
                     background: `linear-gradient(
-                      to bottom,
-                      rgb(103 58 183 / 32%) 0%,
+                      rgba(103, 58, 183, 0.32) 0%,
                       rgba(20, 20, 20, 0.2) 40%,
-                      rgb(20 20 20 / 89%) 65%,
-                      rgb(20 20 20) 80%,
-                      rgb(20 20 20) 90%,
-                      rgba(20, 20, 20, 1) 100%
+                      rgb(20 20 20) 65%,
+                      rgb(20, 20, 20) 80%,
+                      rgb(20, 20, 20) 90%,
+                      rgb(20, 20, 20) 100%
                     )`,
                     transition: "background 0.2s ease",
                     paddingTop: "env(safe-area-inset-top)",
