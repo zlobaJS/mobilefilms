@@ -128,9 +128,6 @@ export const MovieDetails = ({
   const [currentMovie, setCurrentMovie] = useState(movie);
   const [isVisible, setIsVisible] = useState(false);
 
-  // В начале компонента обновим определение размера изображения
-  const backdropSize = isMobile ? "w780" : "original"; // Увеличили размер для мобильных с w500 до w780
-
   // Выносим fetchData на уровень компонента
   const fetchData = async (movieData: any) => {
     if (movieData) {
