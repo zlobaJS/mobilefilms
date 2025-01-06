@@ -1,4 +1,4 @@
-import { Box, Button, Typography } from "@mui/material";
+import { Box, Button, Typography, Skeleton } from "@mui/material";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay } from "swiper/modules";
 import { imageUrl } from "../api/tmdb";
@@ -28,6 +28,21 @@ export const BackdropSlider = ({ movies }: BackdropSliderProps) => {
   const [movieLogos, setMovieLogos] = useState<{
     [key: number]: string | null;
   }>({});
+  const [loading, setLoading] = useState(true);
+  const [loadedImages, setLoadedImages] = useState<{ [key: number]: boolean }>(
+    {}
+  );
+
+  const preloadImage = (src: string, movieId: number) => {
+    const img = new Image();
+    img.src = src;
+    img.onload = () => {
+      setLoadedImages((prev) => ({
+        ...prev,
+        [movieId]: true,
+      }));
+    };
+  };
 
   const fetchMovieLogos = async (movie: Movie) => {
     try {
@@ -49,10 +64,90 @@ export const BackdropSlider = ({ movies }: BackdropSliderProps) => {
   };
 
   useEffect(() => {
-    movies.slice(0, 10).forEach((movie) => {
-      fetchMovieLogos(movie);
-    });
+    const loadMovieAssets = async () => {
+      setLoading(true);
+      try {
+        const firstMovies = movies.slice(0, 3);
+        await Promise.all(
+          firstMovies.map((movie) => {
+            preloadImage(imageUrl(movie.backdrop_path, "original"), movie.id);
+            return fetchMovieLogos(movie);
+          })
+        );
+
+        movies.slice(3, 10).forEach((movie) => {
+          preloadImage(imageUrl(movie.backdrop_path, "original"), movie.id);
+          fetchMovieLogos(movie);
+        });
+      } catch (error) {
+        console.error("Error loading movie assets:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadMovieAssets();
   }, [movies]);
+
+  if (loading) {
+    return (
+      <Box
+        sx={{
+          position: "relative",
+          width: "100%",
+          height: {
+            xs: "calc(100vw * 0.75 + env(safe-area-inset-top) + 100px)",
+            sm: "60vh",
+          },
+          overflow: "hidden",
+        }}
+      >
+        <Skeleton
+          variant="rectangular"
+          width="100%"
+          height="100%"
+          animation="wave"
+          sx={{
+            bgcolor: "rgba(255, 255, 255, 0.1)",
+            position: "absolute",
+            top: 0,
+            left: 0,
+          }}
+        />
+        <Box
+          sx={{
+            position: "absolute",
+            bottom: "20%",
+            left: "50%",
+            transform: "translateX(-50%)",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            gap: 3,
+            zIndex: 1,
+          }}
+        >
+          <Skeleton
+            variant="rectangular"
+            width={250}
+            height={80}
+            animation="wave"
+            sx={{ bgcolor: "rgba(255, 255, 255, 0.1)" }}
+          />
+          <Skeleton
+            variant="rectangular"
+            width={180}
+            height={48}
+            animation="wave"
+            sx={{
+              bgcolor: "rgba(255, 255, 255, 0.1)",
+              borderRadius: "24px",
+            }}
+          />
+        </Box>
+      </Box>
+    );
+  }
 
   return (
     <Box
@@ -102,21 +197,31 @@ export const BackdropSlider = ({ movies }: BackdropSliderProps) => {
                 height: "100%",
               }}
             >
-              <Box
-                component="img"
-                src={imageUrl(movie.backdrop_path, "original")}
-                alt={movie.title}
-                sx={{
-                  width: "100%",
-                  height: "100%",
-                  objectFit: "cover",
-                  objectPosition: {
-                    xs: "center 15%",
-                    sm: "center top",
-                  },
-                  transform: "scale(1.02)",
-                }}
-              />
+              {loadedImages[movie.id] ? (
+                <Box
+                  component="img"
+                  src={imageUrl(movie.backdrop_path, "original")}
+                  alt={movie.title}
+                  sx={{
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "cover",
+                    objectPosition: {
+                      xs: "center 15%",
+                      sm: "center top",
+                    },
+                    transform: "scale(1.02)",
+                  }}
+                />
+              ) : (
+                <Skeleton
+                  variant="rectangular"
+                  width="100%"
+                  height="100%"
+                  animation="wave"
+                  sx={{ bgcolor: "rgba(255, 255, 255, 0.1)" }}
+                />
+              )}
               <Box
                 sx={{
                   position: "absolute",
