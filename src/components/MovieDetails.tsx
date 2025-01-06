@@ -118,7 +118,6 @@ export const MovieDetails = ({
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const [logo, setLogo] = useState<string | null>(null);
   const [details, setDetails] = useState<any>(null);
-  const [scrollOpacity] = useState(0.4); // начальная прозрачность 0.4
   const [isBackdropLoaded, setIsBackdropLoaded] = useState(false);
   const [showPlayer, setShowPlayer] = useState(false);
   const [_, setMediaUrl] = useState<string | null>(null);
@@ -336,7 +335,7 @@ export const MovieDetails = ({
                   position: "relative",
                   width: "100%",
                   height: {
-                    xs: "calc(75vw + env(safe-area-inset-top) + 20px)",
+                    xs: "calc(100vw * 0.75 + env(safe-area-inset-top) + 60px)",
                     sm: "60vh",
                   },
                   overflow: "hidden",
@@ -373,8 +372,14 @@ export const MovieDetails = ({
                     left: 0,
                     top: 0,
                     width: "100%",
-                    height: "100%",
-                    background: `linear-gradient(to bottom, rgba(0,0,0,${scrollOpacity}) 0%, rgba(20,20,20,1) 100%)`,
+                    height: "calc(100% + 100px)",
+                    background: `linear-gradient(
+                      to bottom,
+                      rgba(20,20,20,0) 0%,
+                      rgba(20,20,20,0.4) 50%,
+                      rgba(20,20,20) 80%,
+                      rgba(20,20,20,1) 100%
+                    )`,
                     transition: "background 0.2s ease",
                     paddingTop: "env(safe-area-inset-top)",
                   }}
