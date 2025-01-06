@@ -335,7 +335,7 @@ export const MovieDetails = ({
                   position: "relative",
                   width: "100%",
                   height: {
-                    xs: "calc(100vw * 0.75 + env(safe-area-inset-top) + 60px)",
+                    xs: "calc(100vw * 0.75 + env(safe-area-inset-top) + 100px)",
                     sm: "60vh",
                   },
                   overflow: "hidden",
@@ -372,13 +372,15 @@ export const MovieDetails = ({
                     left: 0,
                     top: 0,
                     width: "100%",
-                    height: "calc(100% + 100px)",
+                    height: "calc(100% + 120px)",
                     background: `linear-gradient(
                       to bottom,
-                      rgba(20,20,20,0) 0%,
-                      rgba(20,20,20,0.4) 50%,
-                      rgba(20,20,20) 80%,
-                      rgba(20,20,20,1) 100%
+                      rgb(103 58 183 / 32%) 0%,
+                      rgba(20, 20, 20, 0.2) 40%,
+                      rgb(20 20 20 / 89%) 65%,
+                      rgb(20 20 20) 80%,
+                      rgb(20 20 20) 90%,
+                      rgba(20, 20, 20, 1) 100%
                     )`,
                     transition: "background 0.2s ease",
                     paddingTop: "env(safe-area-inset-top)",
