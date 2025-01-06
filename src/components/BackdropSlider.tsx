@@ -1,16 +1,15 @@
 import {
   Box,
-  Typography,
   Button,
   useTheme,
   useMediaQuery,
+  Typography,
 } from "@mui/material";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { Autoplay, Navigation, Pagination } from "swiper/modules";
+import { Autoplay } from "swiper/modules";
 import { imageUrl } from "../api/tmdb";
+import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import "swiper/css";
-import "swiper/css/navigation";
-import "swiper/css/pagination";
 
 interface Movie {
   id: number;
@@ -31,23 +30,25 @@ interface BackdropSliderProps {
 export const BackdropSlider = ({ movies }: BackdropSliderProps) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-  const isTablet = useMediaQuery(theme.breakpoints.down("md"));
+  const isTablet = useMediaQuery(theme.breakpoints.between("sm", "md"));
+
+  const truncateOverview = (text: string, maxLength: number = 300) => {
+    if (text.length <= maxLength) return text;
+    return text.slice(0, maxLength) + "...";
+  };
 
   return (
     <Box sx={{ mb: 4, position: "relative" }}>
       <Swiper
-        modules={[Navigation, Pagination, Autoplay]}
-        navigation
-        pagination={{ clickable: true }}
+        modules={[Autoplay]}
         autoplay={{
           delay: 5000,
           disableOnInteraction: false,
         }}
         loop={true}
-        className="backdrop-slider"
         style={{
           width: "100%",
-          height: isMobile ? "70vh" : isTablet ? "60vh" : "80vh",
+          height: isMobile ? "70vh" : isTablet ? "75vh" : "80vh",
         }}
       >
         {movies.slice(0, 10).map((movie) => (
@@ -57,7 +58,6 @@ export const BackdropSlider = ({ movies }: BackdropSliderProps) => {
                 position: "relative",
                 width: "100%",
                 height: "100%",
-                overflow: "hidden",
                 "&::after": {
                   content: '""',
                   position: "absolute",
@@ -65,29 +65,13 @@ export const BackdropSlider = ({ movies }: BackdropSliderProps) => {
                   top: 0,
                   width: "100%",
                   height: "100%",
-                  background: isMobile
-                    ? `linear-gradient(
-                        180deg,
-                        rgba(20,20,20,0) 0%,
-                        rgba(20,20,20,0.6) 50%,
-                        rgba(20,20,20,0.8) 70%,
-                        rgba(20,20,20,0.95) 85%,
-                        rgba(20,20,20,1) 100%
-                      )`
-                    : `linear-gradient(
-                        90deg,
-                        rgba(0,0,0,0.8) 0%,
-                        rgba(0,0,0,0.4) 50%,
-                        rgba(0,0,0,0) 100%
-                      ),
-                      linear-gradient(
-                        180deg,
-                        rgba(20,20,20,0) 0%,
-                        rgba(20,20,20,0.4) 50%,
-                        rgba(20,20,20,0.8) 75%,
-                        rgba(20,20,20,0.95) 85%,
-                        rgba(20,20,20,1) 100%
-                      )`,
+                  background: `linear-gradient(
+                    180deg,
+                    rgba(20,20,20,0) 0%,
+                    rgba(20,20,20,0.4) 50%,
+                    rgba(20,20,20,0.8) 80%,
+                    rgba(20,20,20,1) 100%
+                  )`,
                   zIndex: 1,
                 },
               }}
@@ -97,81 +81,58 @@ export const BackdropSlider = ({ movies }: BackdropSliderProps) => {
                 src={imageUrl(movie.backdrop_path, "original")}
                 alt={movie.title}
                 sx={{
-                  position: "absolute",
-                  top: 0,
-                  left: 0,
                   width: "100%",
                   height: "100%",
                   objectFit: "cover",
-                  objectPosition: "center center",
-                  transform: isMobile ? "scale(1.1)" : "none",
                 }}
               />
               <Box
                 sx={{
                   position: "absolute",
-                  bottom: isMobile ? "10%" : "15%",
-                  left: "5%",
-                  maxWidth: isMobile ? "90%" : "40%",
+                  left: "50%",
+                  bottom: { xs: "15%", sm: "20%", md: "25%" },
+                  transform: "translateX(-50%)",
                   zIndex: 2,
-                  padding: isMobile ? "0 16px" : 0,
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  width: "100%",
+                  maxWidth: { xs: "90%", sm: "80%", md: "60%" },
                 }}
               >
-                <Typography
-                  variant="h3"
-                  sx={{
-                    color: "white",
-                    fontWeight: "bold",
-                    mb: 2,
-                    textShadow: "2px 2px 4px rgba(0,0,0,0.5)",
-                    fontSize: {
-                      xs: "1.75rem",
-                      sm: "2rem",
-                      md: "2.5rem",
-                    },
-                    lineHeight: {
-                      xs: 1.2,
-                      sm: 1.3,
-                    },
-                  }}
-                >
-                  {movie.title}
-                </Typography>
-                <Typography
-                  sx={{
-                    color: "white",
-                    mb: 3,
-                    display: "-webkit-box",
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                    WebkitLineClamp: isMobile ? 4 : 3,
-                    WebkitBoxOrient: "vertical",
-                    fontSize: {
-                      xs: "0.875rem",
-                      sm: "1rem",
-                    },
-                    lineHeight: 1.5,
-                    textShadow: "1px 1px 2px rgba(0,0,0,0.8)",
-                  }}
-                >
-                  {movie.overview}
-                </Typography>
                 <Button
                   variant="contained"
-                  size={isMobile ? "large" : "medium"}
+                  startIcon={<PlayArrowIcon />}
                   sx={{
                     bgcolor: "white",
                     color: "black",
-                    fontWeight: "bold",
-                    px: { xs: 4, sm: 3 },
-                    py: { xs: 1.5, sm: 1 },
+                    fontSize: { xs: "1rem", sm: "1.2rem", md: "1.4rem" },
+                    px: { xs: 4, sm: 6, md: 8 },
+                    py: { xs: 1, sm: 1.5 },
+                    borderRadius: 28,
+                    mb: { xs: 2, sm: 3 },
                     "&:hover": {
                       bgcolor: "rgba(255,255,255,0.8)",
                     },
+                    minWidth: { xs: "140px", sm: "180px", md: "200px" },
+                    textTransform: "none",
                   }}
                 >
-                  Подробнее
+                  Смотреть
                 </Button>
+                <Typography
+                  variant="body1"
+                  sx={{
+                    color: "white",
+                    textAlign: "center",
+                    fontSize: { xs: "0.9rem", sm: "1rem", md: "1.1rem" },
+                    opacity: 0.9,
+                    maxWidth: { xs: "100%", sm: "90%", md: "80%" },
+                    lineHeight: 1.5,
+                  }}
+                >
+                  {truncateOverview(movie.overview)}
+                </Typography>
               </Box>
             </Box>
           </SwiperSlide>
