@@ -98,8 +98,16 @@ export const MovieSlider = ({
         >
           {[...Array(6)].map((_, index) => (
             <SwiperSlide key={index} style={{ height: "auto" }}>
-              <Box sx={{ aspectRatio: "2/3" }}>
-                <MovieCardSkeleton />
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                  height: "100%",
+                }}
+              >
+                <Box sx={{ aspectRatio: "2/3", marginBottom: 1 }}>
+                  <MovieCardSkeleton />
+                </Box>
               </Box>
             </SwiperSlide>
           ))}
@@ -151,8 +159,16 @@ export const MovieSlider = ({
       >
         {movies.map((movie) => (
           <SwiperSlide key={movie.id} style={{ height: "auto" }}>
-            <Box sx={{ aspectRatio: "2/3" }}>
-              <MovieCard movie={movie} onMovieSelect={onMovieSelect} />
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                height: "100%",
+              }}
+            >
+              <Box sx={{ aspectRatio: "2/3", marginBottom: 1 }}>
+                <MovieCard movie={movie} onMovieSelect={onMovieSelect} />
+              </Box>
             </Box>
           </SwiperSlide>
         ))}

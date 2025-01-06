@@ -1,7 +1,6 @@
 import {
   Box,
   CardMedia,
-  CardContent,
   Typography,
   useTheme,
   useMediaQuery,
@@ -99,6 +98,8 @@ export const MovieCard = ({ movie, onMovieSelect }: MovieCardProps) => {
             transform: isDesktop ? "scale(1.05)" : "none",
             zIndex: isDesktop ? 1 : "auto",
           },
+          display: "flex",
+          flexDirection: "column",
         }}
       >
         <CardMedia
@@ -152,32 +153,24 @@ export const MovieCard = ({ movie, onMovieSelect }: MovieCardProps) => {
             {movie.vote_average.toFixed(1)}
           </Box>
         )}
-        <CardContent
+        <Typography
+          variant="subtitle1"
           sx={{
-            position: "absolute",
-            bottom: 0,
-            width: "100%",
-            background: "linear-gradient(transparent, rgba(0,0,0,0.9))",
-            padding: "16px",
-            "&:last-child": { paddingBottom: "16px" },
+            color: "white",
+            fontWeight: "500",
+            fontSize: { xs: "0.875rem", sm: "1rem" },
+            mt: 1,
+            px: 1,
+            textAlign: "center",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            display: "-webkit-box",
+            WebkitLineClamp: 1,
+            WebkitBoxOrient: "vertical",
           }}
         >
-          <Typography
-            variant="subtitle1"
-            sx={{
-              color: "white",
-              fontWeight: "bold",
-              textShadow: "0 2px 4px rgba(0,0,0,0.5)",
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-              display: "-webkit-box",
-              WebkitLineClamp: 2,
-              WebkitBoxOrient: "vertical",
-            }}
-          >
-            {movie.title}
-          </Typography>
-        </CardContent>
+          {movie.title}
+        </Typography>
       </Box>
 
       <MovieDetails
