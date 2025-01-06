@@ -335,9 +335,12 @@ export const MovieDetails = ({
                 sx={{
                   position: "relative",
                   width: "100%",
-                  height: { xs: "40vh", sm: "60vh" },
+                  height: {
+                    xs: "calc(40vh + env(safe-area-inset-top))",
+                    sm: "60vh",
+                  },
                   overflow: "hidden",
-                  mt: `calc(-1 * env(safe-area-inset-top))`,
+                  mt: 0,
                 }}
               >
                 <Box
@@ -356,6 +359,7 @@ export const MovieDetails = ({
                     objectPosition: { xs: "center 15%", sm: "center top" },
                     opacity: isBackdropLoaded ? 1 : 0,
                     transition: "opacity 0.3s ease-out",
+                    transform: "translateY(0)",
                   }}
                   onLoad={() => setIsBackdropLoaded(true)}
                 />
@@ -365,9 +369,10 @@ export const MovieDetails = ({
                     left: 0,
                     top: 0,
                     width: "100%",
-                    height: `calc(100% + env(safe-area-inset-top))`,
+                    height: "100%",
                     background: `linear-gradient(to bottom, rgba(0,0,0,${scrollOpacity}) 0%, rgba(20,20,20,1) 100%)`,
                     transition: "background 0.2s ease",
+                    paddingTop: "env(safe-area-inset-top)",
                   }}
                 />
               </Box>
