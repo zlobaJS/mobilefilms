@@ -6,6 +6,7 @@ import {
   useTheme,
   useMediaQuery,
   Grid,
+  Slide,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import StarBorderIcon from "@mui/icons-material/StarBorder";
@@ -267,20 +268,26 @@ export const MovieDetails = ({
     <Dialog
       open={open}
       onClose={onClose}
-      maxWidth={false}
-      fullWidth
       fullScreen
-      TransitionProps={{
-        timeout: 400,
-      }}
+      TransitionComponent={Slide}
       PaperProps={{
         sx: {
           bgcolor: "#141414",
-          backgroundImage: "none",
-          margin: 0,
           height: "100%",
-          overflowY: "auto",
-          padding: 0,
+          // Добавляем поддержку safe-area для iOS
+          pb: "env(safe-area-inset-bottom, 0px)", // Контент будет заходить за status bar
+          position: "relative",
+          "&::after": {
+            content: '""',
+            position: "fixed",
+            left: 0,
+            right: 0,
+            bottom: 0,
+            height: "env(safe-area-inset-bottom, 0px)",
+            background: "transparent", // Прозрачный status bar
+            zIndex: 1000,
+            pointerEvents: "none", // Чтобы не мешать взаимодействию с контентом
+          },
         },
       }}
     >
