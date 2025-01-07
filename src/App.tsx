@@ -68,17 +68,21 @@ function MobileNavigation() {
 
   return (
     <Box
+      component="nav"
       sx={{
         position: "fixed",
-        bottom: "-env(safe-area-inset-bottom)",
-        left: "50%",
-        transform: "translateX(-50%)",
-        width: "95%",
-        maxWidth: "400px",
+        bottom: 0,
+        left: 0,
+        right: 0,
         zIndex: 1300,
         display: { xs: "block", sm: "none" },
-        pb: 0,
-        height: "calc(56px + env(safe-area-inset-bottom))",
+        "& > *": {
+          margin: "0 auto",
+          maxWidth: "400px",
+          width: "95%",
+        },
+        paddingBottom: "env(safe-area-inset-bottom)",
+        background: "transparent",
       }}
     >
       <BottomNavigation
@@ -110,8 +114,7 @@ function MobileNavigation() {
           borderRadius: "16px",
           border: "1px solid rgba(255, 255, 255, 0.1)",
           overflow: "hidden",
-          height: "100%",
-          paddingBottom: "env(safe-area-inset-bottom)",
+          height: "56px",
           "& .MuiBottomNavigationAction-root": {
             minWidth: "auto",
             padding: "6px 0",
@@ -263,12 +266,15 @@ function AppRoutes() {
                     backgroundColor: "#141414",
                     padding: 0,
                     mt: "-env(safe-area-inset-top)",
+                    mb: "-env(safe-area-inset-bottom)",
                     height:
                       "calc(100vh + env(safe-area-inset-top) + env(safe-area-inset-bottom))",
                     "& > *": {
                       paddingLeft: "env(safe-area-inset-left)",
                       paddingRight: "env(safe-area-inset-right)",
                     },
+                    background:
+                      "linear-gradient(to bottom, #141414 0%, #141414 calc(100% - env(safe-area-inset-bottom)), transparent calc(100% - env(safe-area-inset-bottom)))",
                   }}
                 >
                   <BackdropSlider
