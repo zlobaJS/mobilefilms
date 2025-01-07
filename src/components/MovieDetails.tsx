@@ -423,7 +423,7 @@ export const MovieDetails = ({
                     WebkitBackfaceVisibility: "hidden",
                     MozBackfaceVisibility: "hidden",
                     backfaceVisibility: "hidden",
-                    marginTop: "env(safe-area-inset-top)",
+                    marginTop: 0,
                   }}
                   onLoad={() => setIsBackdropLoaded(true)}
                 />
@@ -443,7 +443,7 @@ export const MovieDetails = ({
                       rgb(20 20 20) 100%
                     )`,
                     transition: "background 0.2s ease",
-                    marginTop: "env(safe-area-inset-top)",
+                    marginTop: 0,
                   }}
                 />
               </Box>
