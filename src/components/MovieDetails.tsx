@@ -326,7 +326,10 @@ export const MovieDetails = ({
           "&.MuiDialog-paper": {
             margin: 0,
           },
+          paddingTop: "env(safe-area-inset-top)",
           paddingBottom: 0,
+          paddingLeft: "env(safe-area-inset-left)",
+          paddingRight: "env(safe-area-inset-right)",
         },
       }}
     >
