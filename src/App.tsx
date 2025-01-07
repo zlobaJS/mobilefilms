@@ -71,14 +71,14 @@ function MobileNavigation() {
       sx={{
         position: "fixed",
         bottom: 0,
-        left: "50%",
-        transform: "translateX(-50%)",
-        width: "95%",
-        maxWidth: "400px",
+        left: 0,
+        right: 0,
+        width: "100%",
         zIndex: 1300,
         display: { xs: "block", sm: "none" },
         pb: "env(safe-area-inset-bottom)",
-        mb: 1,
+        background:
+          "linear-gradient(to top, rgba(20, 20, 20, 1) 0%, rgba(20, 20, 20, 0.8) 100%)",
       }}
     >
       <BottomNavigation
@@ -104,12 +104,9 @@ function MobileNavigation() {
           }
         }}
         sx={{
-          bgcolor: "rgba(20, 20, 20, 0.7)",
+          bgcolor: "transparent",
           backdropFilter: "blur(10px)",
           WebkitBackdropFilter: "blur(10px)",
-          borderRadius: "16px",
-          border: "1px solid rgba(255, 255, 255, 0.1)",
-          overflow: "hidden",
           height: "56px",
           "& .MuiBottomNavigationAction-root": {
             minWidth: "auto",
@@ -119,7 +116,7 @@ function MobileNavigation() {
               color: "white",
             },
             "& .MuiSvgIcon-root": {
-              fontSize: "24px",
+              fontSize: "28px",
               transition: "transform 0.2s",
             },
             "&.Mui-selected .MuiSvgIcon-root": {

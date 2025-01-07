@@ -56,6 +56,7 @@ interface MovieDetailsProps {
       poster_path: string;
       backdrop_path: string;
     };
+    tagline?: string;
   } | null;
   open: boolean;
   onClose: () => void;
@@ -505,6 +506,21 @@ export const MovieDetails = ({
                     </Typography>
                   )}
 
+                  {/* Добавляем слоган */}
+                  {details?.tagline && (
+                    <Typography
+                      sx={{
+                        color: "rgba(255, 255, 255, 0.7)",
+                        fontSize: "1rem",
+                        fontStyle: "italic",
+                        mb: 2,
+                        textAlign: { xs: "center", sm: "left" },
+                      }}
+                    >
+                      {details.tagline}
+                    </Typography>
+                  )}
+
                   <Box
                     sx={{
                       display: "flex",
@@ -530,7 +546,7 @@ export const MovieDetails = ({
                         >
                           <Typography
                             sx={{
-                              fontSize: "0.9rem",
+                              fontSize: "1rem",
                               color: getRatingColor(currentMovie?.vote_average),
                             }}
                           >
@@ -550,7 +566,7 @@ export const MovieDetails = ({
                                 <Typography
                                   sx={{
                                     color: "#888",
-                                    fontSize: "0.9rem",
+                                    fontSize: "1rem",
                                   }}
                                 >
                                   {formatVoteCount(currentMovie?.vote_count)}{" "}
@@ -561,82 +577,71 @@ export const MovieDetails = ({
                         </Box>
                       )}
 
-                    {/* Страны производства */}
-                    {details?.production_countries &&
-                      details.production_countries.length > 0 && (
-                        <Box
-                          sx={{
-                            display: "flex",
-                            alignItems: "center",
-                            gap: "4px",
-                            flexWrap: "wrap", // Разрешаем перенос внутри блока стран
-                            justifyContent: { xs: "center", sm: "flex-start" },
-                          }}
-                        >
-                          {details.production_countries.map(
-                            (country: ProductionCountry, index: number) => (
-                              <Box
-                                key={country.iso_3166_1}
-                                sx={{
-                                  display: "flex",
-                                  alignItems: "center",
-                                  gap: "4px",
-                                }}
-                              >
-                                {country.iso_3166_1 && (
-                                  <Box
-                                    component="span"
-                                    sx={{
-                                      width: "16px",
-                                      display: "inline-block",
-                                      verticalAlign: "middle",
-                                      "& > svg": {
-                                        width: "100%",
-                                      },
-                                    }}
-                                  >
-                                    {(() => {
-                                      const CountryFlag =
-                                        Flags[
-                                          country.iso_3166_1 as keyof typeof Flags
-                                        ];
-                                      return CountryFlag ? (
-                                        <CountryFlag />
-                                      ) : null;
-                                    })()}
-                                  </Box>
-                                )}
-                                <Typography
+                    {/* Страны производства (максимум 2) */}
+                    {details?.production_countries && (
+                      <Box
+                        sx={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "4px",
+                        }}
+                      >
+                        {details.production_countries
+                          .slice(0, 2)
+                          .map((country: ProductionCountry, index: number) => (
+                            <Box
+                              key={country.iso_3166_1}
+                              sx={{
+                                display: "flex",
+                                alignItems: "center",
+                                gap: "4px",
+                              }}
+                            >
+                              {country.iso_3166_1 && (
+                                <Box
+                                  component="span"
                                   sx={{
-                                    color: "#888",
-                                    fontSize: "0.9rem",
+                                    width: "16px",
+                                    display: "inline-block",
+                                    verticalAlign: "middle",
                                   }}
                                 >
-                                  {translateCountry(country.name)}
+                                  {(() => {
+                                    const CountryFlag =
+                                      Flags[
+                                        country.iso_3166_1 as keyof typeof Flags
+                                      ];
+                                    return CountryFlag ? <CountryFlag /> : null;
+                                  })()}
+                                </Box>
+                              )}
+                              <Typography
+                                sx={{ color: "#888", fontSize: "1rem" }}
+                              >
+                                {translateCountry(country.name)}
+                              </Typography>
+                              {index <
+                                Math.min(
+                                  details.production_countries.length - 1,
+                                  1
+                                ) && (
+                                <Typography
+                                  sx={{ color: "#888", fontSize: "1rem" }}
+                                >
+                                  •
                                 </Typography>
-                                {index <
-                                  details.production_countries.length - 1 && (
-                                  <Typography
-                                    sx={{
-                                      color: "#888",
-                                      fontSize: "0.9rem",
-                                    }}
-                                  >
-                                    •
-                                  </Typography>
-                                )}
-                              </Box>
-                            )
-                          )}
-                        </Box>
-                      )}
+                              )}
+                            </Box>
+                          ))}
+                      </Box>
+                    )}
 
                     {/* Год */}
                     {currentMovie?.release_date && (
                       <Typography
                         sx={{
                           color: "#888",
-                          fontSize: "0.9rem",
+                          fontSize: "1rem",
                           flexShrink: 0,
                         }}
                       >
@@ -650,7 +655,7 @@ export const MovieDetails = ({
                         <Typography
                           sx={{
                             color: "#888",
-                            fontSize: "0.9rem",
+                            fontSize: "1rem",
                             flexShrink: 0,
                           }}
                         >
@@ -658,16 +663,17 @@ export const MovieDetails = ({
                         </Typography>
                       )}
 
-                    {/* Жанры */}
+                    {/* Жанры (максимум 2) */}
                     {details?.genres && (
                       <Typography
                         sx={{
                           color: "#888",
-                          fontSize: "0.9rem",
+                          fontSize: "1rem",
                           textAlign: { xs: "center", sm: "left" },
                         }}
                       >
                         {details.genres
+                          .slice(0, 2)
                           .map((genre: Genre) => genre.name)
                           .join(", ")}
                       </Typography>
@@ -789,20 +795,6 @@ export const MovieDetails = ({
                       display: { xs: "block", sm: "none" },
                     }}
                   />
-
-                  <Typography
-                    variant="h6"
-                    sx={{
-                      color: "#6b6868",
-                      fontSize: "0.9rem",
-                      fontWeight: 500,
-                      mb: 1,
-                      textAlign: "left",
-                    }}
-                  >
-                    Описание
-                  </Typography>
-
                   <Typography
                     sx={{
                       color: "#fff",
