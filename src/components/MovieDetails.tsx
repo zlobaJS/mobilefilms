@@ -312,9 +312,9 @@ export const MovieDetails = ({
       }}
       PaperProps={{
         sx: {
-          bgcolor: "#141414",
-          height: "100%",
-          width: "100%",
+          bgcolor: "transparent",
+          height: "100vh",
+          width: "100vw",
           margin: 0,
           padding: 0,
           position: "fixed",
@@ -326,33 +326,29 @@ export const MovieDetails = ({
           "&.MuiDialog-paper": {
             margin: 0,
           },
-          // Убираем все отступы
-          paddingTop: 0,
-          paddingBottom: 0,
-          paddingLeft: 0,
-          paddingRight: 0,
-          // Растягиваем на весь экран
-          minHeight: "-webkit-fill-available",
-          // Убираем белый фон
-          background: "#141414",
+          // Убираем все отступы и делаем прозрачным
+          background: "transparent",
         },
       }}
     >
       <Box
         className="dialog-content"
         sx={{
-          height: "100%",
-          width: "100%",
+          height: "100vh",
+          width: "100vw",
           position: "relative",
           overflowY: "auto",
           WebkitOverflowScrolling: "touch",
           margin: 0,
           padding: 0,
-          // Убираем отступы
-          paddingTop: 0,
-          paddingBottom: 0,
-          // Убираем белый фон
-          background: "#141414",
+          // Отрицательные отступы для заходя за safe-area
+          mt: "-env(safe-area-inset-top)",
+          mb: "-env(safe-area-inset-bottom)",
+          // Увеличиваем высоту для компенсации safe-areas
+          minHeight:
+            "calc(100vh + env(safe-area-inset-top) + env(safe-area-inset-bottom))",
+          // Делаем фон прозрачным
+          background: "transparent",
         }}
       >
         {!showPlayer && (
