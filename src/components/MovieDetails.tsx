@@ -258,9 +258,6 @@ export const MovieDetails = ({
     return "#FF5252";
   };
 
-  // Оптимизируем загрузку изображений для мобильных устройств
-  const imageSize = isMobile ? "w92" : "w185"; // Меньший размер изображений для мобильных
-
   return (
     <Dialog
       open={open}
@@ -415,7 +412,7 @@ export const MovieDetails = ({
               <Box
                 sx={{
                   position: "relative",
-                  mt: { xs: -10, sm: -20 },
+                  mt: "-107px",
                   px: 2,
                   color: "white",
                   display: "flex",
@@ -423,6 +420,7 @@ export const MovieDetails = ({
                   opacity: isVisible ? 1 : 0,
                   transform: isVisible ? "translateY(0)" : "translateY(40px)",
                   transition: "opacity 0.8s ease-out, transform 0.8s ease-out",
+                  zIndex: 1,
                 }}
               >
                 <Box
@@ -809,10 +807,7 @@ export const MovieDetails = ({
                                     <Box
                                       component="img"
                                       loading="lazy"
-                                      src={imageUrl(
-                                        actor.profile_path,
-                                        imageSize
-                                      )}
+                                      src={imageUrl(actor.profile_path, "w342")}
                                       alt={actor.name}
                                       sx={{
                                         position: "absolute",
@@ -821,7 +816,11 @@ export const MovieDetails = ({
                                         width: "100%",
                                         height: "100%",
                                         objectFit: "cover",
-                                        backfaceVisibility: "hidden", // Оптимизация производительности
+                                        imageRendering: [
+                                          "crisp-edges",
+                                          "-webkit-optimize-contrast",
+                                        ],
+                                        backfaceVisibility: "hidden",
                                       }}
                                     />
                                   ) : (
