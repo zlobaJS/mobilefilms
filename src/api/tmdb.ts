@@ -172,3 +172,13 @@ export const getCollection = async (collectionId: number) => {
     return null;
   }
 };
+
+export const getMovieRecommendations = async (movieId: number) => {
+  try {
+    const data = await fetchTMDB(`/movie/${movieId}/recommendations`, {});
+    return data.results || [];
+  } catch (error) {
+    console.error("Error fetching recommendations:", error);
+    return [];
+  }
+};

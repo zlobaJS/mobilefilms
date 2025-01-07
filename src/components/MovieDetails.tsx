@@ -22,6 +22,7 @@ import {
   getMovieDetails,
   getMovieCredits,
   getCollection,
+  getMovieRecommendations,
 } from "../api/tmdb";
 import { useEffect, useState } from "react";
 import { KinoboxPlayer } from "./KinoboxPlayer";
@@ -141,6 +142,8 @@ export const MovieDetails = ({
   const [currentMovie, setCurrentMovie] = useState(movie);
   const [isVisible, setIsVisible] = useState(false);
   const [isExpandedDescription, setIsExpandedDescription] = useState(false);
+  const [recommendations, setRecommendations] = useState<any[]>([]);
+  const [isUpdating, setIsUpdating] = useState(false);
 
   // Выносим fetchData на уровень компонента
   const fetchData = async (movieData: any) => {
@@ -268,6 +271,45 @@ export const MovieDetails = ({
     return truncated.trim();
   };
 
+  useEffect(() => {
+    const fetchRecommendations = async () => {
+      if (currentMovie?.id) {
+        const recommendedMovies = await getMovieRecommendations(
+          currentMovie.id
+        );
+        setRecommendations(recommendedMovies);
+      }
+    };
+    fetchRecommendations();
+  }, [currentMovie?.id]);
+
+  const handleMovieSelect = (selectedMovie: any) => {
+    if (onMovieSelect) {
+      onClose(); // Закрываем текущее окно
+      onMovieSelect(selectedMovie); // Открываем новое окно с выбранным фильмом
+    }
+  };
+
+  const handleRecommendationClick = async (movie: any) => {
+    try {
+      setIsUpdating(true); // Начинаем анимацию
+      const movieDetails = await getMovieDetails(movie.id);
+      if (movieDetails && onMovieSelect) {
+        setCurrentMovie(movieDetails);
+        fetchData(movieDetails);
+        if (onMovieSelect) {
+          onMovieSelect(movieDetails);
+        }
+      }
+    } catch (error) {
+      console.error("Error loading movie details:", error);
+    } finally {
+      setTimeout(() => {
+        setIsUpdating(false); // Заканчиваем анимацию
+      }, 300);
+    }
+  };
+
   if (!movie) return null;
 
   // Функция форматирования времени
@@ -279,15 +321,17 @@ export const MovieDetails = ({
     return hours > 0 ? `${hours}ч ${mins}м` : `${mins}м`;
   };
 
-  // Форматируем количество голосов
+  // Обновляем функцию форматирования рейтинга
+  const formatRating = (rating: number | undefined) => {
+    if (typeof rating !== "number" || isNaN(rating)) return "";
+    return rating.toFixed(1);
+  };
+
+  // Обновляем функцию форматирования голосов
   const formatVoteCount = (count?: number) => {
-    if (!count) return "";
-    if (count >= 1000000) {
-      return `${(count / 1000000).toFixed(1)}M`;
-    }
-    if (count >= 1000) {
-      return `${(count / 1000).toFixed(0)}K`;
-    }
+    if (typeof count !== "number" || isNaN(count)) return "";
+    if (count >= 1000000) return `${(count / 1000000).toFixed(1)}M`;
+    if (count >= 1000) return `${(count / 1000).toFixed(0)}K`;
     return count.toString();
   };
 
@@ -378,6 +422,22 @@ export const MovieDetails = ({
             bgcolor: "#141414",
           }}
         >
+          {/* Оверлей с затемнением */}
+          <Box
+            sx={{
+              position: "fixed",
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              bgcolor: "rgba(0, 0, 0, 0.5)",
+              zIndex: 1300,
+              opacity: isUpdating ? 1 : 0,
+              visibility: isUpdating ? "visible" : "hidden",
+              transition:
+                "opacity 0.3s ease-in-out, visibility 0.3s ease-in-out",
+            }}
+          />
           {showPlayer ? (
             <KinoboxPlayer
               tmdbId={currentMovie?.id || 0}
@@ -550,7 +610,9 @@ export const MovieDetails = ({
                               color: getRatingColor(currentMovie?.vote_average),
                             }}
                           >
-                            {currentMovie?.vote_average.toFixed(1)}
+                            {currentMovie?.vote_average
+                              ? formatRating(currentMovie.vote_average)
+                              : ""}
                           </Typography>
                           {currentMovie?.vote_count &&
                             currentMovie?.vote_count > 0 && (
@@ -569,7 +631,9 @@ export const MovieDetails = ({
                                     fontSize: "1rem",
                                   }}
                                 >
-                                  {formatVoteCount(currentMovie?.vote_count)}{" "}
+                                  {currentMovie?.vote_count
+                                    ? formatVoteCount(currentMovie.vote_count)
+                                    : ""}{" "}
                                   оценок
                                 </Typography>
                               </>
@@ -1168,6 +1232,125 @@ export const MovieDetails = ({
                         </Box>
                       </Dialog>
                     </>
+                  )}
+
+                  {recommendations.length > 0 && (
+                    <Box sx={{ mb: 4 }}>
+                      <Typography
+                        variant="h6"
+                        sx={{
+                          color: "#6b6868",
+                          fontSize: "0.9rem",
+                          fontWeight: 500,
+                          mb: 2,
+                          textAlign: "left",
+                        }}
+                      >
+                        Рекомендации
+                      </Typography>
+                      <Box sx={{ position: "relative" }}>
+                        <Swiper
+                          modules={[FreeMode]}
+                          slidesPerView="auto"
+                          spaceBetween={8}
+                          freeMode
+                          style={{ padding: "4px" }}
+                        >
+                          {recommendations.map((movie) => (
+                            <SwiperSlide
+                              key={movie.id}
+                              style={{
+                                width: "auto",
+                                height: "auto",
+                              }}
+                            >
+                              <Box
+                                onClick={() => handleRecommendationClick(movie)}
+                                sx={{
+                                  cursor: "pointer",
+                                  transition: "transform 0.2s",
+                                  "&:hover": {
+                                    transform: "scale(1.02)",
+                                  },
+                                }}
+                              >
+                                <Box
+                                  sx={{
+                                    width: {
+                                      xs: "120px",
+                                      sm: "200px",
+                                    },
+                                    aspectRatio: "2/3",
+                                    borderRadius: "8px",
+                                    overflow: "hidden",
+                                    mb: 1,
+                                    bgcolor: "rgba(255,255,255,0.1)",
+                                  }}
+                                >
+                                  {movie.poster_path ? (
+                                    <Box
+                                      component="img"
+                                      src={imageUrl(movie.poster_path, "w342")}
+                                      alt={movie.title}
+                                      sx={{
+                                        width: "100%",
+                                        height: "100%",
+                                        objectFit: "cover",
+                                      }}
+                                      loading="lazy"
+                                    />
+                                  ) : (
+                                    <Box
+                                      sx={{
+                                        width: "100%",
+                                        height: "100%",
+                                        display: "flex",
+                                        alignItems: "center",
+                                        justifyContent: "center",
+                                        color: "#666",
+                                      }}
+                                    >
+                                      No image
+                                    </Box>
+                                  )}
+                                </Box>
+                                <Typography
+                                  sx={{
+                                    fontSize: { xs: "0.9rem", sm: "1rem" },
+                                    fontWeight: 500,
+                                    color: "white",
+                                    overflow: "hidden",
+                                    textOverflow: "ellipsis",
+                                    whiteSpace: "nowrap",
+                                    width: {
+                                      xs: "120px",
+                                      sm: "200px",
+                                    },
+                                  }}
+                                >
+                                  {movie.title}
+                                </Typography>
+                                <Typography
+                                  sx={{
+                                    fontSize: { xs: "0.8rem", sm: "0.9rem" },
+                                    color: "#888",
+                                    overflow: "hidden",
+                                    textOverflow: "ellipsis",
+                                    whiteSpace: "nowrap",
+                                    width: {
+                                      xs: "120px",
+                                      sm: "200px",
+                                    },
+                                  }}
+                                >
+                                  {new Date(movie.release_date).getFullYear()}
+                                </Typography>
+                              </Box>
+                            </SwiperSlide>
+                          ))}
+                        </Swiper>
+                      </Box>
+                    </Box>
                   )}
                 </Box>
               </Box>
