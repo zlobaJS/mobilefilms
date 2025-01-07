@@ -71,18 +71,18 @@ function MobileNavigation() {
       component="nav"
       sx={{
         position: "fixed",
-        bottom: 0,
+        bottom: "-env(safe-area-inset-bottom)",
         left: 0,
         right: 0,
         zIndex: 1300,
         display: { xs: "block", sm: "none" },
+        height: "calc(56px + env(safe-area-inset-bottom))",
+        background: "transparent",
         "& > *": {
           margin: "0 auto",
           maxWidth: "400px",
           width: "95%",
         },
-        paddingBottom: "env(safe-area-inset-bottom)",
-        background: "transparent",
       }}
     >
       <BottomNavigation
@@ -271,12 +271,16 @@ function AppRoutes() {
                       mb: "-env(safe-area-inset-bottom)",
                       height:
                         "calc(100vh + env(safe-area-inset-top) + env(safe-area-inset-bottom))",
+                      background: `linear-gradient(
+                        180deg,
+                        #141414 0%,
+                        #141414 calc(100% - env(safe-area-inset-bottom)),
+                        transparent 100%
+                      )`,
                       "& > *": {
                         paddingLeft: "env(safe-area-inset-left)",
                         paddingRight: "env(safe-area-inset-right)",
                       },
-                      background:
-                        "linear-gradient(to bottom, #141414 0%, #141414 calc(100% - env(safe-area-inset-bottom)), transparent calc(100% - env(safe-area-inset-bottom)))",
                     }}
                   >
                     <BackdropSlider
