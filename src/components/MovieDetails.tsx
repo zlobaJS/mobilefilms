@@ -7,6 +7,8 @@ import {
   useMediaQuery,
   Grid,
   Fade,
+  Button,
+  Divider,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import StarBorderIcon from "@mui/icons-material/StarBorder";
@@ -27,6 +29,12 @@ import * as Flags from "country-flag-icons/react/3x2";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { FreeMode } from "swiper/modules";
 import "swiper/css";
+
+declare module "@mui/material/styles" {
+  interface BreakpointOverrides {
+    xxs: true;
+  }
+}
 
 interface MovieDetailsProps {
   movie: {
@@ -116,7 +124,11 @@ export const MovieDetails = ({
   onMovieSelect,
 }: MovieDetailsProps) => {
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  theme.breakpoints.values = {
+    ...theme.breakpoints.values,
+    xxs: 395,
+  };
+  const isMobile = useMediaQuery("(max-width:400px)");
   const [logo, setLogo] = useState<string | null>(null);
   const [details, setDetails] = useState<any>(null);
   const [isBackdropLoaded, setIsBackdropLoaded] = useState(false);
@@ -127,6 +139,7 @@ export const MovieDetails = ({
   const [showCollection, setShowCollection] = useState(false);
   const [currentMovie, setCurrentMovie] = useState(movie);
   const [isVisible, setIsVisible] = useState(false);
+  const [isExpandedDescription, setIsExpandedDescription] = useState(false);
 
   // Выносим fetchData на уровень компонента
   const fetchData = async (movieData: any) => {
@@ -226,6 +239,33 @@ export const MovieDetails = ({
       setIsVisible(false);
     }
   }, [open]);
+
+  // Функция для обрезки текста до ближайшей точки
+  const truncateText = (text: string, maxLength: number) => {
+    if (text.length <= maxLength) return text;
+
+    // Обрезаем до максимальной длины
+    let truncated = text.slice(0, maxLength);
+
+    // Ищем последнюю точку в обрезанном тексте
+    const lastDot = truncated.lastIndexOf(".");
+
+    // Если точка найдена и она не в самом начале текста
+    if (lastDot > 0) {
+      // Обрезаем до последней точки и добавляем саму точку
+      return truncated.slice(0, lastDot + 1);
+    }
+
+    // Если точка не найдена, ищем ближайшую точку после maxLength
+    const nextDot = text.indexOf(".", maxLength);
+    if (nextDot !== -1 && nextDot <= maxLength + 50) {
+      // Ищем точку в пределах 50 символов после maxLength
+      return text.slice(0, nextDot + 1);
+    }
+
+    // Если подходящая точка не найдена, возвращаем обрезанный текст
+    return truncated.trim();
+  };
 
   if (!movie) return null;
 
@@ -637,101 +677,169 @@ export const MovieDetails = ({
                   <Box
                     sx={{
                       display: "flex",
-                      gap: 1,
-                      mt: 3,
-                      mb: 4,
+                      flexDirection: "row",
+                      gap: isMobile ? "8px" : "16px",
+                      mb: 2,
+                      alignItems: "center",
                       justifyContent: { xs: "center", sm: "flex-start" },
+                      flexWrap: { xs: "wrap", sm: "nowrap" },
                     }}
                   >
-                    {/* Кнопка Смотреть онлайн в виде иконки */}
-                    <IconButton
+                    <Button
                       onClick={() => setShowPlayer(true)}
+                      startIcon={
+                        <PlayArrowIcon
+                          sx={{
+                            fontSize: isMobile ? 20 : 24,
+                            marginRight: isMobile ? 0 : 1,
+                            marginLeft: isMobile ? 0 : -0.5,
+                          }}
+                        />
+                      }
                       sx={{
                         background:
                           "linear-gradient(45deg, #2196F3 30%, #21CBF3 90%)",
                         boxShadow: "0 3px 5px 2px rgba(33, 203, 243, .3)",
                         color: "white",
-                        width: 40,
-                        height: 40,
+                        padding: isMobile ? "8px" : "8px 24px",
+                        borderRadius: isMobile ? "50%" : "50px",
                         transition: "all 0.3s ease",
+                        textTransform: "none",
+                        fontSize: { xs: "0.9rem", sm: "1rem" },
+                        fontWeight: 500,
+                        minWidth: isMobile ? "40px" : "auto",
+                        width: isMobile ? "40px" : "auto",
+                        height: isMobile ? "40px" : "auto",
+                        "& .MuiButton-startIcon": {
+                          margin: isMobile ? 0 : "auto",
+                          position: isMobile ? "absolute" : "relative",
+                          left: isMobile ? "50%" : "auto",
+                          transform: isMobile ? "translateX(-50%)" : "none",
+                        },
                         "&:hover": {
                           background:
                             "linear-gradient(45deg, #1976D2 30%, #00B4E5 90%)",
                           boxShadow: "0 4px 8px 3px rgba(33, 203, 243, .4)",
                           transform: "translateY(-1px)",
                         },
-                        "&:active": {
-                          transform: "translateY(1px)",
-                        },
                       }}
                     >
-                      <PlayArrowIcon />
-                    </IconButton>
+                      {!isMobile && "Смотреть"}
+                    </Button>
 
-                    <IconButton
+                    <Box
                       sx={{
-                        color: "white",
-                        bgcolor: "rgba(255,255,255,0.1)",
-                        "&:hover": {
-                          bgcolor: "rgba(255,255,255,0.2)",
-                        },
+                        display: "flex",
+                        gap: 1,
                       }}
                     >
-                      <StarBorderIcon />
-                    </IconButton>
-
-                    <IconButton
-                      sx={{
-                        color: "white",
-                        bgcolor: "rgba(255,255,255,0.1)",
-                        "&:hover": {
-                          bgcolor: "rgba(255,255,255,0.2)",
-                        },
-                      }}
-                    >
-                      <ShareIcon />
-                    </IconButton>
-
-                    <IconButton
-                      sx={{
-                        color: "white",
-                        bgcolor: "rgba(255,255,255,0.1)",
-                        "&:hover": {
-                          bgcolor: "rgba(255,255,255,0.2)",
-                        },
-                      }}
-                    >
-                      <DownloadIcon />
-                    </IconButton>
-
-                    <IconButton
-                      sx={{
-                        color: "white",
-                        bgcolor: "rgba(255,255,255,0.1)",
-                        "&:hover": {
-                          bgcolor: "rgba(255,255,255,0.2)",
-                        },
-                      }}
-                    >
-                      <MoreHorizIcon />
-                    </IconButton>
+                      <IconButton
+                        sx={{
+                          color: "white",
+                          bgcolor: "rgb(65 67 65 / 68%)",
+                          "&:hover": {
+                            bgcolor: "rgb(65 67 65 / 88%)",
+                          },
+                        }}
+                      >
+                        <StarBorderIcon />
+                      </IconButton>
+                      <IconButton
+                        sx={{
+                          color: "white",
+                          bgcolor: "rgb(65 67 65 / 68%)",
+                          "&:hover": {
+                            bgcolor: "rgb(65 67 65 / 88%)",
+                          },
+                        }}
+                      >
+                        <ShareIcon />
+                      </IconButton>
+                      <IconButton
+                        sx={{
+                          color: "white",
+                          bgcolor: "rgb(65 67 65 / 68%)",
+                          "&:hover": {
+                            bgcolor: "rgb(65 67 65 / 88%)",
+                          },
+                        }}
+                      >
+                        <DownloadIcon />
+                      </IconButton>
+                      <IconButton
+                        sx={{
+                          color: "white",
+                          bgcolor: "rgb(65 67 65 / 68%)",
+                          "&:hover": {
+                            bgcolor: "rgb(65 67 65 / 88%)",
+                          },
+                        }}
+                      >
+                        <MoreHorizIcon />
+                      </IconButton>
+                    </Box>
                   </Box>
 
-                  {/* Описание фильма */}
-                  {currentMovie?.overview && (
-                    <Typography
-                      sx={{
-                        color: "#fff",
-                        fontSize: { xs: "0.9rem", sm: "1rem" },
-                        mb: 3,
-                        opacity: 0.8,
-                        textAlign: { xs: "center", sm: "left" },
-                        maxWidth: "800px",
-                      }}
-                    >
-                      {currentMovie.overview}
-                    </Typography>
-                  )}
+                  <Divider
+                    sx={{
+                      my: 3,
+                      borderColor: "rgba(255, 255, 255, 0.04)",
+                      width: "85%",
+                      mx: "auto",
+                      display: { xs: "block", sm: "none" },
+                    }}
+                  />
+
+                  <Typography
+                    variant="h6"
+                    sx={{
+                      color: "#6b6868",
+                      fontSize: "0.9rem",
+                      fontWeight: 500,
+                      mb: 1,
+                      textAlign: "left",
+                    }}
+                  >
+                    Описание
+                  </Typography>
+
+                  <Typography
+                    sx={{
+                      color: "#fff",
+                      fontSize: { xs: "0.8rem", sm: "1rem" },
+                      lineHeight: 1.6,
+                      textAlign: "left",
+                      opacity: 0.7,
+                      mb: 4,
+                    }}
+                  >
+                    {isExpandedDescription
+                      ? currentMovie?.overview
+                      : truncateText(currentMovie?.overview || "", 200)}
+                    {(currentMovie?.overview?.length || 0) > 200 && (
+                      <Button
+                        onClick={() =>
+                          setIsExpandedDescription(!isExpandedDescription)
+                        }
+                        sx={{
+                          color: "#2196F3",
+                          textTransform: "none",
+                          minWidth: "auto",
+                          padding: "0 0 0 8px",
+                          fontSize: "inherit",
+                          fontWeight: "normal",
+                          "&:hover": {
+                            background: "transparent",
+                            color: "#21CBF3",
+                          },
+                          textDecoration: "none",
+                          verticalAlign: "baseline",
+                        }}
+                      >
+                        {isExpandedDescription ? " Свернуть" : "... Подробнее"}
+                      </Button>
+                    )}
+                  </Typography>
 
                   {/* Секция с актерами */}
                   {cast.length > 0 && isVisible && (
@@ -739,10 +847,11 @@ export const MovieDetails = ({
                       <Typography
                         variant="h6"
                         sx={{
-                          color: "white",
-                          mb: 2,
-                          fontSize: { xs: "1rem", sm: "1.1rem" },
+                          color: "#6b6868",
+                          fontSize: "0.9rem",
                           fontWeight: 500,
+                          mb: 2,
+                          textAlign: "left",
                         }}
                       >
                         В главных ролях
@@ -751,96 +860,80 @@ export const MovieDetails = ({
                         <Swiper
                           modules={[FreeMode]}
                           slidesPerView="auto"
-                          spaceBetween={8}
-                          freeMode={{
-                            enabled: true,
-                            momentum: true,
-                            momentumRatio: 0.2,
-                            momentumVelocityRatio: 0.5,
+                          spaceBetween={4}
+                          freeMode
+                          style={{
+                            padding: "4px",
+                            width: "100%",
                           }}
-                          watchSlidesProgress={true}
-                          style={{ padding: "4px" }}
-                          breakpoints={{
-                            0: {
-                              slidesPerView: 3.2,
-                              spaceBetween: 8,
-                            },
-                            600: {
-                              slidesPerView: 4.2,
-                              spaceBetween: 8,
-                            },
-                            900: {
-                              slidesPerView: 6.2,
-                              spaceBetween: 8,
-                            },
-                            1200: {
-                              slidesPerView: 8.2,
-                              spaceBetween: 8,
-                            },
-                          }}
-                          resistanceRatio={0.85}
-                          threshold={5}
                         >
                           {cast.map((actor) => (
-                            <SwiperSlide key={actor.id}>
+                            <SwiperSlide
+                              key={actor.id}
+                              style={{
+                                width: "auto",
+                                marginRight: "4px",
+                              }}
+                            >
                               <Box
                                 sx={{
-                                  cursor: "pointer",
-                                  "&:hover": { opacity: 0.8 },
-                                  WebkitTapHighlightColor: "transparent",
-                                  transform: "translateZ(0)", // Включаем аппаратное ускорение
+                                  aspectRatio: "2/3",
+                                  width: {
+                                    xs: "65px",
+                                    sm: "126px",
+                                  },
+                                  borderRadius: "8px",
+                                  overflow: "hidden",
+                                  position: "relative",
+                                  mb: 1,
                                 }}
                               >
-                                <Box
-                                  sx={{
-                                    width: "100%",
-                                    paddingBottom: "100%",
-                                    position: "relative",
-                                    borderRadius: 1,
-                                    overflow: "hidden",
-                                    bgcolor: "#1f1f1f",
-                                    mb: 1,
-                                    willChange: "transform", // Оптимизация производительности
-                                  }}
-                                >
-                                  {actor.profile_path ? (
-                                    <Box
-                                      component="img"
-                                      loading="lazy"
-                                      src={imageUrl(actor.profile_path, "w342")}
-                                      alt={actor.name}
-                                      sx={{
-                                        position: "absolute",
-                                        top: 0,
-                                        left: 0,
-                                        width: "100%",
-                                        height: "100%",
-                                        objectFit: "cover",
-                                        imageRendering: [
-                                          "crisp-edges",
-                                          "-webkit-optimize-contrast",
-                                        ],
-                                        backfaceVisibility: "hidden",
-                                      }}
-                                    />
-                                  ) : (
-                                    <Box
-                                      sx={{
-                                        position: "absolute",
-                                        top: 0,
-                                        left: 0,
-                                        width: "100%",
-                                        height: "100%",
-                                        display: "flex",
-                                        alignItems: "center",
-                                        justifyContent: "center",
-                                        color: "#666",
-                                      }}
-                                    >
-                                      No photo
-                                    </Box>
-                                  )}
-                                </Box>
+                                {actor.profile_path ? (
+                                  <Box
+                                    component="img"
+                                    loading="lazy"
+                                    src={imageUrl(actor.profile_path, "w342")}
+                                    alt={actor.name}
+                                    sx={{
+                                      position: "absolute",
+                                      top: 0,
+                                      left: 0,
+                                      width: "100%",
+                                      height: "100%",
+                                      objectFit: "cover",
+                                      imageRendering: [
+                                        "crisp-edges",
+                                        "-webkit-optimize-contrast",
+                                      ],
+                                      backfaceVisibility: "hidden",
+                                    }}
+                                  />
+                                ) : (
+                                  <Box
+                                    sx={{
+                                      position: "absolute",
+                                      top: 0,
+                                      left: 0,
+                                      width: "100%",
+                                      height: "100%",
+                                      display: "flex",
+                                      alignItems: "center",
+                                      justifyContent: "center",
+                                      color: "#666",
+                                    }}
+                                  >
+                                    No photo
+                                  </Box>
+                                )}
+                              </Box>
+                              <Box
+                                sx={{
+                                  width: {
+                                    xs: "65px",
+                                    sm: "126px",
+                                  },
+                                }}
+                              >
                                 <Typography
                                   sx={{
                                     color: "white",
@@ -850,6 +943,7 @@ export const MovieDetails = ({
                                     overflow: "hidden",
                                     textOverflow: "ellipsis",
                                     whiteSpace: "nowrap",
+                                    width: "100%",
                                   }}
                                 >
                                   {actor.name}
@@ -861,6 +955,7 @@ export const MovieDetails = ({
                                     overflow: "hidden",
                                     textOverflow: "ellipsis",
                                     whiteSpace: "nowrap",
+                                    width: "100%",
                                   }}
                                 >
                                   {actor.character}
@@ -880,10 +975,11 @@ export const MovieDetails = ({
                         <Typography
                           variant="h6"
                           sx={{
-                            color: "white",
-                            mb: 2,
-                            fontSize: { xs: "1rem", sm: "1.1rem" },
+                            color: "#6b6868",
+                            fontSize: "0.9rem",
                             fontWeight: 500,
+                            mb: 2,
+                            textAlign: "left",
                           }}
                         >
                           Коллекция
