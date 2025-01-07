@@ -806,7 +806,7 @@ export const MovieDetails = ({
                   <Typography
                     sx={{
                       color: "#fff",
-                      fontSize: { xs: "0.8rem", sm: "1rem" },
+                      fontSize: { xs: "1rem", sm: "1rem" },
                       lineHeight: 1.6,
                       textAlign: "left",
                       opacity: 0.7,
