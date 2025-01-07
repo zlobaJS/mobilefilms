@@ -332,6 +332,7 @@ export const MovieDetails = ({
             from: { opacity: 0 },
             to: { opacity: 1 },
           },
+          pb: "env(safe-area-inset-bottom, 0px)",
         },
       }}
     >
@@ -343,9 +344,9 @@ export const MovieDetails = ({
           position: "relative",
           overflowY: "auto",
           WebkitOverflowScrolling: "touch",
-          // Убираем все отступы
           margin: 0,
           padding: 0,
+          pb: 0,
         }}
       >
         {!showPlayer && (
