@@ -77,8 +77,8 @@ function MobileNavigation() {
         maxWidth: "400px",
         zIndex: 1300,
         display: { xs: "block", sm: "none" },
-        pb: "env(safe-area-inset-bottom)",
-        mb: 1,
+        pb: 0,
+        height: "calc(56px + env(safe-area-inset-bottom))",
       }}
     >
       <BottomNavigation
@@ -110,7 +110,8 @@ function MobileNavigation() {
           borderRadius: "16px",
           border: "1px solid rgba(255, 255, 255, 0.1)",
           overflow: "hidden",
-          height: "56px",
+          height: "100%",
+          paddingBottom: "env(safe-area-inset-bottom)",
           "& .MuiBottomNavigationAction-root": {
             minWidth: "auto",
             padding: "6px 0",
