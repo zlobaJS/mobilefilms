@@ -313,38 +313,38 @@ export const MovieDetails = ({
       PaperProps={{
         sx: {
           bgcolor: "#141414",
-          height: "100vh",
-          width: "100vw",
+          height: "100%",
+          width: "100%",
           margin: 0,
-          maxHeight: "100vh",
-          maxWidth: "100vw",
-          borderRadius: 0,
-          position: "fixed",
-          inset: 0,
           padding: 0,
+          position: "fixed",
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
           overflow: "hidden",
           "&.MuiDialog-paper": {
             margin: 0,
           },
-          paddingTop: "env(safe-area-inset-top)",
+          paddingTop: 0,
           paddingBottom: 0,
-          paddingLeft: "env(safe-area-inset-left)",
-          paddingRight: "env(safe-area-inset-right)",
+          minHeight: "100vh",
+          minHeight: "-webkit-fill-available",
         },
       }}
     >
       <Box
         className="dialog-content"
         sx={{
-          height: "100vh",
-          width: "100vw",
+          height: "100%",
+          width: "100%",
           position: "relative",
           overflowY: "auto",
           WebkitOverflowScrolling: "touch",
           margin: 0,
           padding: 0,
+          paddingTop: 0,
           paddingBottom: 0,
-          minHeight: ["100vh", "-webkit-fill-available"],
         }}
       >
         {!showPlayer && (
