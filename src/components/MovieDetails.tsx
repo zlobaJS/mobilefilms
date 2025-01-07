@@ -283,13 +283,6 @@ export const MovieDetails = ({
     fetchRecommendations();
   }, [currentMovie?.id]);
 
-  const handleMovieSelect = (selectedMovie: any) => {
-    if (onMovieSelect) {
-      onClose(); // Закрываем текущее окно
-      onMovieSelect(selectedMovie); // Открываем новое окно с выбранным фильмом
-    }
-  };
-
   const handleRecommendationClick = async (movie: any) => {
     try {
       setIsUpdating(true); // Начинаем анимацию
