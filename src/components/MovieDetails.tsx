@@ -320,19 +320,13 @@ export const MovieDetails = ({
           maxWidth: "100vw",
           borderRadius: 0,
           position: "fixed",
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
+          inset: 0,
           padding: 0,
           overflow: "hidden",
-          opacity: 0,
-          animation: "fadeIn 0.3s ease-in-out forwards",
-          "@keyframes fadeIn": {
-            from: { opacity: 0 },
-            to: { opacity: 1 },
+          "&.MuiDialog-paper": {
+            margin: 0,
           },
-          pb: "env(safe-area-inset-bottom, 0px)",
+          paddingBottom: 0,
         },
       }}
     >
@@ -346,7 +340,9 @@ export const MovieDetails = ({
           WebkitOverflowScrolling: "touch",
           margin: 0,
           padding: 0,
-          pb: 0,
+          paddingBottom: 0,
+          minHeight: "100vh",
+          minHeight: "-webkit-fill-available",
         }}
       >
         {!showPlayer && (
