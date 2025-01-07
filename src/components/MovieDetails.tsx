@@ -341,8 +341,7 @@ export const MovieDetails = ({
           margin: 0,
           padding: 0,
           paddingBottom: 0,
-          minHeight: "100vh",
-          minHeight: "-webkit-fill-available",
+          minHeight: ["100vh", "-webkit-fill-available"],
         }}
       >
         {!showPlayer && (
