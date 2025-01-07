@@ -326,17 +326,13 @@ export const MovieDetails = ({
           "&.MuiDialog-paper": {
             margin: 0,
           },
-          paddingTop: "env(safe-area-inset-top)",
-          paddingBottom: "env(safe-area-inset-bottom)",
-          paddingLeft: "env(safe-area-inset-left)",
-          paddingRight: "env(safe-area-inset-right)",
         },
       }}
     >
       <Box
         className="dialog-content"
         sx={{
-          height: "100vh",
+          height: "calc(100vh + env(safe-area-inset-bottom))",
           width: "100vw",
           position: "relative",
           overflowY: "auto",
@@ -344,7 +340,7 @@ export const MovieDetails = ({
           margin: 0,
           padding: 0,
           mt: "-env(safe-area-inset-top)",
-          mb: "-env(safe-area-inset-bottom)",
+          pb: "env(safe-area-inset-bottom)",
         }}
       >
         {!showPlayer && (
