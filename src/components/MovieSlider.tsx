@@ -188,12 +188,25 @@ export const MovieSlider = ({
                   overflow: "hidden",
                   textOverflow: "ellipsis",
                   whiteSpace: "nowrap",
-                  fontSize: { xs: "0.75rem", sm: "0.875rem" },
+                  fontSize: {
+                    xs: "0.9rem",
+                    sm: "0.875rem",
+                  },
                   opacity: 0.9,
                   width: "100%",
                   textAlign: "center",
-                  mt: 0.5,
-                  px: 1,
+                  mt: {
+                    xs: 1,
+                    sm: 0.5,
+                  },
+                  px: {
+                    xs: 0.5,
+                    sm: 1,
+                  },
+                  fontWeight: {
+                    xs: 500,
+                    sm: 400,
+                  },
                 }}
               >
                 {movie.title}
