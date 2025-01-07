@@ -822,7 +822,7 @@ export const MovieDetails = ({
                           setIsExpandedDescription(!isExpandedDescription)
                         }
                         sx={{
-                          color: "#2196F3",
+                          color: "#21CBF3",
                           textTransform: "none",
                           minWidth: "auto",
                           padding: "0 0 0 8px",
@@ -830,13 +830,13 @@ export const MovieDetails = ({
                           fontWeight: "normal",
                           "&:hover": {
                             background: "transparent",
-                            color: "#21CBF3",
+                            color: "#2196F3",
                           },
                           textDecoration: "none",
                           verticalAlign: "baseline",
                         }}
                       >
-                        {isExpandedDescription ? " Свернуть" : "... Подробнее"}
+                        {isExpandedDescription ? " Свернуть" : " Подробнее"}
                       </Button>
                     )}
                   </Typography>
