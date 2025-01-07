@@ -312,7 +312,7 @@ export const MovieDetails = ({
       }}
       PaperProps={{
         sx: {
-          bgcolor: "#141414",
+          background: "transparent",
           height: "100vh",
           width: "100vw",
           margin: 0,
@@ -325,6 +325,7 @@ export const MovieDetails = ({
           overflow: "hidden",
           "&.MuiDialog-paper": {
             margin: 0,
+            background: "transparent",
           },
         },
       }}
@@ -341,6 +342,7 @@ export const MovieDetails = ({
           padding: 0,
           mt: "-env(safe-area-inset-top)",
           pb: "env(safe-area-inset-bottom)",
+          background: "transparent",
         }}
       >
         {!showPlayer && (
