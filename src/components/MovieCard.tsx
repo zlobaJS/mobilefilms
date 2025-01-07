@@ -99,6 +99,10 @@ export const MovieCard = ({
           overflow: "hidden",
           transition: isDesktop ? "transform 0.2s" : "none",
           cursor: "pointer",
+          filter: {
+            xs: "drop-shadow(2px 14px 6px black)",
+            sm: "drop-shadow(2px 4px 6px black)",
+          },
           "&:hover": {
             transform: isDesktop ? "scale(1.05)" : "none",
             zIndex: isDesktop ? 1 : "auto",
