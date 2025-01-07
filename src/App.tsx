@@ -70,7 +70,7 @@ function MobileNavigation() {
     <Box
       sx={{
         position: "fixed",
-        bottom: 0,
+        bottom: "-env(safe-area-inset-bottom)",
         left: "50%",
         transform: "translateX(-50%)",
         width: "95%",
@@ -261,13 +261,14 @@ function AppRoutes() {
                   sx={{
                     minHeight: "100dvh",
                     backgroundColor: "#141414",
-                    paddingTop:
-                      location.pathname === "/"
-                        ? 0
-                        : "env(safe-area-inset-top)",
-                    paddingBottom: "env(safe-area-inset-bottom)",
-                    paddingLeft: "env(safe-area-inset-left)",
-                    paddingRight: "env(safe-area-inset-right)",
+                    padding: 0,
+                    mt: "-env(safe-area-inset-top)",
+                    height:
+                      "calc(100vh + env(safe-area-inset-top) + env(safe-area-inset-bottom))",
+                    "& > *": {
+                      paddingLeft: "env(safe-area-inset-left)",
+                      paddingRight: "env(safe-area-inset-right)",
+                    },
                   }}
                 >
                   <BackdropSlider
