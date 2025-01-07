@@ -312,39 +312,40 @@ export const MovieDetails = ({
       }}
       PaperProps={{
         sx: {
-          bgcolor: "transparent",
+          bgcolor: "#141414",
+          height: "100vh",
           width: "100vw",
           margin: 0,
-          padding: 0,
+          maxHeight: "100vh",
+          maxWidth: "100vw",
+          borderRadius: 0,
           position: "fixed",
-          inset: 0,
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          padding: 0,
           overflow: "hidden",
-          "&.MuiDialog-paper": {
-            margin: 0,
+          opacity: 0,
+          animation: "fadeIn 0.3s ease-in-out forwards",
+          "@keyframes fadeIn": {
+            from: { opacity: 0 },
+            to: { opacity: 1 },
           },
-          // Явно указываем высоту с учетом safe-area
-          height: "calc(100vh + env(safe-area-inset-bottom))",
-          // Убираем фон
-          background: "transparent",
         },
       }}
     >
       <Box
         className="dialog-content"
         sx={{
+          height: "100vh",
           width: "100vw",
           position: "relative",
           overflowY: "auto",
           WebkitOverflowScrolling: "touch",
+          // Убираем все отступы
           margin: 0,
           padding: 0,
-          // Явно указываем высоту и отступы
-          height: "calc(100vh + env(safe-area-inset-bottom))",
-          mt: "-env(safe-area-inset-top)",
-          // Добавляем отступ снизу
-          pb: "env(safe-area-inset-bottom)",
-          // Прозрачный фон
-          background: "transparent",
         }}
       >
         {!showPlayer && (
@@ -423,7 +424,7 @@ export const MovieDetails = ({
                     WebkitBackfaceVisibility: "hidden",
                     MozBackfaceVisibility: "hidden",
                     backfaceVisibility: "hidden",
-                    marginTop: 0,
+                    marginTop: "env(safe-area-inset-top)",
                   }}
                   onLoad={() => setIsBackdropLoaded(true)}
                 />
@@ -443,7 +444,7 @@ export const MovieDetails = ({
                       rgb(20 20 20) 100%
                     )`,
                     transition: "background 0.2s ease",
-                    marginTop: 0,
+                    marginTop: "env(safe-area-inset-top)",
                   }}
                 />
               </Box>
