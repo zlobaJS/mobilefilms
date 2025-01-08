@@ -417,8 +417,8 @@ export const MovieDetails = ({
       TransitionComponent={Fade}
       TransitionProps={{
         timeout: {
-          enter: 300,
-          exit: 300,
+          enter: 400,
+          exit: 400,
         },
       }}
       PaperProps={{
@@ -445,7 +445,7 @@ export const MovieDetails = ({
           backgroundPosition: "center",
           backgroundRepeat: "no-repeat",
           opacity: 0,
-          animation: "fadeIn 0.3s ease-in-out forwards",
+          animation: "fadeIn 0.4s ease-in-out forwards",
           "@keyframes fadeIn": {
             from: { opacity: 0 },
             to: { opacity: 1 },
@@ -459,7 +459,7 @@ export const MovieDetails = ({
             bottom: 0,
             backgroundColor: "rgba(0, 0, 0, 0.85)",
             animation: open
-              ? "lightUp 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards"
+              ? "lightUp 1.2s cubic-bezier(0.4, 0, 0.2, 1) forwards"
               : "none",
             "@keyframes lightUp": {
               "0%": {
@@ -484,7 +484,7 @@ export const MovieDetails = ({
           margin: 0,
           padding: 0,
           opacity: !isLoading && isVisible ? 1 : 0,
-          transition: "opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1)",
+          transition: "opacity 1s cubic-bezier(0.4, 0, 0.2, 1)",
           zIndex: 1,
         }}
       >
@@ -498,25 +498,20 @@ export const MovieDetails = ({
             flexDirection: "column",
             gap: 2,
             opacity: 0,
-            animation: "fadeInBackdrop 0.3s ease-in-out forwards",
+            animation: "fadeInBackdrop 0.4s ease-in-out forwards",
             "@keyframes fadeInBackdrop": {
               from: { opacity: 0 },
               to: { opacity: 1 },
             },
           }}
         >
-          <CircularProgress
-            size={50}
-            sx={{
-              color: "#2196F3",
-              filter: "drop-shadow(0 0 8px rgba(33, 150, 243, 0.5))",
-            }}
-          />
           <Typography
             variant="body1"
             sx={{
               color: "#fff",
               textShadow: "0 2px 4px rgba(0,0,0,0.5)",
+              fontSize: "1.1rem",
+              letterSpacing: "0.5px",
             }}
           >
             Загрузка...
