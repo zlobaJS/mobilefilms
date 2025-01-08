@@ -440,41 +440,39 @@ export const MovieDetails = ({
           opacity: 0,
           animation: "fadeIn 0.3s ease-in-out forwards",
           "@keyframes fadeIn": {
-            from: { opacity: 0 },
-            to: { opacity: 1 },
+            from: {
+              opacity: 0,
+              backdropFilter: "blur(20px)",
+              WebkitBackdropFilter: "blur(20px)",
+            },
+            to: {
+              opacity: 1,
+              backdropFilter: "blur(10px)",
+              WebkitBackdropFilter: "blur(10px)",
+            },
+          },
+          backgroundImage: `url(${imageUrl(
+            movie?.backdrop_path || movie?.poster_path || "",
+            "w1280"
+          )})`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat",
+          "&::before": {
+            content: '""',
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: "rgba(20, 20, 20, 0.7)",
+            backdropFilter: !isLoading ? "blur(0)" : "blur(20px)",
+            WebkitBackdropFilter: !isLoading ? "blur(0)" : "blur(20px)",
+            transition: "all 0.6s ease-out",
           },
         },
       }}
     >
-      <Backdrop
-        open={isLoading}
-        sx={{
-          position: "absolute",
-          zIndex: 9999,
-          backgroundColor: "rgba(0, 0, 0, 0.8)",
-          display: "flex",
-          flexDirection: "column",
-          gap: 2,
-        }}
-      >
-        <CircularProgress
-          size={50}
-          sx={{
-            color: "#2196F3",
-            filter: "drop-shadow(0 0 8px rgba(33, 150, 243, 0.5))",
-          }}
-        />
-        <Typography
-          variant="body1"
-          sx={{
-            color: "#fff",
-            textShadow: "0 2px 4px rgba(0,0,0,0.5)",
-          }}
-        >
-          Загрузка...
-        </Typography>
-      </Backdrop>
-
       <Box
         className="dialog-content"
         sx={{
@@ -483,13 +481,48 @@ export const MovieDetails = ({
           position: "relative",
           overflowY: "auto",
           WebkitOverflowScrolling: "touch",
-          // Убираем все отступы
           margin: 0,
           padding: 0,
           opacity: !isLoading && isVisible ? 1 : 0,
-          transition: "opacity 0.3s ease-in-out",
+          transition: "opacity 0.6s ease-out",
+          zIndex: 1,
         }}
       >
+        <Backdrop
+          open={isLoading}
+          sx={{
+            position: "absolute",
+            zIndex: 9999,
+            backgroundColor: "transparent",
+            display: "flex",
+            flexDirection: "column",
+            gap: 2,
+            opacity: 0,
+            animation: "fadeInBackdrop 0.3s ease-in-out forwards",
+            "@keyframes fadeInBackdrop": {
+              from: { opacity: 0 },
+              to: { opacity: 1 },
+            },
+          }}
+        >
+          <CircularProgress
+            size={50}
+            sx={{
+              color: "#2196F3",
+              filter: "drop-shadow(0 0 8px rgba(33, 150, 243, 0.5))",
+            }}
+          />
+          <Typography
+            variant="body1"
+            sx={{
+              color: "#fff",
+              textShadow: "0 2px 4px rgba(0,0,0,0.5)",
+            }}
+          >
+            Загрузка...
+          </Typography>
+        </Backdrop>
+
         {!showPlayer && (
           <IconButton
             onClick={handleClose}
