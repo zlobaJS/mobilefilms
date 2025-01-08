@@ -58,7 +58,19 @@ export const MovieSlider = ({
 
   if (loading) {
     return (
-      <Box sx={{ mb: 4 }}>
+      <Box
+        sx={{
+          mb: 4,
+          position: "relative",
+          zIndex: 5,
+          ...(title === "Сейчас смотрят" && {
+            mt: {
+              xs: 2,
+              sm: 0,
+            },
+          }),
+        }}
+      >
         <Box
           sx={{
             display: "flex",
@@ -66,6 +78,8 @@ export const MovieSlider = ({
             justifyContent: "space-between",
             mb: 2,
             mx: 2,
+            position: "relative",
+            zIndex: 5,
           }}
         >
           <Typography
@@ -117,7 +131,19 @@ export const MovieSlider = ({
   }
 
   return (
-    <Box sx={{ mb: 4 }}>
+    <Box
+      sx={{
+        mb: 4,
+        position: "relative",
+        zIndex: 5,
+        ...(title === "Сейчас смотрят" && {
+          mt: {
+            xs: 2,
+            sm: 0,
+          },
+        }),
+      }}
+    >
       <Box
         sx={{
           display: "flex",
@@ -125,6 +151,8 @@ export const MovieSlider = ({
           justifyContent: "space-between",
           mb: 2,
           mx: 2,
+          position: "relative",
+          zIndex: 5,
         }}
       >
         <Typography

@@ -5,7 +5,9 @@ import { imageUrl } from "../api/tmdb";
 import { getMovieImages, getMovieDetails } from "../api/tmdb";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import "swiper/css";
+import "swiper/css/navigation";
 import { useState, useEffect } from "react";
+import { useScrollBrightness } from "../hooks/useScrollBrightness";
 
 interface Movie {
   id: number;
@@ -35,6 +37,8 @@ export const BackdropSlider = ({ movies }: BackdropSliderProps) => {
   const [loadedImages, setLoadedImages] = useState<{ [key: number]: boolean }>(
     {}
   );
+  const brightness = useScrollBrightness();
+  console.log("Current brightness:", brightness);
 
   const preloadImage = (src: string, movieId: number) => {
     const img = new Image();
@@ -126,27 +130,23 @@ export const BackdropSlider = ({ movies }: BackdropSliderProps) => {
     China: "Китай",
     Japan: "Япония",
     "South Korea": "Южная Корея",
-    // Добавьте другие страны по необходимости
   };
 
-  const MovieInfo = ({ movie }: { movie: Movie }) => {
-    const getCountryName = (englishName: string) => {
-      return countryTranslations[englishName] || englishName;
-    };
+  const getCountryName = (englishName: string) => {
+    return countryTranslations[englishName] || englishName;
+  };
 
-    return (
-      <Box
-        sx={{
-          display: { xs: "none", md: "flex" },
-          flexDirection: "column",
-          position: "absolute",
-          left: "5%",
-          bottom: "15%",
-          maxWidth: "40%",
-          zIndex: 2,
-          gap: 2,
-        }}
-      >
+  const MovieInfo = ({
+    movie,
+    isMobile = false,
+    sx = {},
+  }: {
+    movie: Movie;
+    isMobile?: boolean;
+    sx?: any;
+  }) => {
+    const content = (
+      <>
         {movieLogos[movie.id] ? (
           <Box
             component="img"
@@ -172,19 +172,28 @@ export const BackdropSlider = ({ movies }: BackdropSliderProps) => {
           />
         ) : (
           <Typography
-            variant="h2"
+            variant={isMobile ? "h4" : "h2"}
             sx={{
               color: "white",
               fontWeight: "bold",
               textShadow: "0 4px 12px rgba(0,0,0,0.5)",
               animation: "fadeInLeft 0.8s ease-out",
+              textAlign: isMobile ? "center" : "left",
             }}
           >
             {movie.title}
           </Typography>
         )}
 
-        <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
+        <Box
+          sx={{
+            display: "flex",
+            gap: 2,
+            alignItems: "center",
+            justifyContent: isMobile ? "center" : "flex-start",
+            flexWrap: "wrap",
+          }}
+        >
           <Typography
             sx={{
               color: "#00e676",
@@ -202,7 +211,7 @@ export const BackdropSlider = ({ movies }: BackdropSliderProps) => {
                 {getCountryName(movie.production_countries[0].name)}
               </Typography>
             )}
-          {movie.runtime && (
+          {movie.runtime && !isMobile && (
             <Typography sx={{ color: "rgba(255,255,255,0.7)" }}>
               {formatRuntime(movie.runtime)}
             </Typography>
@@ -224,18 +233,27 @@ export const BackdropSlider = ({ movies }: BackdropSliderProps) => {
           )}
         </Box>
 
-        <Typography
+        {!isMobile && (
+          <Typography
+            sx={{
+              color: "rgba(255,255,255,0.9)",
+              fontSize: "1rem",
+              lineHeight: 1.5,
+              textShadow: "0 2px 4px rgba(0,0,0,0.5)",
+            }}
+          >
+            {movie.overview}
+          </Typography>
+        )}
+
+        <Box
           sx={{
-            color: "rgba(255,255,255,0.9)",
-            fontSize: "1rem",
-            lineHeight: 1.5,
-            textShadow: "0 2px 4px rgba(0,0,0,0.5)",
+            display: "flex",
+            gap: 2,
+            mt: 2,
+            justifyContent: isMobile ? "center" : "flex-start",
           }}
         >
-          {movie.overview}
-        </Typography>
-
-        <Box sx={{ display: "flex", gap: 2, mt: 2 }}>
           <Button
             variant="contained"
             startIcon={<PlayArrowIcon />}
@@ -245,9 +263,9 @@ export const BackdropSlider = ({ movies }: BackdropSliderProps) => {
                 rgba(244,67,54,1) 100%
               )`,
               color: "white",
-              fontSize: "1.2rem",
-              px: 6,
-              py: 1.5,
+              fontSize: isMobile ? "1rem" : "1.2rem",
+              px: isMobile ? 4 : 6,
+              py: isMobile ? 1 : 1.5,
               borderRadius: 28,
               "&:hover": {
                 background: `linear-gradient(90deg, 
@@ -262,6 +280,24 @@ export const BackdropSlider = ({ movies }: BackdropSliderProps) => {
             Смотреть
           </Button>
         </Box>
+      </>
+    );
+
+    return (
+      <Box
+        sx={{
+          display: { xs: "none", md: "flex" },
+          flexDirection: "column",
+          position: "absolute",
+          left: "5%",
+          bottom: "15%",
+          maxWidth: "40%",
+          zIndex: 2,
+          gap: 2,
+          ...sx,
+        }}
+      >
+        {content}
       </Box>
     );
   };
@@ -270,13 +306,16 @@ export const BackdropSlider = ({ movies }: BackdropSliderProps) => {
     return (
       <Box
         sx={{
-          position: "relative",
-          width: "100%",
+          position: "fixed",
+          top: 0,
+          left: { xs: 0, sm: "72px" },
+          right: 0,
           height: {
-            xs: "calc(100vw * 0.75 + env(safe-area-inset-top) + 100px)",
+            xs: "calc(100vw * 0.75 + env(safe-area-inset-top))",
             sm: "60vh",
           },
-          overflow: "hidden",
+          zIndex: 0,
+          backgroundColor: "#141414",
         }}
       >
         <Skeleton
@@ -329,226 +368,202 @@ export const BackdropSlider = ({ movies }: BackdropSliderProps) => {
   return (
     <Box
       sx={{
-        position: "relative",
-        width: "100%",
+        position: "fixed",
+        top: 0,
+        left: { xs: 0, sm: "72px" },
+        right: 0,
         height: {
-          xs: "calc(100vw * 0.75 + env(safe-area-inset-top) + 100px)",
+          xs: "calc(100vw * 1.2 + env(safe-area-inset-top))",
           sm: "60vh",
         },
-        overflow: "hidden",
+        zIndex: 0,
+        backgroundColor: "#141414",
+        touchAction: "pan-y",
+        pointerEvents: "none",
       }}
     >
       <Swiper
         modules={[Autoplay]}
+        slidesPerView={1}
+        loop={true}
         autoplay={{
           delay: 5000,
           disableOnInteraction: false,
         }}
-        loop={true}
-        slidesPerView={1}
-        spaceBetween={0}
+        allowTouchMove={true}
+        touchEventsTarget="wrapper"
         style={{
           width: "100%",
           height: "100%",
-          overflow: "hidden",
+          pointerEvents: "auto",
         }}
-        className="backdrop-slider"
       >
-        <style>
-          {`
-            .backdrop-slider .swiper-slide {
-              opacity: 0;
-              transition: opacity 0.3s ease;
-            }
-            .backdrop-slider .swiper-slide-active {
-              opacity: 1;
-            }
-          `}
-        </style>
         {randomMovies.map((movie) => (
           <SwiperSlide key={movie.id}>
+            {loadedImages[movie.id] && (
+              <Box
+                component="img"
+                src={imageUrl(movie.backdrop_path, "original")}
+                alt={movie.title}
+                sx={{
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "cover",
+                  objectPosition: "center top",
+                }}
+              />
+            )}
+
+            {/* Градиент снизу */}
             <Box
               sx={{
-                position: "relative",
+                position: "absolute",
+                left: 0,
+                bottom: 0,
                 width: "100%",
+                height: "70%",
+                background: `linear-gradient(
+                  0deg,
+                  rgba(20,20,20,1) 0%,
+                  rgba(20,20,20,0.8) 40%,
+                  rgba(20,20,20,0) 100%
+                )`,
+                zIndex: 1,
+                pointerEvents: "none",
+              }}
+            />
+
+            {/* Градиент слева */}
+            <Box
+              sx={{
+                display: { xs: "none", md: "block" },
+                position: "absolute",
+                left: 0,
+                top: 0,
+                width: "60%",
                 height: "100%",
+                background: `linear-gradient(
+                  90deg,
+                  rgba(20,20,20,0.95) 0%,
+                  rgba(20,20,20,0.8) 50%,
+                  rgba(20,20,20,0) 100%
+                )`,
+                zIndex: 1,
+              }}
+            />
+
+            {/* Затемнение при скролле */}
+            <Box
+              sx={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                backgroundColor: `rgba(18, 18, 18, ${brightness})`,
+                transition: "background-color 0.6s ease-out",
+                zIndex: 3,
+                pointerEvents: "none",
+              }}
+            />
+
+            <MovieInfo
+              movie={movie}
+              sx={{
+                pointerEvents: "auto",
+              }}
+            />
+
+            {/* Мобильная версия */}
+            <Box
+              sx={{
+                position: "absolute",
+                left: "50%",
+                bottom: { xs: "15%", sm: "20%" },
+                transform: "translateX(-50%)",
+                zIndex: 2,
+                display: { xs: "flex", md: "none" },
+                flexDirection: "column",
+                alignItems: "center",
+                width: "100%",
+                maxWidth: { xs: "90%", sm: "80%" },
+                gap: 3,
+                pointerEvents: "auto",
               }}
             >
-              {loadedImages[movie.id] ? (
+              {movieLogos[movie.id] ? (
                 <Box
                   component="img"
-                  src={imageUrl(movie.backdrop_path, "original")}
+                  src={imageUrl(movieLogos[movie.id]!, "w500")}
                   alt={movie.title}
                   sx={{
-                    width: "100%",
-                    height: "100%",
-                    objectFit: "cover",
-                    objectPosition: {
-                      xs: "center 15%",
-                      sm: "center top",
-                    },
-                    transform: "scale(1.02)",
+                    width: "250px",
+                    height: "auto",
+                    objectFit: "contain",
+                    objectPosition: "center",
+                    filter: "drop-shadow(2px 14px 6px black)",
                   }}
                 />
               ) : (
-                <Skeleton
-                  variant="rectangular"
-                  width="100%"
-                  height="100%"
-                  animation="wave"
-                  sx={{ bgcolor: "rgba(255, 255, 255, 0.1)" }}
-                />
-              )}
-              <Box
-                sx={{
-                  position: "absolute",
-                  left: 0,
-                  top: "-env(safe-area-inset-top)",
-                  width: "100%",
-                  height: "calc(100% + env(safe-area-inset-top) + 120px)",
-                  background: `linear-gradient(
-                    0deg,
-                    rgba(20,20,20,1) 0%,
-                    rgba(20,20,20,0.95) 10%,
-                    rgba(20,20,20,0.9) 20%,
-                    rgba(20,20,20,0.8) 30%,
-                    rgba(20,20,20,0.6) 40%,
-                    rgba(20,20,20,0.4) 50%,
-                    rgba(20,20,20,0.2) 60%,
-                    rgba(20,20,20,0.1) 70%,
-                    rgba(20,20,20,0) 100%
-                  )`,
-                  zIndex: 1,
-                }}
-              />
-              <Box
-                sx={{
-                  position: "absolute",
-                  left: 0,
-                  bottom: 0,
-                  width: "100%",
-                  height: "40%",
-                  background: `linear-gradient(
-                    180deg,
-                    rgba(20,20,20,0) 0%,
-                    rgba(20,20,20,0.8) 50%,
-                    rgba(20,20,20,1) 100%
-                  )`,
-                  zIndex: 1,
-                }}
-              />
-              <Box
-                sx={{
-                  display: { xs: "none", md: "block" },
-                  position: "absolute",
-                  left: 0,
-                  top: 0,
-                  width: "60%",
-                  height: "100%",
-                  background: `linear-gradient(
-                    90deg,
-                    rgba(20,20,20,0.95) 0%,
-                    rgba(20,20,20,0.8) 50%,
-                    rgba(20,20,20,0) 100%
-                  )`,
-                  zIndex: 1,
-                }}
-              />
-              <MovieInfo movie={movie} />
-              <Box
-                sx={{
-                  position: "absolute",
-                  left: "50%",
-                  bottom: { xs: "15%", sm: "20%" },
-                  transform: "translateX(-50%)",
-                  zIndex: 2,
-                  display: { xs: "flex", md: "none" },
-                  flexDirection: "column",
-                  alignItems: "center",
-                  width: "100%",
-                  maxWidth: { xs: "90%", sm: "80%" },
-                  gap: 3,
-                }}
-              >
-                {movieLogos[movie.id] ? (
-                  <Box
-                    component="img"
-                    src={imageUrl(movieLogos[movie.id]!, "w500")}
-                    alt={movie.title}
-                    sx={{
-                      width: { xs: "200px", sm: "250px", md: "300px" },
-                      height: "auto",
-                      objectFit: "contain",
-                      filter: "drop-shadow(2px 14px 6px black)",
-                      animation: "fadeInUp 0.8s ease-out",
-                      "@keyframes fadeInUp": {
-                        from: {
-                          opacity: 0,
-                          transform: "translateY(20px)",
-                        },
-                        to: {
-                          opacity: 1,
-                          transform: "translateY(0)",
-                        },
-                      },
-                    }}
-                  />
-                ) : (
-                  <Typography
-                    variant="h3"
-                    sx={{
-                      color: "white",
-                      textAlign: "center",
-                      fontSize: { xs: "2rem", sm: "2.5rem", md: "3rem" },
-                      fontWeight: "bold",
-                      textShadow: "0 4px 12px rgba(0,0,0,0.5)",
-                      animation: "fadeInUp 0.8s ease-out",
-                      "@keyframes fadeInUp": {
-                        from: {
-                          opacity: 0,
-                          transform: "translateY(20px)",
-                        },
-                        to: {
-                          opacity: 1,
-                          transform: "translateY(0)",
-                        },
-                      },
-                    }}
-                  >
-                    {movie.title}
-                  </Typography>
-                )}
-                <Button
-                  variant="contained"
-                  startIcon={<PlayArrowIcon />}
+                <Typography
+                  variant="h4"
                   sx={{
-                    background: `linear-gradient(90deg, 
-                      rgba(229,9,20,1) 0%, 
-                      rgba(244,67,54,1) 100%
-                    )`,
                     color: "white",
-                    fontSize: { xs: "1rem", sm: "1.2rem", md: "1.4rem" },
-                    px: { xs: 4, sm: 6, md: 8 },
-                    py: { xs: 1, sm: 1.5 },
-                    borderRadius: 28,
-                    "&:hover": {
-                      background: `linear-gradient(90deg, 
-                        rgba(244,67,54,1) 0%, 
-                        rgba(229,9,20,1) 100%
-                      )`,
-                    },
-                    minWidth: { xs: "140px", sm: "180px", md: "200px" },
-                    textTransform: "none",
-                    boxShadow: "0 8px 32px rgba(229,9,20,0.3)",
-                    transition: "all 0.3s ease",
-                    border: "none",
-                    "&:active": {
-                      transform: "scale(0.98)",
-                    },
+                    fontWeight: "bold",
+                    textShadow: "0 4px 12px rgba(0,0,0,0.5)",
+                    textAlign: "center",
                   }}
                 >
-                  Смотреть
-                </Button>
+                  {movie.title}
+                </Typography>
+              )}
+
+              <Box
+                sx={{
+                  display: "flex",
+                  gap: 2,
+                  alignItems: "center",
+                  justifyContent: "center",
+                  flexWrap: "wrap",
+                }}
+              >
+                <Typography
+                  sx={{
+                    color: "#00e676",
+                    fontWeight: "bold",
+                  }}
+                >
+                  {Math.round(movie.vote_average * 10)}%
+                </Typography>
+                <Typography sx={{ color: "rgba(255,255,255,0.7)" }}>
+                  {new Date(movie.release_date).getFullYear()}
+                </Typography>
+                {movie.production_countries &&
+                  movie.production_countries.length > 0 && (
+                    <Typography sx={{ color: "rgba(255,255,255,0.7)" }}>
+                      {getCountryName(movie.production_countries[0].name)}
+                    </Typography>
+                  )}
+                {movie.runtime && (
+                  <Typography sx={{ color: "rgba(255,255,255,0.7)" }}>
+                    {formatRuntime(movie.runtime)}
+                  </Typography>
+                )}
+                {movie.release_quality && (
+                  <Typography
+                    sx={{
+                      color: "#000000",
+                      textTransform: "uppercase",
+                      fontWeight: "bold",
+                      backgroundColor: "rgba(255,255,255,0.7)",
+                      padding: "2px 8px",
+                      borderRadius: "4px",
+                      fontSize: "0.8rem",
+                    }}
+                  >
+                    {movie.release_quality}
+                  </Typography>
+                )}
               </Box>
             </Box>
           </SwiperSlide>

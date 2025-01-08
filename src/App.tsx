@@ -343,7 +343,22 @@ function AppRoutes() {
   return (
     <>
       <DesktopNavigation />
-      <Box sx={{ ml: { xs: 0, sm: "72px" } }}>
+      <Box
+        sx={{
+          ml: { xs: 0, sm: "72px" },
+          minHeight: "100dvh",
+          position: "relative",
+          zIndex: 1,
+          overflowX: "hidden",
+          overflowY: "auto",
+          height: "100dvh",
+          "&::-webkit-scrollbar": {
+            display: "none",
+          },
+          scrollbarWidth: "none",
+          msOverflowStyle: "none",
+        }}
+      >
         <AnimatePresence mode="sync">
           <Routes location={location} key={location.pathname}>
             <Route
@@ -355,19 +370,36 @@ function AppRoutes() {
                   exit={{ opacity: 1 }}
                   transition={{ duration: 0.1 }}
                   key="home"
-                  style={{ minHeight: "100dvh" }}
+                  style={{
+                    minHeight: "100dvh",
+                    position: "relative",
+                  }}
                 >
                   <Box
                     sx={{
                       minHeight: "100dvh",
                       backgroundColor: "#141414",
-                      paddingTop:
-                        location.pathname === "/"
-                          ? 0
-                          : "env(safe-area-inset-top)",
-                      paddingBottom: "env(safe-area-inset-bottom)",
-                      paddingLeft: "env(safe-area-inset-left)",
-                      paddingRight: "env(safe-area-inset-right)",
+                      paddingTop: {
+                        xs: "calc(100vw * 1.2 + env(safe-area-inset-top) + 16px)",
+                        sm: "60vh",
+                      },
+                      position: "relative",
+                      zIndex: 4,
+                      WebkitOverflowScrolling: "touch",
+                      overscrollBehavior: "contain",
+                      "&::before": {
+                        content: '""',
+                        position: "absolute",
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        height: {
+                          xs: "calc(100vw * 1.2 + env(safe-area-inset-top))",
+                          sm: "60vh",
+                        },
+                        pointerEvents: "none",
+                        zIndex: 1,
+                      },
                     }}
                   >
                     <BackdropSlider
