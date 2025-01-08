@@ -9,7 +9,6 @@ import {
   Fade,
   Button,
   Divider,
-  CircularProgress,
   Backdrop,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
