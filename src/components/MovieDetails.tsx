@@ -144,11 +144,14 @@ export const MovieDetails = ({
   const [isExpandedDescription, setIsExpandedDescription] = useState(false);
   const [recommendations, setRecommendations] = useState<any[]>([]);
   const [isUpdating, setIsUpdating] = useState(false);
+  const [isLogoLoading, setIsLogoLoading] = useState(true);
+  const [hasLogo, setHasLogo] = useState(false);
 
-  // Выносим fetchData на уровень компонента
+  // Модифицируем fetchData для оптимизации загрузки лого
   const fetchData = async (movieData: any) => {
     if (movieData) {
       try {
+        setIsLogoLoading(true);
         const [images, movieDetails, credits] = await Promise.all([
           getMovieImages(movieData.id),
           getMovieDetails(movieData.id),
@@ -159,11 +162,14 @@ export const MovieDetails = ({
           const russianLogo = images.logos.find(
             (logo: any) => logo.iso_639_1 === "ru"
           );
-          setLogo(
-            russianLogo ? russianLogo.file_path : images.logos[0].file_path
-          );
+          const logoPath = russianLogo
+            ? russianLogo.file_path
+            : images.logos[0].file_path;
+          setLogo(logoPath);
+          setHasLogo(true);
         } else {
           setLogo(null);
+          setHasLogo(false);
         }
 
         if (movieDetails) {
@@ -175,6 +181,10 @@ export const MovieDetails = ({
         }
       } catch (error) {
         console.error("Error loading movie details:", error);
+        setLogo(null);
+        setHasLogo(false);
+      } finally {
+        setIsLogoLoading(false);
       }
     }
   };
@@ -271,25 +281,50 @@ export const MovieDetails = ({
     return truncated.trim();
   };
 
+  // Модифицируем эффект для загрузки рекомендаций
   useEffect(() => {
+    let isMounted = true; // Флаг для предотвращения утечек памяти
+
     const fetchRecommendations = async () => {
-      if (currentMovie?.id) {
+      if (!currentMovie?.id) return;
+
+      try {
+        setRecommendations([]); // Очищаем предыдущие рекомендации
         const recommendedMovies = await getMovieRecommendations(
           currentMovie.id
         );
-        setRecommendations(recommendedMovies);
+
+        if (isMounted) {
+          setRecommendations(recommendedMovies || []);
+        }
+      } catch (error) {
+        console.error("Error fetching recommendations:", error);
+        if (isMounted) {
+          setRecommendations([]);
+        }
       }
     };
-    fetchRecommendations();
-  }, [currentMovie?.id]);
 
+    if (open && currentMovie?.id) {
+      fetchRecommendations();
+    }
+
+    return () => {
+      isMounted = false;
+    };
+  }, [currentMovie?.id, open]);
+
+  // Обновляем обработчик клика по рекомендации
   const handleRecommendationClick = async (movie: any) => {
     try {
-      setIsUpdating(true); // Начинаем анимацию
+      setIsUpdating(true);
       const movieDetails = await getMovieDetails(movie.id);
-      if (movieDetails && onMovieSelect) {
+
+      if (movieDetails) {
         setCurrentMovie(movieDetails);
+        setRecommendations([]); // Очищаем рекомендации перед загрузкой новых
         fetchData(movieDetails);
+
         if (onMovieSelect) {
           onMovieSelect(movieDetails);
         }
@@ -298,9 +333,37 @@ export const MovieDetails = ({
       console.error("Error loading movie details:", error);
     } finally {
       setTimeout(() => {
-        setIsUpdating(false); // Заканчиваем анимацию
+        setIsUpdating(false);
       }, 300);
     }
+  };
+
+  // Обновляем эффект для сброса состояний
+  useEffect(() => {
+    if (!open) {
+      setLogo(null);
+      setDetails(null);
+      setIsBackdropLoaded(false);
+      setShowPlayer(false);
+      setMediaUrl(null);
+      setCast([]);
+      setCollectionMovies([]);
+      setShowCollection(false);
+      setCurrentMovie(movie);
+      setIsVisible(false);
+      setIsExpandedDescription(false);
+      setRecommendations([]); // Очищаем рекомендации при закрытии
+      setIsUpdating(false);
+    } else {
+      // При открытии устанавливаем начальный фильм
+      setCurrentMovie(movie);
+    }
+  }, [open, movie]);
+
+  // Модифицируем обработчик закрытия
+  const handleClose = () => {
+    setCurrentMovie(movie); // Возвращаем исходный фильм
+    onClose();
   };
 
   if (!movie) return null;
@@ -339,7 +402,7 @@ export const MovieDetails = ({
   return (
     <Dialog
       open={open}
-      onClose={onClose}
+      onClose={handleClose}
       fullScreen
       TransitionComponent={Fade}
       TransitionProps={{
@@ -388,7 +451,7 @@ export const MovieDetails = ({
       >
         {!showPlayer && (
           <IconButton
-            onClick={onClose}
+            onClick={handleClose}
             sx={{
               position: "fixed",
               top: "env(safe-area-inset-top, 16px)",
@@ -523,41 +586,43 @@ export const MovieDetails = ({
                     width: "100%",
                   }}
                 >
-                  {logo ? (
-                    <Box
-                      sx={{
-                        display: "flex",
-                        justifyContent: { xs: "center", sm: "flex-start" },
-                        width: "100%",
-                        minHeight: "80px",
-                      }}
-                    >
+                  {!isLogoLoading ? (
+                    hasLogo && logo ? (
                       <Box
-                        component="img"
-                        src={imageUrl(logo, "w500")}
-                        alt={currentMovie?.title}
                         sx={{
-                          maxHeight: "80px",
-                          maxWidth: "100%",
-                          objectFit: "contain",
-                          mb: 2,
-                          filter: "brightness(1.2)",
+                          display: "flex",
+                          justifyContent: { xs: "center", sm: "flex-start" },
+                          width: "100%",
+                          minHeight: "80px",
                         }}
-                      />
-                    </Box>
-                  ) : (
-                    <Typography
-                      variant="h4"
-                      sx={{
-                        fontWeight: "bold",
-                        mb: 2,
-                        fontSize: { xs: "1.5rem", sm: "2rem" },
-                        textAlign: { xs: "center", sm: "left" },
-                      }}
-                    >
-                      {currentMovie?.title}
-                    </Typography>
-                  )}
+                      >
+                        <Box
+                          component="img"
+                          src={imageUrl(logo, "w500")}
+                          alt={currentMovie?.title}
+                          sx={{
+                            maxHeight: "80px",
+                            maxWidth: "100%",
+                            objectFit: "contain",
+                            mb: 2,
+                            filter: "brightness(1.2)",
+                          }}
+                        />
+                      </Box>
+                    ) : (
+                      <Typography
+                        variant="h4"
+                        sx={{
+                          fontWeight: "bold",
+                          mb: 2,
+                          fontSize: { xs: "1.5rem", sm: "2rem" },
+                          textAlign: { xs: "center", sm: "left" },
+                        }}
+                      >
+                        {currentMovie?.title}
+                      </Typography>
+                    )
+                  ) : null}
 
                   {/* Добавляем слоган */}
                   {details?.tagline && (

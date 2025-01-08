@@ -235,7 +235,10 @@ function AppRoutes() {
   }, []);
 
   const handleMovieSelect = (movie: any) => {
-    setSelectedMovie(movie);
+    setSelectedMovie(null);
+    setTimeout(() => {
+      setSelectedMovie(movie);
+    }, 0);
   };
 
   return (
