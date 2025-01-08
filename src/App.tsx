@@ -78,7 +78,7 @@ function MobileNavigation() {
         display: { xs: "block", sm: "none" },
         pb: "env(safe-area-inset-bottom)",
         background:
-          "linear-gradient(to top, rgba(20, 20, 20, 1) 0%, rgba(20, 20, 20, 0.8) 100%)",
+          "linear-gradient(to top, rgba(20, 20, 20, 1) 0%, rgb(20 20 20 / 93%) 100%)",
       }}
     >
       <BottomNavigation
