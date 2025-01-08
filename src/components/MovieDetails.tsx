@@ -9,6 +9,8 @@ import {
   Fade,
   Button,
   Divider,
+  CircularProgress,
+  Backdrop,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import StarBorderIcon from "@mui/icons-material/StarBorder";
@@ -146,51 +148,59 @@ export const MovieDetails = ({
   const [isUpdating, setIsUpdating] = useState(false);
   const [isLogoLoading, setIsLogoLoading] = useState(true);
   const [hasLogo, setHasLogo] = useState(false);
+  const [isLoading, setIsLoading] = useState(true); // Общее состояние загрузки
 
-  // Модифицируем fetchData для оптимизации загрузки лого
+  // Модифицируем fetchData для одновременной загрузки всех данных
   const fetchData = async (movieData: any) => {
     if (movieData) {
+      setIsLoading(true);
+      setIsLogoLoading(true); // Начинаем загрузку лого
       try {
-        setIsLogoLoading(true);
-        const [images, movieDetails, credits] = await Promise.all([
-          getMovieImages(movieData.id),
-          getMovieDetails(movieData.id),
-          getMovieCredits(movieData.id),
-        ]);
+        const [images, movieDetails, credits, recommendedMovies] =
+          await Promise.all([
+            getMovieImages(movieData.id),
+            getMovieDetails(movieData.id),
+            getMovieCredits(movieData.id),
+            getMovieRecommendations(movieData.id),
+          ]);
+
+        let logoPath = null;
+        let hasLogoTemp = false;
 
         if (images.logos && images.logos.length > 0) {
           const russianLogo = images.logos.find(
             (logo: any) => logo.iso_639_1 === "ru"
           );
-          const logoPath = russianLogo
+          logoPath = russianLogo
             ? russianLogo.file_path
             : images.logos[0].file_path;
-          setLogo(logoPath);
-          setHasLogo(true);
-        } else {
-          setLogo(null);
-          setHasLogo(false);
+          hasLogoTemp = true;
         }
 
-        if (movieDetails) {
-          setDetails(movieDetails);
-        }
-
-        if (credits?.cast) {
-          setCast(credits.cast.slice(0, 15));
-        }
+        setLogo(logoPath);
+        setHasLogo(hasLogoTemp);
+        setDetails(movieDetails || null);
+        setCast(credits?.cast?.slice(0, 15) || []);
+        setRecommendations(recommendedMovies || []);
+        setIsLogoLoading(false); // Завершаем загрузку лого
       } catch (error) {
         console.error("Error loading movie details:", error);
         setLogo(null);
         setHasLogo(false);
-      } finally {
         setIsLogoLoading(false);
+      } finally {
+        setTimeout(() => {
+          setIsLoading(false);
+          setIsVisible(true);
+        }, 100);
       }
     }
   };
 
+  // Обновляем эффект для открытия диалога
   useEffect(() => {
     if (open) {
+      setIsVisible(false);
       fetchData(movie);
     }
   }, [movie, open]);
@@ -436,6 +446,35 @@ export const MovieDetails = ({
         },
       }}
     >
+      <Backdrop
+        open={isLoading}
+        sx={{
+          position: "absolute",
+          zIndex: 9999,
+          backgroundColor: "rgba(0, 0, 0, 0.8)",
+          display: "flex",
+          flexDirection: "column",
+          gap: 2,
+        }}
+      >
+        <CircularProgress
+          size={50}
+          sx={{
+            color: "#2196F3",
+            filter: "drop-shadow(0 0 8px rgba(33, 150, 243, 0.5))",
+          }}
+        />
+        <Typography
+          variant="body1"
+          sx={{
+            color: "#fff",
+            textShadow: "0 2px 4px rgba(0,0,0,0.5)",
+          }}
+        >
+          Загрузка...
+        </Typography>
+      </Backdrop>
+
       <Box
         className="dialog-content"
         sx={{
@@ -447,6 +486,8 @@ export const MovieDetails = ({
           // Убираем все отступы
           margin: 0,
           padding: 0,
+          opacity: !isLoading && isVisible ? 1 : 0,
+          transition: "opacity 0.3s ease-in-out",
         }}
       >
         {!showPlayer && (
@@ -586,8 +627,8 @@ export const MovieDetails = ({
                     width: "100%",
                   }}
                 >
-                  {!isLogoLoading ? (
-                    hasLogo && logo ? (
+                  {!isLogoLoading &&
+                    (hasLogo && logo ? (
                       <Box
                         sx={{
                           display: "flex",
@@ -621,8 +662,7 @@ export const MovieDetails = ({
                       >
                         {currentMovie?.title}
                       </Typography>
-                    )
-                  ) : null}
+                    ))}
 
                   {/* Добавляем слоган */}
                   {details?.tagline && (
