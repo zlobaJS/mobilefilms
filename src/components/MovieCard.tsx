@@ -97,14 +97,26 @@ export const MovieCard = ({
           boxShadow: "none",
           borderRadius: "12px",
           overflow: "hidden",
-          transition: isDesktop ? "transform 0.2s" : "none",
           cursor: "pointer",
-          "&:hover": {
-            transform: isDesktop ? "scale(1.05)" : "none",
-            zIndex: isDesktop ? 1 : "auto",
-          },
           display: "flex",
           flexDirection: "column",
+          "&::after": {
+            content: '""',
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: "rgba(0, 0, 0, 0)",
+            transition: "background-color 0.2s ease",
+            borderRadius: "12px",
+            pointerEvents: "none",
+          },
+          "&:hover::after": {
+            backgroundColor: isDesktop
+              ? "rgba(0, 0, 0, 0.4)"
+              : "rgba(0, 0, 0, 0)",
+          },
         }}
       >
         <CardMedia

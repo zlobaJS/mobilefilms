@@ -6,6 +6,11 @@ import {
   createTheme,
   BottomNavigation,
   BottomNavigationAction,
+  Drawer,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemButton,
 } from "@mui/material";
 import HomeIcon from "@mui/icons-material/Home";
 import SearchIcon from "@mui/icons-material/Search";
@@ -135,6 +140,100 @@ function MobileNavigation() {
   );
 }
 
+function DesktopNavigation() {
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  return (
+    <Drawer
+      variant="permanent"
+      sx={{
+        display: { xs: "none", sm: "block" },
+        "& .MuiDrawer-paper": {
+          width: "72px",
+          backgroundColor: "#141414",
+          borderRight: "none",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          pt: "env(safe-area-inset-top)",
+        },
+      }}
+    >
+      <List
+        sx={{
+          width: "100%",
+          height: "100%",
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+          alignItems: "center",
+          gap: 1,
+        }}
+      >
+        <ListItem disablePadding>
+          <ListItemButton
+            onClick={() => navigate("/")}
+            selected={location.pathname === "/"}
+            sx={{
+              minHeight: 48,
+              justifyContent: "center",
+              "&.Mui-selected": {
+                bgcolor: "rgba(255, 255, 255, 0.08)",
+              },
+              "&:hover": {
+                bgcolor: "rgba(255, 255, 255, 0.12)",
+              },
+            }}
+          >
+            <ListItemIcon
+              sx={{
+                minWidth: 0,
+                justifyContent: "center",
+                color:
+                  location.pathname === "/"
+                    ? "white"
+                    : "rgba(255, 255, 255, 0.5)",
+              }}
+            >
+              <HomeIcon />
+            </ListItemIcon>
+          </ListItemButton>
+        </ListItem>
+        <ListItem disablePadding>
+          <ListItemButton
+            onClick={() => navigate("/search")}
+            selected={location.pathname === "/search"}
+            sx={{
+              minHeight: 48,
+              justifyContent: "center",
+              "&.Mui-selected": {
+                bgcolor: "rgba(255, 255, 255, 0.08)",
+              },
+              "&:hover": {
+                bgcolor: "rgba(255, 255, 255, 0.12)",
+              },
+            }}
+          >
+            <ListItemIcon
+              sx={{
+                minWidth: 0,
+                justifyContent: "center",
+                color:
+                  location.pathname === "/search"
+                    ? "white"
+                    : "rgba(255, 255, 255, 0.5)",
+              }}
+            >
+              <SearchIcon />
+            </ListItemIcon>
+          </ListItemButton>
+        </ListItem>
+      </List>
+    </Drawer>
+  );
+}
+
 function AppRoutes() {
   const location = useLocation();
   const mainPageScrollPos = useRef(0);
@@ -243,140 +342,143 @@ function AppRoutes() {
 
   return (
     <>
-      <AnimatePresence mode="sync">
-        <Routes location={location} key={location.pathname}>
-          <Route
-            path="/"
-            element={
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 1 }}
-                transition={{ duration: 0.1 }}
-                key="home"
-                style={{ minHeight: "100dvh" }}
-              >
-                <Box
-                  sx={{
-                    minHeight: "100dvh",
-                    backgroundColor: "#141414",
-                    paddingTop:
-                      location.pathname === "/"
-                        ? 0
-                        : "env(safe-area-inset-top)",
-                    paddingBottom: "env(safe-area-inset-bottom)",
-                    paddingLeft: "env(safe-area-inset-left)",
-                    paddingRight: "env(safe-area-inset-right)",
-                  }}
+      <DesktopNavigation />
+      <Box sx={{ ml: { xs: 0, sm: "72px" } }}>
+        <AnimatePresence mode="sync">
+          <Routes location={location} key={location.pathname}>
+            <Route
+              path="/"
+              element={
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 1 }}
+                  transition={{ duration: 0.1 }}
+                  key="home"
+                  style={{ minHeight: "100dvh" }}
                 >
-                  <BackdropSlider
-                    movies={movies.popular}
-                    onMovieSelect={handleMovieSelect}
-                  />
-                  <MovieSlider
-                    title="Сейчас смотрят"
-                    movies={movies.watchingToday}
-                    loading={loading}
-                    categoryId="now-playing"
-                    onMovieSelect={handleMovieSelect}
-                  />
-                  <MovieSlider
-                    title="Сегодня в тренде"
-                    movies={movies.trendingToday}
-                    loading={loading}
-                    categoryId="trending-today"
-                    onMovieSelect={handleMovieSelect}
-                  />
-                  <MovieSlider
-                    title="За неделю в тренде"
-                    movies={movies.trendingWeek}
-                    loading={loading}
-                    categoryId="trending-week"
-                    onMovieSelect={handleMovieSelect}
-                  />
-                  <MovieSlider
-                    title="Популярное"
-                    movies={movies.popular}
-                    loading={loading}
-                    categoryId="popular"
-                    onMovieSelect={handleMovieSelect}
-                  />
-                  <MovieSlider
-                    title="Ужасы"
-                    movies={movies.horror}
-                    loading={loading}
-                    categoryId="horror"
-                    onMovieSelect={handleMovieSelect}
-                  />
-                  <MovieSlider
-                    title="Боевики"
-                    movies={movies.action}
-                    loading={loading}
-                    categoryId="action"
-                    onMovieSelect={handleMovieSelect}
-                  />
-                  <MovieSlider
-                    title="Комедии"
-                    movies={movies.comedy}
-                    loading={loading}
-                    categoryId="comedy"
-                    onMovieSelect={handleMovieSelect}
-                  />
-                  <MovieSlider
-                    title="Фантастика"
-                    movies={movies.scifi}
-                    loading={loading}
-                    categoryId="scifi"
-                    onMovieSelect={handleMovieSelect}
-                  />
-                  <MovieSlider
-                    title="Триллеры"
-                    movies={movies.thriller}
-                    loading={loading}
-                    categoryId="thriller"
-                    onMovieSelect={handleMovieSelect}
-                  />
-                  <MovieSlider
-                    title="Вестерны"
-                    movies={movies.western}
-                    loading={loading}
-                    categoryId="western"
-                    onMovieSelect={handleMovieSelect}
-                  />
-                  <MovieSlider
-                    title="Драмы"
-                    movies={movies.drama}
-                    loading={loading}
-                    categoryId="drama"
-                    onMovieSelect={handleMovieSelect}
-                  />
-                  <MovieSlider
-                    title="Военные"
-                    movies={movies.war}
-                    loading={loading}
-                    categoryId="war"
-                    onMovieSelect={handleMovieSelect}
-                  />
-                </Box>
-              </motion.div>
-            }
-          />
-          <Route
-            path="/category/:categoryId"
-            element={
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 1 }}
-                transition={{ duration: 0.1 }}
-                key="category"
-              >
-                <CategoryPage />
-              </motion.div>
-            }
-          />
-        </Routes>
-      </AnimatePresence>
+                  <Box
+                    sx={{
+                      minHeight: "100dvh",
+                      backgroundColor: "#141414",
+                      paddingTop:
+                        location.pathname === "/"
+                          ? 0
+                          : "env(safe-area-inset-top)",
+                      paddingBottom: "env(safe-area-inset-bottom)",
+                      paddingLeft: "env(safe-area-inset-left)",
+                      paddingRight: "env(safe-area-inset-right)",
+                    }}
+                  >
+                    <BackdropSlider
+                      movies={movies.popular}
+                      onMovieSelect={handleMovieSelect}
+                    />
+                    <MovieSlider
+                      title="Сейчас смотрят"
+                      movies={movies.watchingToday}
+                      loading={loading}
+                      categoryId="now-playing"
+                      onMovieSelect={handleMovieSelect}
+                    />
+                    <MovieSlider
+                      title="Сегодня в тренде"
+                      movies={movies.trendingToday}
+                      loading={loading}
+                      categoryId="trending-today"
+                      onMovieSelect={handleMovieSelect}
+                    />
+                    <MovieSlider
+                      title="За неделю в тренде"
+                      movies={movies.trendingWeek}
+                      loading={loading}
+                      categoryId="trending-week"
+                      onMovieSelect={handleMovieSelect}
+                    />
+                    <MovieSlider
+                      title="Популярное"
+                      movies={movies.popular}
+                      loading={loading}
+                      categoryId="popular"
+                      onMovieSelect={handleMovieSelect}
+                    />
+                    <MovieSlider
+                      title="Ужасы"
+                      movies={movies.horror}
+                      loading={loading}
+                      categoryId="horror"
+                      onMovieSelect={handleMovieSelect}
+                    />
+                    <MovieSlider
+                      title="Боевики"
+                      movies={movies.action}
+                      loading={loading}
+                      categoryId="action"
+                      onMovieSelect={handleMovieSelect}
+                    />
+                    <MovieSlider
+                      title="Комедии"
+                      movies={movies.comedy}
+                      loading={loading}
+                      categoryId="comedy"
+                      onMovieSelect={handleMovieSelect}
+                    />
+                    <MovieSlider
+                      title="Фантастика"
+                      movies={movies.scifi}
+                      loading={loading}
+                      categoryId="scifi"
+                      onMovieSelect={handleMovieSelect}
+                    />
+                    <MovieSlider
+                      title="Триллеры"
+                      movies={movies.thriller}
+                      loading={loading}
+                      categoryId="thriller"
+                      onMovieSelect={handleMovieSelect}
+                    />
+                    <MovieSlider
+                      title="Вестерны"
+                      movies={movies.western}
+                      loading={loading}
+                      categoryId="western"
+                      onMovieSelect={handleMovieSelect}
+                    />
+                    <MovieSlider
+                      title="Драмы"
+                      movies={movies.drama}
+                      loading={loading}
+                      categoryId="drama"
+                      onMovieSelect={handleMovieSelect}
+                    />
+                    <MovieSlider
+                      title="Военные"
+                      movies={movies.war}
+                      loading={loading}
+                      categoryId="war"
+                      onMovieSelect={handleMovieSelect}
+                    />
+                  </Box>
+                </motion.div>
+              }
+            />
+            <Route
+              path="/category/:categoryId"
+              element={
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 1 }}
+                  transition={{ duration: 0.1 }}
+                  key="category"
+                >
+                  <CategoryPage />
+                </motion.div>
+              }
+            />
+          </Routes>
+        </AnimatePresence>
+      </Box>
       <MobileNavigation />
     </>
   );
