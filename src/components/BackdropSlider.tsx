@@ -2,7 +2,7 @@ import { Box, Button, Typography, Skeleton } from "@mui/material";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay } from "swiper/modules";
 import { imageUrl } from "../api/tmdb";
-import { getMovieImages } from "../api/tmdb";
+import { getMovieImages, getMovieDetails } from "../api/tmdb";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import "swiper/css";
 import { useState, useEffect } from "react";
@@ -17,6 +17,8 @@ interface Movie {
   release_date: string;
   release_quality?: string;
   logo_path?: string;
+  production_countries?: Array<{ iso_3166_1: string; name: string }>;
+  runtime?: number;
 }
 
 interface BackdropSliderProps {
@@ -47,7 +49,11 @@ export const BackdropSlider = ({ movies }: BackdropSliderProps) => {
 
   const fetchMovieLogos = async (movie: Movie) => {
     try {
-      const images = await getMovieImages(movie.id);
+      const [images, details] = await Promise.all([
+        getMovieImages(movie.id),
+        getMovieDetails(movie.id),
+      ]);
+
       if (images.logos && images.logos.length > 0) {
         const russianLogo = images.logos.find(
           (logo: any) => logo.iso_639_1 === "ru"
@@ -59,8 +65,13 @@ export const BackdropSlider = ({ movies }: BackdropSliderProps) => {
             : images.logos[0].file_path,
         }));
       }
+
+      if (details) {
+        movie.production_countries = details.production_countries;
+        movie.runtime = details.runtime;
+      }
     } catch (error) {
-      console.error("Error loading movie logos:", error);
+      console.error("Error loading movie data:", error);
     }
   };
 
@@ -97,6 +108,163 @@ export const BackdropSlider = ({ movies }: BackdropSliderProps) => {
       loadMovieAssets();
     }
   }, [randomMovies]);
+
+  const formatRuntime = (minutes: number) => {
+    const hours = Math.floor(minutes / 60);
+    const mins = minutes % 60;
+    return `${hours}ч ${mins}м`;
+  };
+
+  const countryTranslations: { [key: string]: string } = {
+    "United States of America": "США",
+    "United Kingdom": "Великобритания",
+    Russia: "Россия",
+    France: "Франция",
+    Germany: "Германия",
+    Italy: "Италия",
+    Spain: "Испания",
+    China: "Китай",
+    Japan: "Япония",
+    "South Korea": "Южная Корея",
+    // Добавьте другие страны по необходимости
+  };
+
+  const MovieInfo = ({ movie }: { movie: Movie }) => {
+    const getCountryName = (englishName: string) => {
+      return countryTranslations[englishName] || englishName;
+    };
+
+    return (
+      <Box
+        sx={{
+          display: { xs: "none", md: "flex" },
+          flexDirection: "column",
+          position: "absolute",
+          left: "5%",
+          bottom: "15%",
+          maxWidth: "40%",
+          zIndex: 2,
+          gap: 2,
+        }}
+      >
+        {movieLogos[movie.id] ? (
+          <Box
+            component="img"
+            src={imageUrl(movieLogos[movie.id]!, "w500")}
+            alt={movie.title}
+            sx={{
+              width: "300px",
+              height: "auto",
+              objectFit: "contain",
+              filter: "drop-shadow(2px 14px 6px black)",
+              animation: "fadeInLeft 0.8s ease-out",
+              "@keyframes fadeInLeft": {
+                from: {
+                  opacity: 0,
+                  transform: "translateX(-20px)",
+                },
+                to: {
+                  opacity: 1,
+                  transform: "translateX(0)",
+                },
+              },
+            }}
+          />
+        ) : (
+          <Typography
+            variant="h2"
+            sx={{
+              color: "white",
+              fontWeight: "bold",
+              textShadow: "0 4px 12px rgba(0,0,0,0.5)",
+              animation: "fadeInLeft 0.8s ease-out",
+            }}
+          >
+            {movie.title}
+          </Typography>
+        )}
+
+        <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
+          <Typography
+            sx={{
+              color: "#00e676",
+              fontWeight: "bold",
+            }}
+          >
+            {Math.round(movie.vote_average * 10)}%
+          </Typography>
+          <Typography sx={{ color: "rgba(255,255,255,0.7)" }}>
+            {new Date(movie.release_date).getFullYear()}
+          </Typography>
+          {movie.production_countries &&
+            movie.production_countries.length > 0 && (
+              <Typography sx={{ color: "rgba(255,255,255,0.7)" }}>
+                {getCountryName(movie.production_countries[0].name)}
+              </Typography>
+            )}
+          {movie.runtime && (
+            <Typography sx={{ color: "rgba(255,255,255,0.7)" }}>
+              {formatRuntime(movie.runtime)}
+            </Typography>
+          )}
+          {movie.release_quality && (
+            <Typography
+              sx={{
+                color: "#000000",
+                textTransform: "uppercase",
+                fontWeight: "bold",
+                backgroundColor: "rgba(255,255,255,0.7)",
+                padding: "2px 8px",
+                borderRadius: "4px",
+                fontSize: "0.8rem",
+              }}
+            >
+              {movie.release_quality}
+            </Typography>
+          )}
+        </Box>
+
+        <Typography
+          sx={{
+            color: "rgba(255,255,255,0.9)",
+            fontSize: "1rem",
+            lineHeight: 1.5,
+            textShadow: "0 2px 4px rgba(0,0,0,0.5)",
+          }}
+        >
+          {movie.overview}
+        </Typography>
+
+        <Box sx={{ display: "flex", gap: 2, mt: 2 }}>
+          <Button
+            variant="contained"
+            startIcon={<PlayArrowIcon />}
+            sx={{
+              background: `linear-gradient(90deg, 
+                rgba(229,9,20,1) 0%, 
+                rgba(244,67,54,1) 100%
+              )`,
+              color: "white",
+              fontSize: "1.2rem",
+              px: 6,
+              py: 1.5,
+              borderRadius: 28,
+              "&:hover": {
+                background: `linear-gradient(90deg, 
+                  rgba(244,67,54,1) 0%, 
+                  rgba(229,9,20,1) 100%
+                )`,
+              },
+              textTransform: "none",
+              boxShadow: "0 8px 32px rgba(229,9,20,0.3)",
+            }}
+          >
+            Смотреть
+          </Button>
+        </Box>
+      </Box>
+    );
+  };
 
   if (loading) {
     return (
@@ -271,16 +439,34 @@ export const BackdropSlider = ({ movies }: BackdropSliderProps) => {
               />
               <Box
                 sx={{
+                  display: { xs: "none", md: "block" },
+                  position: "absolute",
+                  left: 0,
+                  top: 0,
+                  width: "60%",
+                  height: "100%",
+                  background: `linear-gradient(
+                    90deg,
+                    rgba(20,20,20,0.95) 0%,
+                    rgba(20,20,20,0.8) 50%,
+                    rgba(20,20,20,0) 100%
+                  )`,
+                  zIndex: 1,
+                }}
+              />
+              <MovieInfo movie={movie} />
+              <Box
+                sx={{
                   position: "absolute",
                   left: "50%",
-                  bottom: { xs: "15%", sm: "20%", md: "25%" },
+                  bottom: { xs: "15%", sm: "20%" },
                   transform: "translateX(-50%)",
                   zIndex: 2,
-                  display: "flex",
+                  display: { xs: "flex", md: "none" },
                   flexDirection: "column",
                   alignItems: "center",
                   width: "100%",
-                  maxWidth: { xs: "90%", sm: "80%", md: "60%" },
+                  maxWidth: { xs: "90%", sm: "80%" },
                   gap: 3,
                 }}
               >
