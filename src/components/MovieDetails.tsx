@@ -437,20 +437,6 @@ export const MovieDetails = ({
           bottom: 0,
           padding: 0,
           overflow: "hidden",
-          opacity: 0,
-          animation: "fadeIn 0.3s ease-in-out forwards",
-          "@keyframes fadeIn": {
-            from: {
-              opacity: 0,
-              backdropFilter: "blur(20px)",
-              WebkitBackdropFilter: "blur(20px)",
-            },
-            to: {
-              opacity: 1,
-              backdropFilter: "blur(10px)",
-              WebkitBackdropFilter: "blur(10px)",
-            },
-          },
           backgroundImage: `url(${imageUrl(
             movie?.backdrop_path || movie?.poster_path || "",
             "w1280"
@@ -458,6 +444,12 @@ export const MovieDetails = ({
           backgroundSize: "cover",
           backgroundPosition: "center",
           backgroundRepeat: "no-repeat",
+          opacity: 0,
+          animation: "fadeIn 0.3s ease-in-out forwards",
+          "@keyframes fadeIn": {
+            from: { opacity: 0 },
+            to: { opacity: 1 },
+          },
           "&::before": {
             content: '""',
             position: "absolute",
@@ -465,10 +457,18 @@ export const MovieDetails = ({
             left: 0,
             right: 0,
             bottom: 0,
-            backgroundColor: "rgba(20, 20, 20, 0.7)",
-            backdropFilter: !isLoading ? "blur(0)" : "blur(20px)",
-            WebkitBackdropFilter: !isLoading ? "blur(0)" : "blur(20px)",
-            transition: "all 0.6s ease-out",
+            backgroundColor: "rgba(0, 0, 0, 0.85)",
+            animation: open
+              ? "lightUp 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards"
+              : "none",
+            "@keyframes lightUp": {
+              "0%": {
+                backgroundColor: "rgba(0, 0, 0, 0.85)",
+              },
+              "100%": {
+                backgroundColor: "rgba(20, 20, 20, 0.7)",
+              },
+            },
           },
         },
       }}
@@ -484,7 +484,7 @@ export const MovieDetails = ({
           margin: 0,
           padding: 0,
           opacity: !isLoading && isVisible ? 1 : 0,
-          transition: "opacity 0.6s ease-out",
+          transition: "opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1)",
           zIndex: 1,
         }}
       >
