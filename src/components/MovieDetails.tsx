@@ -503,19 +503,7 @@ export const MovieDetails = ({
               to: { opacity: 1 },
             },
           }}
-        >
-          <Typography
-            variant="body1"
-            sx={{
-              color: "#fff",
-              textShadow: "0 2px 4px rgba(0,0,0,0.5)",
-              fontSize: "1.1rem",
-              letterSpacing: "0.5px",
-            }}
-          >
-            Загрузка...
-          </Typography>
-        </Backdrop>
+        />
 
         {!showPlayer && (
           <IconButton
