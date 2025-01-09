@@ -11,6 +11,7 @@ import {
   ListItem,
   ListItemIcon,
   ListItemButton,
+  Typography,
 } from "@mui/material";
 import HomeIcon from "@mui/icons-material/Home";
 import SearchIcon from "@mui/icons-material/Search";
@@ -50,13 +51,13 @@ function MobileNavigation() {
   useEffect(() => {
     switch (location.pathname) {
       case "/":
-        setValue(0);
+        setValue(2);
         break;
       case "/search":
-        setValue(1);
+        setValue(0);
         break;
       case "/favorites":
-        setValue(2);
+        setValue(1);
         break;
       case "/settings":
         setValue(3);
@@ -66,7 +67,7 @@ function MobileNavigation() {
         break;
       default:
         if (location.pathname.includes("/category")) {
-          setValue(0);
+          setValue(2);
         }
     }
   }, [location]);
@@ -84,6 +85,7 @@ function MobileNavigation() {
         pb: "env(safe-area-inset-bottom)",
         background:
           "linear-gradient(to top, rgba(20, 20, 20, 1) 0%, rgb(20 20 20 / 93%) 100%)",
+        boxShadow: "-4px 5px 72px 16px #39393a",
       }}
     >
       <BottomNavigation
@@ -92,13 +94,13 @@ function MobileNavigation() {
           setValue(newValue);
           switch (newValue) {
             case 0:
-              navigate("/");
-              break;
-            case 1:
               navigate("/search");
               break;
-            case 2:
+            case 1:
               navigate("/favorites");
+              break;
+            case 2:
+              navigate("/");
               break;
             case 3:
               navigate("/settings");
@@ -112,27 +114,108 @@ function MobileNavigation() {
           bgcolor: "transparent",
           backdropFilter: "blur(10px)",
           WebkitBackdropFilter: "blur(10px)",
-          height: "56px",
+          height: "64px",
+          position: "relative",
           "& .MuiBottomNavigationAction-root": {
             minWidth: "auto",
-            padding: "6px 0",
+            padding: 0,
             color: "rgba(255, 255, 255, 0.5)",
+            transition: "background-color 0.3s",
+            "&:focus": {
+              outline: "none",
+            },
+            "&.Mui-focusVisible": {
+              outline: "none",
+            },
+            "&:hover": {
+              backgroundColor: "transparent",
+            },
             "&.Mui-selected": {
               color: "white",
+              backgroundColor: "#0686ee",
             },
             "& .MuiSvgIcon-root": {
-              fontSize: "28px",
+              fontSize: "26px",
               transition: "transform 0.2s",
             },
             "&.Mui-selected .MuiSvgIcon-root": {
               transform: "scale(1.1)",
             },
           },
+          "& .MuiBottomNavigationAction-root:nth-of-type(2)": {
+            marginRight: "52px",
+          },
+          "& .MuiBottomNavigationAction-root:nth-of-type(4)": {
+            marginLeft: "52px",
+          },
+          "& .MuiBottomNavigationAction-root:nth-of-type(3)": {
+            position: "absolute",
+            left: "50%",
+            top: "-20px",
+            transform: "translateX(-50%)",
+            width: "50px",
+            height: "50px",
+            borderRadius: "50%",
+            backgroundColor: "#141414",
+            color: "rgba(255, 255, 255, 0.5)",
+            boxShadow: {
+              ...(value === 2 && {
+                boxShadow: `
+                  0 -4px 12px rgba(6, 134, 238, 0.5),
+                  0 0 0 6px rgba(6, 134, 238, 0.1),
+                  0 0 0 3px rgba(6, 134, 238, 0.2)
+                `,
+              }),
+            },
+            padding: 0,
+            minWidth: "50px",
+            margin: 0,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            "&::before": {
+              content: '""',
+              position: "absolute",
+              top: "-3px",
+              left: "-3px",
+              right: "-3px",
+              bottom: "-3px",
+              borderRadius: "50%",
+              background:
+                "radial-gradient(circle at center, rgba(0,132,238,0.2) 0%, transparent 70%)",
+              animation: value === 2 ? "pulse 2s infinite" : "none",
+            },
+            "@keyframes pulse": {
+              "0%": {
+                transform: "scale(1)",
+                opacity: 0.8,
+              },
+              "70%": {
+                transform: "scale(1.3)",
+                opacity: 0,
+              },
+              "100%": {
+                transform: "scale(1.3)",
+                opacity: 0,
+              },
+            },
+            "&.Mui-selected": {
+              backgroundColor: "#0686ee",
+              color: "white",
+            },
+            "& .MuiSvgIcon-root": {
+              fontSize: "26px",
+              position: "static",
+              transform: "none",
+              margin: 0,
+              filter: "drop-shadow(0 0 4px rgba(255,255,255,0.3))",
+            },
+          },
         }}
       >
-        <BottomNavigationAction icon={<HomeIcon />} />
         <BottomNavigationAction icon={<SearchIcon />} />
         <BottomNavigationAction icon={<FavoriteIcon />} />
+        <BottomNavigationAction icon={<HomeIcon />} />
         <BottomNavigationAction icon={<SettingsIcon />} />
         <BottomNavigationAction icon={<InfoIcon />} />
       </BottomNavigation>
@@ -505,6 +588,70 @@ function AppRoutes() {
                   key="category"
                 >
                   <CategoryPage />
+                </motion.div>
+              }
+            />
+            <Route
+              path="/search"
+              element={
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 1 }}
+                  transition={{ duration: 0.1 }}
+                  key="search"
+                >
+                  <Box sx={{ p: 3 }}>
+                    <Typography variant="h4">Поиск</Typography>
+                  </Box>
+                </motion.div>
+              }
+            />
+            <Route
+              path="/favorites"
+              element={
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 1 }}
+                  transition={{ duration: 0.1 }}
+                  key="favorites"
+                >
+                  <Box sx={{ p: 3 }}>
+                    <Typography variant="h4">Избранное</Typography>
+                  </Box>
+                </motion.div>
+              }
+            />
+            <Route
+              path="/settings"
+              element={
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 1 }}
+                  transition={{ duration: 0.1 }}
+                  key="settings"
+                >
+                  <Box sx={{ p: 3 }}>
+                    <Typography variant="h4">Настройки</Typography>
+                  </Box>
+                </motion.div>
+              }
+            />
+            <Route
+              path="/about"
+              element={
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 1 }}
+                  transition={{ duration: 0.1 }}
+                  key="about"
+                >
+                  <Box sx={{ p: 3 }}>
+                    <Typography variant="h4">О приложении</Typography>
+                  </Box>
                 </motion.div>
               }
             />
