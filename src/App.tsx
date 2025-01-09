@@ -32,6 +32,7 @@ import { CategoryPage } from "./pages/CategoryPage";
 import CastProvider from "react-chromecast";
 import { AnimatePresence } from "framer-motion";
 import { motion } from "framer-motion";
+import { KeywordPage } from "./pages/KeywordPage";
 
 const darkTheme = createTheme({
   palette: {
@@ -652,6 +653,20 @@ function AppRoutes() {
                   <Box sx={{ p: 3 }}>
                     <Typography variant="h4">О приложении</Typography>
                   </Box>
+                </motion.div>
+              }
+            />
+            <Route
+              path="/keyword/:keywordId/:keywordName"
+              element={
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 1 }}
+                  transition={{ duration: 0.1 }}
+                  key="keyword"
+                >
+                  <KeywordPage />
                 </motion.div>
               }
             />

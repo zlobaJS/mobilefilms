@@ -10,6 +10,7 @@ import {
   Button,
   Divider,
   Backdrop,
+  Chip,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import StarBorderIcon from "@mui/icons-material/StarBorder";
@@ -24,6 +25,7 @@ import {
   getMovieCredits,
   getCollection,
   getMovieRecommendations,
+  getMovieKeywords,
 } from "../api/tmdb";
 import { useEffect, useState } from "react";
 import { KinoboxPlayer } from "./KinoboxPlayer";
@@ -31,6 +33,7 @@ import * as Flags from "country-flag-icons/react/3x2";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { FreeMode } from "swiper/modules";
 import "swiper/css";
+import { useNavigate } from "react-router-dom";
 
 declare module "@mui/material/styles" {
   interface BreakpointOverrides {
@@ -148,6 +151,10 @@ export const MovieDetails = ({
   const [isLogoLoading, setIsLogoLoading] = useState(true);
   const [hasLogo, setHasLogo] = useState(false);
   const [isLoading, setIsLoading] = useState(true); // Общее состояние загрузки
+  const [keywords, setKeywords] = useState<Array<{ id: number; name: string }>>(
+    []
+  );
+  const navigate = useNavigate();
 
   // Модифицируем fetchData для одновременной загрузки всех данных
   const fetchData = async (movieData: any) => {
@@ -373,6 +380,22 @@ export const MovieDetails = ({
   const handleClose = () => {
     setCurrentMovie(movie); // Возвращаем исходный фильм
     onClose();
+  };
+
+  // Добавьте загрузку тегов в useEffect
+  useEffect(() => {
+    const fetchKeywords = async () => {
+      if (currentMovie?.id) {
+        const keywordsData = await getMovieKeywords(currentMovie.id);
+        setKeywords(keywordsData);
+      }
+    };
+    fetchKeywords();
+  }, [currentMovie?.id]);
+
+  const handleKeywordClick = (keywordId: number, keywordName: string) => {
+    navigate(`/keyword/${keywordId}/${keywordName}`);
+    onClose(); // закрываем модальное окно с деталями фильма
   };
 
   if (!movie) return null;
@@ -1462,6 +1485,50 @@ export const MovieDetails = ({
                             </SwiperSlide>
                           ))}
                         </Swiper>
+                      </Box>
+                    </Box>
+                  )}
+
+                  {keywords.length > 0 && (
+                    <Box sx={{ mb: 3 }}>
+                      <Typography
+                        variant="h6"
+                        sx={{
+                          color: "#6b6868",
+                          fontSize: "0.9rem",
+                          fontWeight: 500,
+                          mb: 1,
+                          textAlign: "left",
+                        }}
+                      >
+                        Ключевые слова
+                      </Typography>
+                      <Box
+                        sx={{
+                          display: "flex",
+                          flexWrap: "wrap",
+                          gap: 1,
+                          justifyContent: { xs: "center", sm: "flex-start" },
+                        }}
+                      >
+                        {keywords.map((keyword) => (
+                          <Chip
+                            key={keyword.id}
+                            label={keyword.name}
+                            onClick={() =>
+                              handleKeywordClick(keyword.id, keyword.name)
+                            }
+                            sx={{
+                              backgroundColor: "rgba(255, 255, 255, 0.08)",
+                              color: "#fff",
+                              fontSize: "0.8rem",
+                              cursor: "pointer",
+                              "&:hover": {
+                                backgroundColor: "rgba(255, 255, 255, 0.12)",
+                              },
+                            }}
+                          />
+                        ))}
                       </Box>
                     </Box>
                   )}

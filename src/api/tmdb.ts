@@ -182,3 +182,27 @@ export const getMovieRecommendations = async (movieId: number) => {
     return [];
   }
 };
+
+export const getMovieKeywords = async (movieId: number) => {
+  try {
+    const data = await fetchTMDB(`/movie/${movieId}/keywords`, {});
+    return data.keywords || [];
+  } catch (error) {
+    console.error("Error fetching movie keywords:", error);
+    return [];
+  }
+};
+
+export const getMoviesByKeyword = async (keywordId: number, page = 1) => {
+  try {
+    const data = await fetchTMDB("/discover/movie", {
+      with_keywords: keywordId.toString(),
+      page: page.toString(),
+      sort_by: "popularity.desc",
+    });
+    return data;
+  } catch (error) {
+    console.error("Error fetching movies by keyword:", error);
+    return { results: [] };
+  }
+};

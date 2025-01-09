@@ -9,7 +9,7 @@ import {
   Skeleton,
 } from "@mui/material";
 import { MovieCard } from "../components/MovieCard";
-import { getMovies } from "../api/tmdb";
+import { getMovies, getMoviesByKeyword } from "../api/tmdb";
 import { motion } from "framer-motion";
 
 const CATEGORY_TITLES: { [key: string]: string } = {
@@ -38,8 +38,23 @@ interface Movie {
   release_quality?: string;
 }
 
-export const CategoryPage = () => {
-  const { categoryId } = useParams();
+interface CategoryPageProps {
+  categoryType?: "regular" | "keyword";
+  categoryId?: string;
+  title?: string;
+}
+
+export const CategoryPage = ({
+  categoryType = "regular",
+  categoryId: propsCategoryId,
+  title: propsTitle,
+}: CategoryPageProps) => {
+  const params = useParams();
+  const routeCategoryId = params.categoryId;
+
+  const categoryId = propsCategoryId || routeCategoryId;
+  const title = propsTitle || CATEGORY_TITLES[categoryId || ""];
+
   const [movies, setMovies] = useState<Movie[]>([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
@@ -59,15 +74,19 @@ export const CategoryPage = () => {
   }, [categoryId]);
 
   const fetchCategoryMovies = async (pageNumber: number) => {
+    const startTime = Date.now();
+
     try {
-      if (pageNumber > 1) {
-        setIsLoadingMore(true);
-      }
+      setIsLoadingMore(pageNumber > 1);
       setLoading(true);
 
-      const startTime = Date.now();
+      let data;
+      if (categoryType === "keyword") {
+        data = await getMoviesByKeyword(Number(categoryId), pageNumber);
+      } else {
+        data = await getMovies.byCategory(categoryId || "", pageNumber);
+      }
 
-      const data = await getMovies.byCategory(categoryId || "", pageNumber);
       const newMovies = Array.isArray(data.results) ? data.results : [];
 
       if (pageNumber === 1) {
@@ -116,8 +135,10 @@ export const CategoryPage = () => {
   );
 
   useEffect(() => {
-    fetchCategoryMovies(page);
-  }, [page, categoryId]);
+    if (page > 0) {
+      fetchCategoryMovies(page);
+    }
+  }, [page, categoryId, categoryType]);
 
   useEffect(() => {
     return () => {
@@ -183,7 +204,7 @@ export const CategoryPage = () => {
                   color: "white",
                 }}
               >
-                {CATEGORY_TITLES[categoryId || ""]}
+                {title}
               </Typography>
               <Box sx={{ position: "relative" }}>
                 <Grid container spacing={2}>
