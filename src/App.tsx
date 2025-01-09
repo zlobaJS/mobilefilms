@@ -1,4 +1,4 @@
-import { StrictMode, useEffect, useState, useRef } from "react";
+import { StrictMode, useEffect, useState, useRef, useCallback } from "react";
 import {
   Box,
   CssBaseline,
@@ -459,12 +459,12 @@ function AppRoutes() {
     fetchMovies();
   }, []);
 
-  const handleMovieSelect = (movie: any) => {
+  const handleMovieSelect = useCallback((movie: any) => {
     setSelectedMovie(null);
     setTimeout(() => {
       setSelectedMovie(movie);
-    }, 0);
-  };
+    }, 50);
+  }, []);
 
   return (
     <>

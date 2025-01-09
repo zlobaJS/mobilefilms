@@ -214,15 +214,14 @@ export const MovieSlider = ({
                 }}
               >
                 <MovieCard
-                  movie={{
-                    ...movie,
-                    vote_average:
-                      typeof movie.vote_average === "number" &&
-                      !isNaN(movie.vote_average)
-                        ? movie.vote_average
-                        : 0,
+                  movie={movie}
+                  onMovieSelect={(selectedMovie) => {
+                    if (onMovieSelect) {
+                      setTimeout(() => {
+                        onMovieSelect(selectedMovie);
+                      }, 0);
+                    }
                   }}
-                  onMovieSelect={onMovieSelect}
                   showTitle={false}
                 />
               </Box>

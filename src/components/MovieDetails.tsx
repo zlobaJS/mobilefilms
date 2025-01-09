@@ -345,7 +345,10 @@ export const MovieDetails = ({
         fetchData(movieDetails);
 
         if (onMovieSelect) {
-          onMovieSelect(movieDetails);
+          // Добавляем задержку перед вызовом onMovieSelect
+          setTimeout(() => {
+            onMovieSelect(movieDetails);
+          }, 50);
         }
       }
     } catch (error) {
