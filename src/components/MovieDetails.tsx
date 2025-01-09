@@ -424,24 +424,6 @@ export const MovieDetails = ({
       gap: 16px;
     `;
 
-    // Добавляем мобильное меню
-    const bottomNav = document.createElement("div");
-    bottomNav.style.cssText = `
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      background-color: #141414;
-      height: 56px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      border-top: 1px solid rgba(255, 255, 255, 0.12);
-    `;
-
-    document.body.appendChild(overlay);
-    overlay.appendChild(bottomNav);
-
     overlay.innerHTML = `
       <div style="display: flex; flex-direction: column; align-items: center; gap: 16px;">
         <svg class="loading-spinner" width="60" height="60" viewBox="0 0 50 50" style="color: white;">
@@ -462,33 +444,9 @@ export const MovieDetails = ({
           )}"
         </div>
       </div>
-      <div style="
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        background-color: rgb(20, 20, 20);
-        height: 56px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        border-top: 1px solid rgba(255, 255, 255, 0.12);
-        padding-bottom: env(safe-area-inset-bottom);
-      ">
-        <div style="
-          display: flex;
-          justify-content: space-around;
-          align-items: center;
-          width: 100%;
-          max-width: 500px;
-          padding: 0 16px;
-        ">
-          <div style="color: rgba(255,255,255,0.5); font-size: 0.75rem;">Главная</div>
-          <div style="color: rgba(255,255,255,0.5); font-size: 0.75rem;">Поиск</div>
-          <div style="color: rgba(255,255,255,0.5); font-size: 0.75rem;">Избранное</div>
-        </div>
-      </div>
     `;
+
+    document.body.appendChild(overlay);
 
     requestAnimationFrame(() => {
       overlay.style.opacity = "1";
