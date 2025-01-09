@@ -394,8 +394,75 @@ export const MovieDetails = ({
   }, [currentMovie?.id]);
 
   const handleKeywordClick = (keywordId: number, keywordName: string) => {
-    navigate(`/keyword/${keywordId}/${keywordName}`);
-    onClose(); // закрываем модальное окно с деталями фильма
+    // Добавляем стили анимации для лоадера
+    const style = document.createElement("style");
+    style.textContent = `
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+      .loading-spinner {
+        animation: spin 1s linear infinite;
+      }
+    `;
+    document.head.appendChild(style);
+
+    const overlay = document.createElement("div");
+    overlay.style.cssText = `
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #141414;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      z-index: 10000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 16px;
+    `;
+
+    document.body.appendChild(overlay);
+
+    overlay.innerHTML = `
+      <div style="display: flex; flex-direction: column; align-items: center; gap: 16px;">
+        <svg class="loading-spinner" width="60" height="60" viewBox="0 0 50 50" style="color: white;">
+          <circle
+            cx="25"
+            cy="25"
+            r="20"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="4"
+            stroke-linecap="round"
+            style="stroke-dasharray: 80px, 200px; stroke-dashoffset: 0px;"
+          />
+        </svg>
+        <div style="color: white; font-size: 1.25rem;">Загрузка категории...</div>
+      </div>
+    `;
+
+    requestAnimationFrame(() => {
+      overlay.style.opacity = "1";
+
+      setTimeout(() => {
+        onClose();
+        navigate(`/keyword/${keywordId}/${keywordName}`);
+
+        setTimeout(() => {
+          overlay.style.opacity = "0";
+          setTimeout(() => {
+            if (document.body.contains(overlay)) {
+              document.body.removeChild(overlay);
+              document.head.removeChild(style); // Удаляем добавленные стили
+            }
+          }, 300);
+        }, 500);
+      }, 300);
+    });
   };
 
   if (!movie) return null;
