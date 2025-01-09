@@ -151,10 +151,10 @@ function MobileNavigation() {
           "& .MuiBottomNavigationAction-root:nth-of-type(3)": {
             position: "absolute",
             left: "50%",
-            top: "-20px",
+            top: "-24px",
             transform: "translateX(-50%)",
-            width: "50px",
-            height: "50px",
+            width: "60px",
+            height: "60px",
             borderRadius: "50%",
             backgroundColor: "#141414",
             color: "rgba(255, 255, 255, 0.5)",
@@ -204,7 +204,7 @@ function MobileNavigation() {
               color: "white",
             },
             "& .MuiSvgIcon-root": {
-              fontSize: "26px",
+              fontSize: "32px",
               position: "static",
               transform: "none",
               margin: 0,
