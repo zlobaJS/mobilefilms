@@ -93,7 +93,17 @@ export const MovieCard = memo(
         sx={{
           backgroundColor: "transparent",
           boxShadow: "none",
+          background: "none",
+          backgroundImage: "none",
+          "&::before": {
+            display: "none",
+          },
+          "& .MuiPaper-root": {
+            "--Paper-overlay": "none !important",
+            backgroundImage: "none !important",
+          },
         }}
+        elevation={0}
       >
         <Box
           onClick={handleOpenDetails}
