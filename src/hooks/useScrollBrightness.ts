@@ -6,13 +6,11 @@ export const useScrollBrightness = () => {
   const handleScroll = useCallback((event: Event) => {
     const container = event.target as Element;
     const scrollTop = container.scrollTop;
+    const threshold = 300; // Порог прокрутки
 
-    // Уменьшаем порог до половины для более быстрого затемнения
-    const threshold = 300; // Уменьшили порог
-
-    // Используем более агрессивную степень для быстрого достижения максимума
-    const ratio = scrollTop / threshold;
-    const newBrightness = Math.min(Math.pow(ratio, 2), 0.98); // Увеличили степень для более быстрого затемнения
+    // Используем более агрессивную формулу для достижения полного затемнения
+    const ratio = Math.min(scrollTop / threshold, 1);
+    const newBrightness = Math.min(Math.pow(ratio, 1.5), 1); // Изменили максимум на 1 (полное затемнение)
 
     setBrightness(newBrightness);
   }, []);
@@ -25,9 +23,10 @@ export const useScrollBrightness = () => {
         passive: true,
       });
 
+      // Устанавливаем начальное значение
       const initialScrollTop = scrollContainer.scrollTop;
-      const ratio = initialScrollTop / 300;
-      const initialBrightness = Math.min(Math.pow(ratio, 2), 0.98);
+      const ratio = Math.min(initialScrollTop / 300, 1);
+      const initialBrightness = Math.min(Math.pow(ratio, 1.5), 1);
       setBrightness(initialBrightness);
 
       return () => {

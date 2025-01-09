@@ -311,7 +311,7 @@ export const BackdropSlider = ({ movies }: BackdropSliderProps) => {
           left: { xs: 0, sm: "72px" },
           right: 0,
           height: {
-            xs: "calc(100vw * 0.75 + env(safe-area-inset-top))",
+            xs: "calc(100vw * 1.2 + env(safe-area-inset-top))",
             sm: "60vh",
           },
           zIndex: 0,

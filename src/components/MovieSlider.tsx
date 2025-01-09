@@ -65,7 +65,7 @@ export const MovieSlider = ({
           zIndex: 5,
           ...(title === "Сейчас смотрят" && {
             mt: {
-              xs: 2,
+              xs: 0,
               sm: 0,
             },
           }),
@@ -138,7 +138,7 @@ export const MovieSlider = ({
         zIndex: 5,
         ...(title === "Сейчас смотрят" && {
           mt: {
-            xs: 2,
+            xs: "-41px",
             sm: 0,
           },
         }),
