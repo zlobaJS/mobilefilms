@@ -206,39 +206,9 @@ export const MovieSlider = ({
                 <MovieCard
                   movie={movie}
                   onMovieSelect={onMovieSelect}
-                  hideTitle
+                  showTitle={false}
                 />
               </Box>
-              <Typography
-                variant="body2"
-                sx={{
-                  color: "white",
-                  overflow: "hidden",
-                  textOverflow: "ellipsis",
-                  whiteSpace: "nowrap",
-                  fontSize: {
-                    xs: "0.9rem",
-                    sm: "0.875rem",
-                  },
-                  opacity: 0.9,
-                  width: "100%",
-                  textAlign: "center",
-                  mt: {
-                    xs: 1,
-                    sm: 0.5,
-                  },
-                  px: {
-                    xs: 0.5,
-                    sm: 1,
-                  },
-                  fontWeight: {
-                    xs: 500,
-                    sm: 400,
-                  },
-                }}
-              >
-                {movie.title}
-              </Typography>
             </Box>
           </SwiperSlide>
         ))}

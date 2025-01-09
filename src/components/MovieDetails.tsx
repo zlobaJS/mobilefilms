@@ -394,7 +394,6 @@ export const MovieDetails = ({
   }, [currentMovie?.id]);
 
   const handleKeywordClick = (keywordId: number, keywordName: string) => {
-    // Добавляем стили анимации для лоадера
     const style = document.createElement("style");
     style.textContent = `
       @keyframes spin {
@@ -425,7 +424,23 @@ export const MovieDetails = ({
       gap: 16px;
     `;
 
+    // Добавляем мобильное меню
+    const bottomNav = document.createElement("div");
+    bottomNav.style.cssText = `
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background-color: #141414;
+      height: 56px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border-top: 1px solid rgba(255, 255, 255, 0.12);
+    `;
+
     document.body.appendChild(overlay);
+    overlay.appendChild(bottomNav);
 
     overlay.innerHTML = `
       <div style="display: flex; flex-direction: column; align-items: center; gap: 16px;">
@@ -441,7 +456,37 @@ export const MovieDetails = ({
             style="stroke-dasharray: 80px, 200px; stroke-dashoffset: 0px;"
           />
         </svg>
-        <div style="color: white; font-size: 1.25rem;">Загрузка категории...</div>
+        <div style="color: white; font-size: 1.25rem; text-align: center; max-width: 280px; line-height: 1.4;">
+          Подготавливаем фильмы<br/>в категории "${decodeURIComponent(
+            keywordName
+          )}"
+        </div>
+      </div>
+      <div style="
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background-color: rgb(20, 20, 20);
+        height: 56px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border-top: 1px solid rgba(255, 255, 255, 0.12);
+        padding-bottom: env(safe-area-inset-bottom);
+      ">
+        <div style="
+          display: flex;
+          justify-content: space-around;
+          align-items: center;
+          width: 100%;
+          max-width: 500px;
+          padding: 0 16px;
+        ">
+          <div style="color: rgba(255,255,255,0.5); font-size: 0.75rem;">Главная</div>
+          <div style="color: rgba(255,255,255,0.5); font-size: 0.75rem;">Поиск</div>
+          <div style="color: rgba(255,255,255,0.5); font-size: 0.75rem;">Избранное</div>
+        </div>
       </div>
     `;
 
@@ -457,7 +502,7 @@ export const MovieDetails = ({
           setTimeout(() => {
             if (document.body.contains(overlay)) {
               document.body.removeChild(overlay);
-              document.head.removeChild(style); // Удаляем добавленные стили
+              document.head.removeChild(style);
             }
           }, 300);
         }, 500);

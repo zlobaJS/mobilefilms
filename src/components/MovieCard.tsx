@@ -23,6 +23,7 @@ interface MovieCardProps {
   };
   onMovieSelect?: (movie: any) => void;
   hideTitle?: boolean;
+  showTitle?: boolean;
 }
 
 export const MovieCardSkeleton = () => {
@@ -71,7 +72,7 @@ export const MovieCardSkeleton = () => {
 export const MovieCard = ({
   movie,
   onMovieSelect,
-  hideTitle,
+  showTitle = true,
 }: MovieCardProps) => {
   const theme = useTheme();
   const isDesktop = useMediaQuery(theme.breakpoints.up("md"));
@@ -170,7 +171,7 @@ export const MovieCard = ({
             {movie.vote_average.toFixed(1)}
           </Box>
         )}
-        {!hideTitle && (
+        {showTitle && (
           <Typography
             variant="subtitle1"
             sx={{
