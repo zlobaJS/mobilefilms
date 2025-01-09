@@ -12,6 +12,7 @@ import {
   ListItemIcon,
   ListItemButton,
   Typography,
+  CircularProgress,
 } from "@mui/material";
 import HomeIcon from "@mui/icons-material/Home";
 import SearchIcon from "@mui/icons-material/Search";
@@ -49,6 +50,7 @@ function MobileNavigation() {
   const navigate = useNavigate();
   const location = useLocation();
   const [value, setValue] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     switch (location.pathname) {
@@ -74,154 +76,193 @@ function MobileNavigation() {
     }
   }, [location]);
 
+  const handleNavigation = (newValue: number) => {
+    setIsLoading(true);
+    setValue(newValue);
+
+    // Плавная прокрутка вверх
+    window.scrollTo({ top: 0, behavior: "smooth" });
+
+    let path = "/";
+    switch (newValue) {
+      case 0:
+        path = "/search";
+        break;
+      case 1:
+        path = "/favorites";
+        break;
+      case 2:
+        path = "/";
+        break;
+      case 3:
+        path = "/settings";
+        break;
+      case 4:
+        path = "/about";
+        break;
+    }
+
+    navigate(path);
+
+    // Задержка для анимации загрузки
+    setTimeout(() => {
+      setIsLoading(false);
+    }, 500);
+  };
+
   return (
-    <Box
-      sx={{
-        position: "fixed",
-        bottom: 0,
-        left: 0,
-        right: 0,
-        width: "100%",
-        zIndex: 1300,
-        display: { xs: "block", sm: "none" },
-        pb: "env(safe-area-inset-bottom)",
-        background:
-          "linear-gradient(to top, rgba(20, 20, 20, 1) 0%, rgb(20 20 20 / 93%) 100%)",
-        boxShadow: "-4px 5px 72px 16px #39393a",
-      }}
-    >
-      <BottomNavigation
-        value={value}
-        onChange={(_, newValue) => {
-          setValue(newValue);
-          switch (newValue) {
-            case 0:
-              navigate("/search");
-              break;
-            case 1:
-              navigate("/favorites");
-              break;
-            case 2:
-              navigate("/");
-              break;
-            case 3:
-              navigate("/settings");
-              break;
-            case 4:
-              navigate("/about");
-              break;
-          }
-        }}
-        sx={{
-          bgcolor: "transparent",
-          backdropFilter: "blur(10px)",
-          WebkitBackdropFilter: "blur(10px)",
-          height: "64px",
-          position: "relative",
-          "& .MuiBottomNavigationAction-root": {
-            minWidth: "auto",
-            padding: 0,
-            color: "rgba(255, 255, 255, 0.5)",
-            transition: "background-color 0.3s",
-            "&:focus": {
-              outline: "none",
-            },
-            "&.Mui-focusVisible": {
-              outline: "none",
-            },
-            "&:hover": {
-              backgroundColor: "transparent",
-            },
-            "&.Mui-selected": {
-              color: "white",
-              backgroundColor: "#0686ee",
-            },
-            "& .MuiSvgIcon-root": {
-              fontSize: "26px",
-              transition: "transform 0.2s",
-            },
-            "&.Mui-selected .MuiSvgIcon-root": {
-              transform: "scale(1.1)",
-            },
-          },
-          "& .MuiBottomNavigationAction-root:nth-of-type(2)": {
-            marginRight: "52px",
-          },
-          "& .MuiBottomNavigationAction-root:nth-of-type(4)": {
-            marginLeft: "52px",
-          },
-          "& .MuiBottomNavigationAction-root:nth-of-type(3)": {
-            position: "absolute",
-            left: "50%",
-            top: "-24px",
-            transform: "translateX(-50%)",
-            width: "60px",
-            height: "60px",
-            borderRadius: "50%",
-            backgroundColor: "#141414",
-            color: "rgba(255, 255, 255, 0.5)",
-            boxShadow: {
-              ...(value === 2 && {
-                boxShadow: `
-                  0 -4px 12px rgba(6, 134, 238, 0.5),
-                  0 0 0 6px rgba(6, 134, 238, 0.1),
-                  0 0 0 3px rgba(6, 134, 238, 0.2)
-                `,
-              }),
-            },
-            padding: 0,
-            minWidth: "50px",
-            margin: 0,
+    <>
+      {isLoading && (
+        <Box
+          component={motion.div}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          sx={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            "&::before": {
-              content: '""',
-              position: "absolute",
-              top: "-3px",
-              left: "-3px",
-              right: "-3px",
-              bottom: "-3px",
-              borderRadius: "50%",
-              background:
-                "radial-gradient(circle at center, rgba(0,132,238,0.2) 0%, transparent 70%)",
-              animation: value === 2 ? "pulse 2s infinite" : "none",
-            },
-            "@keyframes pulse": {
-              "0%": {
-                transform: "scale(1)",
-                opacity: 0.8,
-              },
-              "70%": {
-                transform: "scale(1.3)",
-                opacity: 0,
-              },
-              "100%": {
-                transform: "scale(1.3)",
-                opacity: 0,
-              },
-            },
-            "&.Mui-selected": {
-              backgroundColor: "#0686ee",
-              color: "white",
-            },
-            "& .MuiSvgIcon-root": {
-              fontSize: "32px",
-              position: "static",
-              transform: "none",
-              margin: 0,
-              filter: "drop-shadow(0 0 4px rgba(255,255,255,0.3))",
-            },
-          },
+            backgroundColor: "rgba(0,0,0,0.8)",
+            zIndex: 1299,
+          }}
+        >
+          <CircularProgress sx={{ color: "white" }} />
+        </Box>
+      )}
+      <Box
+        sx={{
+          position: "fixed",
+          bottom: 0,
+          left: 0,
+          right: 0,
+          width: "100%",
+          zIndex: 1300,
+          display: { xs: "block", sm: "none" },
+          pb: "env(safe-area-inset-bottom)",
+          background:
+            "linear-gradient(to top, rgba(20, 20, 20, 1) 0%, rgb(20 20 20 / 93%) 100%)",
+          boxShadow: "-4px 5px 72px 16px #39393a",
         }}
       >
-        <BottomNavigationAction icon={<SearchIcon />} />
-        <BottomNavigationAction icon={<FavoriteIcon />} />
-        <BottomNavigationAction icon={<HomeIcon />} />
-        <BottomNavigationAction icon={<SettingsIcon />} />
-        <BottomNavigationAction icon={<InfoIcon />} />
-      </BottomNavigation>
-    </Box>
+        <BottomNavigation
+          value={value}
+          onChange={(_, newValue) => handleNavigation(newValue)}
+          sx={{
+            bgcolor: "transparent",
+            backdropFilter: "blur(10px)",
+            WebkitBackdropFilter: "blur(10px)",
+            height: "64px",
+            position: "relative",
+            "& .MuiBottomNavigationAction-root": {
+              minWidth: "auto",
+              padding: 0,
+              color: "rgba(255, 255, 255, 0.5)",
+              transition: "background-color 0.3s",
+              "&:focus": {
+                outline: "none",
+              },
+              "&.Mui-focusVisible": {
+                outline: "none",
+              },
+              "&:hover": {
+                backgroundColor: "transparent",
+              },
+              "&.Mui-selected": {
+                color: "white",
+                backgroundColor: "#0686ee",
+              },
+              "& .MuiSvgIcon-root": {
+                fontSize: "26px",
+                transition: "transform 0.2s",
+              },
+              "&.Mui-selected .MuiSvgIcon-root": {
+                transform: "scale(1.1)",
+              },
+            },
+            "& .MuiBottomNavigationAction-root:nth-of-type(2)": {
+              marginRight: "52px",
+            },
+            "& .MuiBottomNavigationAction-root:nth-of-type(4)": {
+              marginLeft: "52px",
+            },
+            "& .MuiBottomNavigationAction-root:nth-of-type(3)": {
+              position: "absolute",
+              left: "50%",
+              top: "-24px",
+              transform: "translateX(-50%)",
+              width: "60px",
+              height: "60px",
+              borderRadius: "50%",
+              backgroundColor: "#141414",
+              color: "rgba(255, 255, 255, 0.5)",
+              boxShadow: {
+                ...(value === 2 && {
+                  boxShadow: `
+                    0 -4px 12px rgba(6, 134, 238, 0.5),
+                    0 0 0 6px rgba(6, 134, 238, 0.1),
+                    0 0 0 3px rgba(6, 134, 238, 0.2)
+                  `,
+                }),
+              },
+              padding: 0,
+              minWidth: "50px",
+              margin: 0,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              "&::before": {
+                content: '""',
+                position: "absolute",
+                top: "-3px",
+                left: "-3px",
+                right: "-3px",
+                bottom: "-3px",
+                borderRadius: "50%",
+                background:
+                  "radial-gradient(circle at center, rgba(0,132,238,0.2) 0%, transparent 70%)",
+                animation: value === 2 ? "pulse 2s infinite" : "none",
+              },
+              "@keyframes pulse": {
+                "0%": {
+                  transform: "scale(1)",
+                  opacity: 0.8,
+                },
+                "70%": {
+                  transform: "scale(1.3)",
+                  opacity: 0,
+                },
+                "100%": {
+                  transform: "scale(1.3)",
+                  opacity: 0,
+                },
+              },
+              "&.Mui-selected": {
+                backgroundColor: "#0686ee",
+                color: "white",
+              },
+              "& .MuiSvgIcon-root": {
+                fontSize: "32px",
+                position: "static",
+                transform: "none",
+                margin: 0,
+                filter: "drop-shadow(0 0 4px rgba(255,255,255,0.3))",
+              },
+            },
+          }}
+        >
+          <BottomNavigationAction icon={<SearchIcon />} />
+          <BottomNavigationAction icon={<FavoriteIcon />} />
+          <BottomNavigationAction icon={<HomeIcon />} />
+          <BottomNavigationAction icon={<SettingsIcon />} />
+          <BottomNavigationAction icon={<InfoIcon />} />
+        </BottomNavigation>
+      </Box>
+    </>
   );
 }
 
