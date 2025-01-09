@@ -69,6 +69,11 @@ export const MovieCardSkeleton = () => {
   );
 };
 
+const formatRating = (rating: number | undefined): string => {
+  if (!rating || isNaN(rating)) return "";
+  return rating.toFixed(1);
+};
+
 export const MovieCard = ({
   movie,
   onMovieSelect,
@@ -149,28 +154,31 @@ export const MovieCard = ({
             {movie.release_quality}
           </Box>
         )}
-        {movie.vote_average > 0 && (
-          <Box
-            sx={{
-              position: "absolute",
-              top: 8,
-              left: 8,
-              bgcolor:
-                movie.vote_average >= 7
-                  ? "#4CAF50"
-                  : movie.vote_average >= 5.6
-                  ? "#888"
-                  : "#FF5252",
-              color: "#fff",
-              padding: { xs: "2px 6px", sm: "4px 8px" },
-              borderRadius: { xs: "6px", sm: "8px" },
-              fontSize: { xs: "12px", sm: "14px" },
-              fontWeight: "bold",
-            }}
-          >
-            {movie.vote_average.toFixed(1)}
-          </Box>
-        )}
+        {movie.vote_average &&
+          movie.vote_average > 0 &&
+          !isNaN(movie.vote_average) && (
+            <Box
+              sx={{
+                position: "absolute",
+                top: 8,
+                left: 8,
+                bgcolor: (() => {
+                  const rating = Number(movie.vote_average);
+                  if (isNaN(rating)) return "#888";
+                  if (rating >= 7) return "#4CAF50";
+                  if (rating >= 5.6) return "#888";
+                  return "#FF5252";
+                })(),
+                color: "#fff",
+                padding: { xs: "2px 6px", sm: "4px 8px" },
+                borderRadius: { xs: "6px", sm: "8px" },
+                fontSize: { xs: "12px", sm: "14px" },
+                fontWeight: "bold",
+              }}
+            >
+              {formatRating(movie.vote_average)}
+            </Box>
+          )}
         {showTitle && (
           <Typography
             variant="subtitle1"
@@ -197,12 +205,7 @@ export const MovieCard = ({
         movie={movie}
         open={isDetailsOpen}
         onClose={() => setIsDetailsOpen(false)}
-        onMovieSelect={(newMovie) => {
-          if (onMovieSelect) {
-            onMovieSelect(newMovie);
-            setIsDetailsOpen(true);
-          }
-        }}
+        onMovieSelect={onMovieSelect}
       />
     </>
   );

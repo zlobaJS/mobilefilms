@@ -521,17 +521,18 @@ export const MovieDetails = ({
     return hours > 0 ? `${hours}ч ${mins}м` : `${mins}м`;
   };
 
-  // Обновляем функцию форматирования рейтинга
-  const formatRating = (rating: number | undefined) => {
-    if (typeof rating !== "number" || isNaN(rating)) return "";
-    return rating.toFixed(1);
+  // Функция для форматирования рейтинга
+  const formatRating = (rating: number) => {
+    return rating ? rating.toFixed(1) : "-";
   };
 
-  // Обновляем функцию форматирования голосов
-  const formatVoteCount = (count?: number) => {
-    if (typeof count !== "number" || isNaN(count)) return "";
-    if (count >= 1000000) return `${(count / 1000000).toFixed(1)}M`;
-    if (count >= 1000) return `${(count / 1000).toFixed(0)}K`;
+  // Функция для форматирования количества голосов
+  const formatVoteCount = (count: number) => {
+    if (!count) return "-";
+    if (count >= 1000) {
+      const thousands = Math.floor(count / 1000);
+      return `${thousands}K`;
+    }
     return count.toString();
   };
 
@@ -849,21 +850,21 @@ export const MovieDetails = ({
                             display: "flex",
                             alignItems: "center",
                             gap: "4px",
-                            flexShrink: 0, // Предотвращаем сжатие элемента
+                            flexShrink: 0,
                           }}
                         >
                           <Typography
                             sx={{
                               fontSize: "1rem",
-                              color: getRatingColor(currentMovie?.vote_average),
+                              color: getRatingColor(
+                                currentMovie?.vote_average || 0
+                              ),
                             }}
                           >
-                            {currentMovie?.vote_average
-                              ? formatRating(currentMovie.vote_average)
-                              : ""}
+                            {formatRating(currentMovie?.vote_average || 0)}
                           </Typography>
-                          {currentMovie?.vote_count &&
-                            currentMovie?.vote_count > 0 && (
+                          {typeof currentMovie?.vote_count === "number" &&
+                            currentMovie.vote_count > 0 && (
                               <>
                                 <Typography
                                   sx={{
@@ -879,9 +880,7 @@ export const MovieDetails = ({
                                     fontSize: "1rem",
                                   }}
                                 >
-                                  {currentMovie?.vote_count
-                                    ? formatVoteCount(currentMovie.vote_count)
-                                    : ""}{" "}
+                                  {formatVoteCount(currentMovie.vote_count)}{" "}
                                   оценок
                                 </Typography>
                               </>

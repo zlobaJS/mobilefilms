@@ -56,6 +56,15 @@ export const MovieSlider = ({
     return 6.2;
   };
 
+  const validMovies = movies.filter(
+    (movie) =>
+      movie &&
+      typeof movie.id === "number" &&
+      movie.title &&
+      (movie.vote_average === undefined ||
+        (typeof movie.vote_average === "number" && !isNaN(movie.vote_average)))
+  );
+
   if (loading) {
     return (
       <Box
@@ -185,7 +194,7 @@ export const MovieSlider = ({
         slidesPerView={getSlidesPerView()}
         style={{ padding: "0 16px" }}
       >
-        {movies.map((movie) => (
+        {validMovies.map((movie) => (
           <SwiperSlide key={movie.id} style={{ height: "auto" }}>
             <Box
               sx={{
@@ -204,7 +213,14 @@ export const MovieSlider = ({
                 }}
               >
                 <MovieCard
-                  movie={movie}
+                  movie={{
+                    ...movie,
+                    vote_average:
+                      typeof movie.vote_average === "number" &&
+                      !isNaN(movie.vote_average)
+                        ? movie.vote_average
+                        : 0,
+                  }}
                   onMovieSelect={onMovieSelect}
                   showTitle={false}
                 />
