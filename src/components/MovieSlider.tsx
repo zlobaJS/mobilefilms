@@ -12,6 +12,7 @@ import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import "swiper/css";
 import "swiper/css/navigation";
 import { Navigation } from "swiper/modules";
+import { useMemo } from "react";
 
 interface Movie {
   id: number;
@@ -48,7 +49,7 @@ export const MovieSlider = ({
     navigate(`/category/${categoryId}`);
   };
 
-  console.log(`Movies in "${title}" slider:`, movies);
+  const memoizedMovies = useMemo(() => movies, [movies]);
 
   const getSlidesPerView = () => {
     if (isMobile) return 2.2;
@@ -56,7 +57,7 @@ export const MovieSlider = ({
     return 6.2;
   };
 
-  const validMovies = movies.filter(
+  const validMovies = memoizedMovies.filter(
     (movie) =>
       movie &&
       typeof movie.id === "number" &&

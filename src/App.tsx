@@ -33,6 +33,7 @@ import CastProvider from "react-chromecast";
 import { AnimatePresence } from "framer-motion";
 import { motion } from "framer-motion";
 import { KeywordPage } from "./pages/KeywordPage";
+import { FavoritesPage } from "./pages/FavoritesPage";
 
 const darkTheme = createTheme({
   palette: {
@@ -449,18 +450,10 @@ function AppRoutes() {
               path="/"
               element={
                 <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
-                  transition={{
-                    duration: 0.3,
-                    ease: "easeInOut",
-                  }}
-                  key="home"
-                  style={{
-                    minHeight: "100dvh",
-                    position: "relative",
-                  }}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.3 }}
                 >
                   <Box
                     sx={{
@@ -601,9 +594,8 @@ function AppRoutes() {
                 <motion.div
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
-                  exit={{ opacity: 1 }}
-                  transition={{ duration: 0.1 }}
-                  key="search"
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.3 }}
                 >
                   <Box sx={{ p: 3 }}>
                     <Typography variant="h4">Поиск</Typography>
@@ -617,13 +609,10 @@ function AppRoutes() {
                 <motion.div
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
-                  exit={{ opacity: 1 }}
-                  transition={{ duration: 0.1 }}
-                  key="favorites"
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.3 }}
                 >
-                  <Box sx={{ p: 3 }}>
-                    <Typography variant="h4">Избранное</Typography>
-                  </Box>
+                  <FavoritesPage />
                 </motion.div>
               }
             />
@@ -676,7 +665,7 @@ function AppRoutes() {
           </Routes>
         </AnimatePresence>
       </Box>
-      <MobileNavigation />
+      {!location.pathname.includes("/keyword") && <MobileNavigation />}
     </>
   );
 }

@@ -13,11 +13,12 @@ import {
   Chip,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-import StarBorderIcon from "@mui/icons-material/StarBorder";
 import ShareIcon from "@mui/icons-material/Share";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import DownloadIcon from "@mui/icons-material/Download";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
+import BookmarkBorderIcon from "@mui/icons-material/BookmarkBorder";
+import BookmarkIcon from "@mui/icons-material/Bookmark";
 import {
   imageUrl,
   getMovieImages,
@@ -34,6 +35,7 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import { FreeMode } from "swiper/modules";
 import "swiper/css";
 import { useNavigate } from "react-router-dom";
+import { useFavorites } from "../hooks/useFavorites";
 
 declare module "@mui/material/styles" {
   interface BreakpointOverrides {
@@ -155,6 +157,7 @@ export const MovieDetails = ({
     []
   );
   const navigate = useNavigate();
+  const { addToFavorites, removeFromFavorites, isFavorite } = useFavorites();
 
   // Модифицируем fetchData для одновременной загрузки всех данных
   const fetchData = async (movieData: any) => {
@@ -466,6 +469,16 @@ export const MovieDetails = ({
         }, 500);
       }, 300);
     });
+  };
+
+  const handleFavoriteClick = () => {
+    if (movie) {
+      if (isFavorite(movie.id)) {
+        removeFromFavorites(movie.id);
+      } else {
+        addToFavorites(movie);
+      }
+    }
   };
 
   if (!movie) return null;
@@ -1009,6 +1022,7 @@ export const MovieDetails = ({
                       }}
                     >
                       <IconButton
+                        onClick={handleFavoriteClick}
                         sx={{
                           color: "white",
                           bgcolor: "rgb(65 67 65 / 68%)",
@@ -1017,7 +1031,11 @@ export const MovieDetails = ({
                           },
                         }}
                       >
-                        <StarBorderIcon />
+                        {isFavorite(movie?.id || 0) ? (
+                          <BookmarkIcon />
+                        ) : (
+                          <BookmarkBorderIcon />
+                        )}
                       </IconButton>
                       <IconButton
                         sx={{
