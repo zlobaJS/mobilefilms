@@ -46,10 +46,67 @@ const darkTheme = createTheme({
   },
 });
 
+function SplashScreen() {
+  return (
+    <Box
+      component={motion.div}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      sx={{
+        position: "fixed",
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        backgroundColor: "#141414",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        zIndex: 9999,
+      }}
+    >
+      <Box
+        component={motion.div}
+        initial={{ scale: 0.8, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        transition={{
+          duration: 0.5,
+          repeat: Infinity,
+          repeatType: "reverse",
+        }}
+        sx={{
+          width: 120,
+          height: 120,
+          mb: 3,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <HomeIcon sx={{ fontSize: 60, color: "#0686ee" }} />
+      </Box>
+      <CircularProgress size={40} sx={{ color: "#0686ee" }} />
+      <Typography
+        variant="h6"
+        sx={{
+          mt: 2,
+          color: "white",
+          fontWeight: "bold",
+          textAlign: "center",
+        }}
+      >
+        Загрузка контента...
+      </Typography>
+    </Box>
+  );
+}
+
 function MobileNavigation() {
   const navigate = useNavigate();
   const location = useLocation();
-  const [value, setValue] = useState(0);
+  const [value, setValue] = useState(2);
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
@@ -360,104 +417,9 @@ function DesktopNavigation() {
   );
 }
 
-function AppRoutes() {
+function AppRoutes({ movies }: { movies: any }) {
   const location = useLocation();
-  const mainPageScrollPos = useRef(0);
-  const [movies, setMovies] = useState({
-    watchingToday: [],
-    trendingToday: [],
-    trendingWeek: [],
-    popular: [],
-    horror: [],
-    action: [],
-    comedy: [],
-    scifi: [],
-    thriller: [],
-    western: [],
-    drama: [],
-    war: [],
-  });
-  const [loading, setLoading] = useState(true);
   const [_, setSelectedMovie] = useState<any>(null);
-
-  useEffect(() => {
-    if (location.pathname !== "/") {
-      mainPageScrollPos.current = window.scrollY;
-    }
-
-    if (
-      location.pathname.includes("/category") &&
-      !window.history.state?.usr?.isBack
-    ) {
-      window.scrollTo(0, 0);
-    }
-  }, [location]);
-
-  useEffect(() => {
-    const handlePopState = () => {
-      if (window.history.state) {
-        window.history.state.usr = { isBack: true };
-      }
-    };
-
-    window.addEventListener("popstate", handlePopState);
-    return () => window.removeEventListener("popstate", handlePopState);
-  }, []);
-
-  useEffect(() => {
-    const fetchMovies = async () => {
-      setLoading(true);
-      try {
-        const [
-          nowPlayingData,
-          trendingTodayData,
-          trendingWeekData,
-          popularData,
-          horrorData,
-          actionData,
-          comedyData,
-          scifiData,
-          thrillerData,
-          westernData,
-          dramaData,
-          warData,
-        ] = await Promise.all([
-          getMovies.nowPlaying(),
-          getMovies.trendingToday(),
-          getMovies.trendingWeek(),
-          getMovies.popular(),
-          getMovies.byGenre(GENRES.HORROR),
-          getMovies.byGenre(GENRES.ACTION),
-          getMovies.byGenre(GENRES.COMEDY),
-          getMovies.byGenre(GENRES.SCIFI),
-          getMovies.byGenre(GENRES.THRILLER),
-          getMovies.byGenre(GENRES.WESTERN),
-          getMovies.byGenre(GENRES.DRAMA),
-          getMovies.byGenre(GENRES.WAR),
-        ]);
-
-        setMovies({
-          watchingToday: nowPlayingData.results,
-          trendingToday: trendingTodayData.results,
-          trendingWeek: trendingWeekData.results,
-          popular: popularData.results,
-          horror: horrorData.results,
-          action: actionData.results,
-          comedy: comedyData.results,
-          scifi: scifiData.results,
-          thriller: thrillerData.results,
-          western: westernData.results,
-          drama: dramaData.results,
-          war: warData.results,
-        });
-      } catch (error) {
-        console.error("Error fetching movies:", error);
-      }
-      setLoading(false);
-    };
-
-    fetchMovies();
-  }, []);
 
   const handleMovieSelect = useCallback((movie: any) => {
     setSelectedMovie(null);
@@ -530,84 +492,84 @@ function AppRoutes() {
                     <MovieSlider
                       title="Сейчас смотрят"
                       movies={movies.watchingToday}
-                      loading={loading}
+                      loading={false}
                       categoryId="now-playing"
                       onMovieSelect={handleMovieSelect}
                     />
                     <MovieSlider
                       title="Сегодня в тренде"
                       movies={movies.trendingToday}
-                      loading={loading}
+                      loading={false}
                       categoryId="trending-today"
                       onMovieSelect={handleMovieSelect}
                     />
                     <MovieSlider
                       title="За неделю в тренде"
                       movies={movies.trendingWeek}
-                      loading={loading}
+                      loading={false}
                       categoryId="trending-week"
                       onMovieSelect={handleMovieSelect}
                     />
                     <MovieSlider
                       title="Популярное"
                       movies={movies.popular}
-                      loading={loading}
+                      loading={false}
                       categoryId="popular"
                       onMovieSelect={handleMovieSelect}
                     />
                     <MovieSlider
                       title="Ужасы"
                       movies={movies.horror}
-                      loading={loading}
+                      loading={false}
                       categoryId="horror"
                       onMovieSelect={handleMovieSelect}
                     />
                     <MovieSlider
                       title="Боевики"
                       movies={movies.action}
-                      loading={loading}
+                      loading={false}
                       categoryId="action"
                       onMovieSelect={handleMovieSelect}
                     />
                     <MovieSlider
                       title="Комедии"
                       movies={movies.comedy}
-                      loading={loading}
+                      loading={false}
                       categoryId="comedy"
                       onMovieSelect={handleMovieSelect}
                     />
                     <MovieSlider
                       title="Фантастика"
                       movies={movies.scifi}
-                      loading={loading}
+                      loading={false}
                       categoryId="scifi"
                       onMovieSelect={handleMovieSelect}
                     />
                     <MovieSlider
                       title="Триллеры"
                       movies={movies.thriller}
-                      loading={loading}
+                      loading={false}
                       categoryId="thriller"
                       onMovieSelect={handleMovieSelect}
                     />
                     <MovieSlider
                       title="Вестерны"
                       movies={movies.western}
-                      loading={loading}
+                      loading={false}
                       categoryId="western"
                       onMovieSelect={handleMovieSelect}
                     />
                     <MovieSlider
                       title="Драмы"
                       movies={movies.drama}
-                      loading={loading}
+                      loading={false}
                       categoryId="drama"
                       onMovieSelect={handleMovieSelect}
                     />
                     <MovieSlider
                       title="Военные"
                       movies={movies.war}
-                      loading={loading}
+                      loading={false}
                       categoryId="war"
                       onMovieSelect={handleMovieSelect}
                     />
@@ -712,16 +674,113 @@ function AppRoutes() {
 }
 
 function App() {
-  useEffect(() => {
-    const meta = document.createElement("meta");
-    meta.name = "viewport";
-    meta.content = "width=device-width, initial-scale=1, viewport-fit=cover";
-    document.head.appendChild(meta);
+  const [isLoading, setIsLoading] = useState(true);
+  const [movies, setMovies] = useState({
+    watchingToday: [],
+    trendingToday: [],
+    trendingWeek: [],
+    popular: [],
+    horror: [],
+    action: [],
+    comedy: [],
+    scifi: [],
+    thriller: [],
+    western: [],
+    drama: [],
+    war: [],
+    backdrop: [],
+  });
+  const startTimeRef = useRef(Date.now());
+  const contentRef = useRef<HTMLDivElement>(null);
 
-    const statusBarMeta = document.createElement("meta");
-    statusBarMeta.name = "apple-mobile-web-app-status-bar-style";
-    statusBarMeta.content = "black-translucent";
-    document.head.appendChild(statusBarMeta);
+  useEffect(() => {
+    const initializeApp = async () => {
+      try {
+        // 1. Загружаем все данные
+        const [
+          backdropData,
+          nowPlayingData,
+          trendingTodayData,
+          trendingWeekData,
+          popularData,
+          horrorData,
+          actionData,
+          comedyData,
+          scifiData,
+          thrillerData,
+          westernData,
+          dramaData,
+          warData,
+        ] = await Promise.all([
+          getMovies.popular(),
+          getMovies.nowPlaying(),
+          getMovies.trendingToday(),
+          getMovies.trendingWeek(),
+          getMovies.popular(),
+          getMovies.byGenre(GENRES.HORROR),
+          getMovies.byGenre(GENRES.ACTION),
+          getMovies.byGenre(GENRES.COMEDY),
+          getMovies.byGenre(GENRES.SCIFI),
+          getMovies.byGenre(GENRES.THRILLER),
+          getMovies.byGenre(GENRES.WESTERN),
+          getMovies.byGenre(GENRES.DRAMA),
+          getMovies.byGenre(GENRES.WAR),
+        ]);
+
+        const backdropMovies = backdropData.results.slice(0, 5);
+
+        // 2. Устанавливаем данные
+        setMovies({
+          watchingToday: nowPlayingData.results,
+          trendingToday: trendingTodayData.results,
+          trendingWeek: trendingWeekData.results,
+          popular: popularData.results,
+          horror: horrorData.results,
+          action: actionData.results,
+          comedy: comedyData.results,
+          scifi: scifiData.results,
+          thriller: thrillerData.results,
+          western: westernData.results,
+          drama: dramaData.results,
+          war: warData.results,
+          backdrop: backdropMovies,
+        });
+
+        // 3. Ждем пока контент отрендерится
+        await new Promise((resolve) => setTimeout(resolve, 100));
+
+        // 4. Предварительно загружаем изображения для backdrop
+        await Promise.all(
+          backdropMovies.map((movie: { backdrop_path: string }) => {
+            return new Promise((resolve) => {
+              const img = new Image();
+              img.src = `https://image.tmdb.org/t/p/original${movie.backdrop_path}`;
+              img.onload = resolve;
+              img.onerror = resolve;
+            });
+          })
+        );
+
+        // 5. Вычисляем оставшееся время для splash screen
+        const currentTime = Date.now();
+        const elapsedTime = currentTime - startTimeRef.current;
+        const minDisplayTime = 3000;
+        const remainingTime = Math.max(minDisplayTime - elapsedTime, 500);
+
+        // 6. Ждем оставшееся время и скрываем splash
+        setTimeout(() => {
+          if (contentRef.current) {
+            contentRef.current.style.visibility = "visible";
+          }
+          setIsLoading(false);
+        }, remainingTime);
+      } catch (error) {
+        console.error("Error initializing app:", error);
+        setIsLoading(false);
+      }
+    };
+
+    initializeApp();
   }, []);
 
   return (
@@ -730,7 +789,39 @@ function App() {
         <CastProvider>
           <ThemeProvider theme={darkTheme}>
             <CssBaseline />
-            <AppRoutes />
+            {/* Рендерим контент сразу, но скрываем его */}
+            <div
+              ref={contentRef}
+              style={{
+                visibility: isLoading ? "hidden" : "visible",
+                position: isLoading ? "fixed" : "relative",
+                width: "100%",
+                height: "100%",
+              }}
+            >
+              <AppRoutes movies={movies} />
+            </div>
+
+            {/* Показываем splash поверх контента */}
+            <AnimatePresence mode="wait">
+              {isLoading && (
+                <motion.div
+                  initial={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.5 }}
+                  style={{
+                    position: "fixed",
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    zIndex: 9999,
+                  }}
+                >
+                  <SplashScreen />
+                </motion.div>
+              )}
+            </AnimatePresence>
           </ThemeProvider>
         </CastProvider>
       </BrowserRouter>
