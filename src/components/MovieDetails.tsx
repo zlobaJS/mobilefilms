@@ -1070,9 +1070,16 @@ export const MovieDetails = ({
                         onClick={handleFavoriteClick}
                         sx={{
                           color: "white",
-                          bgcolor: "rgb(65 67 65 / 68%)",
+                          background: isFavorite(movie?.id || 0)
+                            ? "linear-gradient(45deg, #2196F3 30%, #21CBF3 90%)"
+                            : "rgb(65 67 65 / 68%)",
+                          boxShadow: isFavorite(movie?.id || 0)
+                            ? "0 3px 5px 2px rgba(33, 203, 243, .3)"
+                            : "none",
                           "&:hover": {
-                            bgcolor: "rgb(65 67 65 / 88%)",
+                            background: isFavorite(movie?.id || 0)
+                              ? "linear-gradient(45deg, #1976D2 30%, #00B4E5 90%)"
+                              : "rgb(65 67 65 / 88%)",
                           },
                         }}
                       >
