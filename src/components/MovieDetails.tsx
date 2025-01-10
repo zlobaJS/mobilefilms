@@ -810,7 +810,7 @@ export const MovieDetails = ({
                           alt={currentMovie?.title}
                           sx={{
                             maxHeight: "80px",
-                            maxWidth: "100%",
+                            maxWidth: "70%",
                             objectFit: "contain",
                             mb: 2,
                             filter: "brightness(1.2)",
