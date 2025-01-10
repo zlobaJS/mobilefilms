@@ -159,20 +159,26 @@ export const MovieDetails = ({
   );
   const navigate = useNavigate();
   const { addToFavorites, removeFromFavorites, isFavorite } = useFavorites();
-  const [loadingBackdrop, setLoadingBackdrop] = useState<string | null>(null);
 
-  // Модифицируем fetchData для одновременной загрузки всех данных
+  // Модифицируем fetchData
   const fetchData = async (movieData: any) => {
     if (movieData) {
       setIsLoading(true);
-      setIsLogoLoading(true); // Начинаем загрузку лого
       try {
-        const [images, movieDetails, credits, recommendedMovies] =
+        // Предварительно очищаем все данные
+        setLogo(null);
+        setDetails(null);
+        setCast([]);
+        setRecommendations([]);
+        setKeywords([]);
+
+        const [images, movieDetails, credits, recommendedMovies, keywordsData] =
           await Promise.all([
             getMovieImages(movieData.id),
             getMovieDetails(movieData.id),
             getMovieCredits(movieData.id),
             getMovieRecommendations(movieData.id),
+            getMovieKeywords(movieData.id),
           ]);
 
         let logoPath = null;
@@ -193,17 +199,13 @@ export const MovieDetails = ({
         setDetails(movieDetails || null);
         setCast(credits?.cast?.slice(0, 15) || []);
         setRecommendations(recommendedMovies || []);
+        setKeywords(keywordsData);
         setIsLogoLoading(false); // Завершаем загрузку лого
+
+        setIsLoading(false);
       } catch (error) {
-        console.error("Error loading movie details:", error);
-        setLogo(null);
-        setHasLogo(false);
-        setIsLogoLoading(false);
-      } finally {
-        setTimeout(() => {
-          setIsLoading(false);
-          setIsVisible(true);
-        }, 100);
+        console.error(error);
+        setIsLoading(false);
       }
     }
   };
@@ -249,11 +251,6 @@ export const MovieDetails = ({
   const handleCollectionMovieClick = async (movieId: number) => {
     try {
       setIsUpdating(true);
-      const selectedMovie = collectionMovies.find((m) => m.id === movieId);
-      if (selectedMovie) {
-        setLoadingBackdrop(selectedMovie.backdrop_path);
-      }
-
       const movieDetails = await getMovieDetails(movieId);
 
       if (movieDetails) {
@@ -273,7 +270,6 @@ export const MovieDetails = ({
     } finally {
       setTimeout(() => {
         setIsUpdating(false);
-        setLoadingBackdrop(null);
       }, 300);
     }
   };
@@ -358,14 +354,12 @@ export const MovieDetails = ({
   const handleRecommendationClick = async (movie: any) => {
     try {
       setIsUpdating(true);
-      // Сохраняем текущий backdrop для экрана загрузки
-      setLoadingBackdrop(movie.backdrop_path);
 
       const movieDetails = await getMovieDetails(movie.id);
 
       if (movieDetails) {
         setCurrentMovie(movieDetails);
-        setRecommendations([]); // Очищаем рекомендации перед загрузкой новых
+        setRecommendations([]);
         fetchData(movieDetails);
 
         if (onMovieSelect) {
@@ -379,7 +373,6 @@ export const MovieDetails = ({
     } finally {
       setTimeout(() => {
         setIsUpdating(false);
-        setLoadingBackdrop(null);
       }, 300);
     }
   };
@@ -408,7 +401,6 @@ export const MovieDetails = ({
 
   // Модифицируем обработчик закрытия
   const handleClose = () => {
-    setCurrentMovie(movie); // Возвращаем исходный фильм
     onClose();
   };
 
@@ -570,10 +562,6 @@ export const MovieDetails = ({
           bottom: 0,
           padding: 0,
           overflow: "hidden",
-          backgroundImage: `url(${imageUrl(
-            movie?.backdrop_path || movie?.poster_path || "",
-            "w1280"
-          )})`,
           backgroundSize: "cover",
           backgroundPosition: "center",
           backgroundRepeat: "no-repeat",
@@ -606,6 +594,37 @@ export const MovieDetails = ({
         },
       }}
     >
+      {isLoading && (
+        <Box
+          sx={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: "#141414",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 9999,
+          }}
+        >
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              gap: 2,
+            }}
+          >
+            <CircularProgress size={60} sx={{ color: "white" }} />
+            <Typography variant="h6" sx={{ color: "white" }}>
+              Загрузка фильма...
+            </Typography>
+          </Box>
+        </Box>
+      )}
+
       <Box
         className="dialog-content"
         sx={{
@@ -676,7 +695,7 @@ export const MovieDetails = ({
               left: 0,
               right: 0,
               bottom: 0,
-              bgcolor: "rgba(0, 0, 0, 0.5)",
+              bgcolor: "rgba(0, 0, 0, 0.7)",
               zIndex: 1300,
               opacity: isUpdating ? 1 : 0,
               visibility: isUpdating ? "visible" : "hidden",
@@ -1652,65 +1671,6 @@ export const MovieDetails = ({
           )}
         </Box>
       </Box>
-      {isUpdating && (
-        <Box
-          sx={{
-            position: "fixed",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            backgroundColor: "rgba(0, 0, 0, 0.9)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            zIndex: 9999,
-          }}
-        >
-          {loadingBackdrop && (
-            <Box
-              sx={{
-                position: "absolute",
-                top: 0,
-                left: 0,
-                right: 0,
-                bottom: 0,
-                opacity: 0.3,
-                "&::before": {
-                  content: '""',
-                  position: "absolute",
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  bottom: 0,
-                  backgroundImage: `url(${imageUrl(
-                    loadingBackdrop,
-                    "original"
-                  )})`,
-                  backgroundSize: "cover",
-                  backgroundPosition: "center",
-                  filter: "blur(8px)",
-                },
-              }}
-            />
-          )}
-          <Box
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              gap: 2,
-              position: "relative",
-              zIndex: 1,
-            }}
-          >
-            <CircularProgress size={60} sx={{ color: "white" }} />
-            <Typography variant="h6" sx={{ color: "white" }}>
-              Загрузка фильма...
-            </Typography>
-          </Box>
-        </Box>
-      )}
     </Dialog>
   );
 };
