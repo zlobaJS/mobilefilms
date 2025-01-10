@@ -13,6 +13,7 @@ import "swiper/css";
 import "swiper/css/navigation";
 import { Navigation } from "swiper/modules";
 import { useMemo } from "react";
+import { FreeMode } from "swiper/modules";
 
 interface Movie {
   id: number;
@@ -191,9 +192,9 @@ export const MovieSlider = ({
         </Button>
       </Box>
       <Swiper
-        modules={[Navigation]}
-        navigation
-        spaceBetween={12}
+        modules={[FreeMode]}
+        freeMode={true}
+        spaceBetween={isMobile ? 0 : 12}
         slidesPerView={getSlidesPerView()}
         style={{ padding: "0 16px" }}
       >
@@ -210,8 +211,8 @@ export const MovieSlider = ({
             >
               <Box
                 sx={{
-                  aspectRatio: "2/3",
-                  width: "100%",
+                  aspectRatio: isMobile ? "2/3" : "1/1.5",
+                  width: isMobile ? "95%" : "100%",
                   marginBottom: 1,
                 }}
               >
@@ -224,7 +225,7 @@ export const MovieSlider = ({
                       }, 0);
                     }
                   }}
-                  showTitle={false}
+                  showTitle={true}
                 />
               </Box>
             </Box>

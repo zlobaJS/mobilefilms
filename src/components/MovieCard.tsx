@@ -194,7 +194,7 @@ export const MovieCard = memo(
               variant="subtitle1"
               sx={{
                 color: "white",
-                fontWeight: "500",
+                fontWeight: "bold",
                 fontSize: { xs: "0.875rem", sm: "1rem" },
                 mt: 1,
                 px: 1,
