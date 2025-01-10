@@ -37,6 +37,7 @@ import { FreeMode } from "swiper/modules";
 import "swiper/css";
 import { useNavigate } from "react-router-dom";
 import { useFavorites } from "../hooks/useFavorites";
+import { isIOS, isAndroid } from "react-device-detect";
 
 declare module "@mui/material/styles" {
   interface BreakpointOverrides {
@@ -497,6 +498,29 @@ export const MovieDetails = ({
       } else {
         addToFavorites(movie);
       }
+    }
+  };
+
+  const handleShare = async () => {
+    const shareData = {
+      title: currentMovie?.title,
+      text: `Смотреть ${currentMovie?.title} онлайн`,
+      url: window.location.href,
+    };
+
+    try {
+      if (navigator.share && (isIOS || isAndroid)) {
+        // Используем нативный шеринг для мобильных устройств
+        await navigator.share(shareData);
+      } else {
+        // Fallback для десктопов или устройств без поддержки Web Share API
+        if (navigator.clipboard) {
+          await navigator.clipboard.writeText(window.location.href);
+          // Здесь можно добавить уведомление о копировании ссылки
+        }
+      }
+    } catch (error) {
+      console.error("Error sharing:", error);
     }
   };
 
@@ -1090,6 +1114,7 @@ export const MovieDetails = ({
                         )}
                       </IconButton>
                       <IconButton
+                        onClick={handleShare}
                         sx={{
                           color: "white",
                           bgcolor: "rgb(65 67 65 / 68%)",
