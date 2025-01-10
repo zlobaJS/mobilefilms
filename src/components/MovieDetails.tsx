@@ -721,7 +721,6 @@ export const MovieDetails = ({
                     xs: "calc(100vw * 0.75 + env(safe-area-inset-top) + 100px)",
                     sm: "60vh",
                   },
-                  overflow: "hidden",
                   mt: "-env(safe-area-inset-top)",
                 }}
               >
