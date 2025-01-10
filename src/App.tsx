@@ -40,6 +40,7 @@ import { motion } from "framer-motion";
 import { KeywordPage } from "./pages/KeywordPage";
 import { FavoritesPage } from "./pages/FavoritesPage";
 import { MovieCard } from "./components/MovieCard";
+import { imageUrl } from "./api/tmdb";
 
 const darkTheme = createTheme({
   palette: {
@@ -50,6 +51,13 @@ const darkTheme = createTheme({
     },
   },
 });
+
+interface Movie {
+  id: number;
+  title: string;
+  backdrop_path: string;
+  // Добавьте другие свойства, если необходимо
+}
 
 function SplashScreen() {
   return (
@@ -423,7 +431,7 @@ function DesktopNavigation() {
 
 function SearchPage() {
   const [query, setQuery] = useState("");
-  const [results, setResults] = useState([]);
+  const [results, setResults] = useState<Movie[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
@@ -457,6 +465,8 @@ function SearchPage() {
       handleSearch();
     }
   };
+
+  const firstMovie: Movie | null = results.length > 0 ? results[0] : null;
 
   return (
     <Box sx={{ p: 3, position: "relative", marginTop: 4 }}>
@@ -507,15 +517,44 @@ function SearchPage() {
           <CircularProgress sx={{ color: "#0686ee" }} />
         </Box>
       )}
-      {!isLoading && (
-        <Grid container spacing={2}>
-          {results.map((movie) => (
-            <Grid item xs={6} sm={4} md={3} key={movie.id}>
-              <MovieCard movie={movie} showTitle={true} />
-            </Grid>
-          ))}
-        </Grid>
+      {!isLoading && firstMovie && (
+        <Box
+          sx={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundImage: `url(${imageUrl(
+              firstMovie.backdrop_path,
+              "original"
+            )})`,
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+            backgroundRepeat: "no-repeat",
+            zIndex: -1,
+          }}
+        >
+          <Box
+            sx={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              backgroundColor: "rgba(0, 0, 0, 0.7)",
+              zIndex: 1,
+            }}
+          />
+        </Box>
       )}
+      <Grid container spacing={2}>
+        {results.map((movie) => (
+          <Grid item xs={6} sm={4} md={3} key={movie.id}>
+            <MovieCard movie={movie} showTitle={true} />
+          </Grid>
+        ))}
+      </Grid>
     </Box>
   );
 }
