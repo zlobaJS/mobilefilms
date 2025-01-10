@@ -290,7 +290,7 @@ export const BackdropSlider = ({ movies }: BackdropSliderProps) => {
           flexDirection: "column",
           position: "absolute",
           left: "5%",
-          bottom: "15%",
+          bottom: "25%",
           maxWidth: "40%",
           zIndex: 2,
           gap: 2,
@@ -479,7 +479,7 @@ export const BackdropSlider = ({ movies }: BackdropSliderProps) => {
               sx={{
                 position: "absolute",
                 left: "50%",
-                bottom: { xs: "15%", sm: "20%" },
+                bottom: { xs: "25%", sm: "30%" },
                 transform: "translateX(-50%)",
                 zIndex: 2,
                 display: { xs: "flex", md: "none" },

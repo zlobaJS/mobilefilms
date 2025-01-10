@@ -21,6 +21,7 @@ const CATEGORY_TITLES: { [key: string]: string } = {
   action: "Боевики",
   comedy: "Комедии",
   scifi: "Фантастика",
+  fantasy: "Фэнтези",
   thriller: "Триллеры",
   western: "Вестерны",
   drama: "Драмы",

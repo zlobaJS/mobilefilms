@@ -106,6 +106,8 @@ export const getMovies = {
         return await getMovies.byGenre(GENRES.COMEDY, page);
       case "scifi":
         return await getMovies.byGenre(GENRES.SCIFI, page);
+      case "fantasy":
+        return await getMovies.byGenre(GENRES.FANTASY, page);
       case "thriller":
         return await getMovies.byGenre(GENRES.THRILLER, page);
       case "western":
@@ -157,6 +159,7 @@ export const GENRES = {
   COMEDY: 35,
   HORROR: 27,
   SCIFI: 878,
+  FANTASY: 14,
   THRILLER: 53,
   WESTERN: 37,
   DRAMA: 18,

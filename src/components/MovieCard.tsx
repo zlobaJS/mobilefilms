@@ -152,14 +152,13 @@ export const MovieCard = memo(
                 position: "absolute",
                 top: 8,
                 right: 8,
-                bgcolor: "rgba(0,0,0,0.75)",
-                color: "#fff",
-                padding: "4px 8px",
-                borderRadius: "4px",
-                fontSize: "12px",
-                fontWeight: "500",
-                letterSpacing: "0.5px",
+                color: "#000000",
                 textTransform: "uppercase",
+                fontWeight: "bold",
+                backgroundColor: "rgba(255,255,255,0.7)",
+                padding: "2px 8px",
+                borderRadius: "4px",
+                fontSize: "0.8rem",
               }}
             >
               {movie.release_quality}

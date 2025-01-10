@@ -57,14 +57,16 @@ export const MovieSlider = ({
     return 6.2;
   };
 
-  const validMovies = memoizedMovies.filter(
-    (movie) =>
-      movie &&
-      typeof movie.id === "number" &&
-      movie.title &&
-      (movie.vote_average === undefined ||
-        (typeof movie.vote_average === "number" && !isNaN(movie.vote_average)))
-  );
+  const validMovies =
+    memoizedMovies?.filter(
+      (movie) =>
+        movie &&
+        typeof movie.id === "number" &&
+        movie.title &&
+        (movie.vote_average === undefined ||
+          (typeof movie.vote_average === "number" &&
+            !isNaN(movie.vote_average)))
+    ) || [];
 
   if (loading) {
     return (
@@ -148,7 +150,7 @@ export const MovieSlider = ({
         zIndex: 5,
         ...(title === "Сейчас смотрят" && {
           mt: {
-            xs: "-41px",
+            xs: "-116px",
             sm: 0,
           },
         }),

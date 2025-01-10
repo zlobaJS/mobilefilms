@@ -546,6 +546,13 @@ function AppRoutes({ movies }: { movies: any }) {
                       onMovieSelect={handleMovieSelect}
                     />
                     <MovieSlider
+                      title="Фэнтези"
+                      movies={movies.fantasy}
+                      loading={false}
+                      categoryId="fantasy"
+                      onMovieSelect={handleMovieSelect}
+                    />
+                    <MovieSlider
                       title="Триллеры"
                       movies={movies.thriller}
                       loading={false}
@@ -689,6 +696,7 @@ function App() {
     drama: [],
     war: [],
     backdrop: [],
+    fantasy: [],
   });
   const startTimeRef = useRef(Date.now());
   const contentRef = useRef<HTMLDivElement>(null);
@@ -711,6 +719,7 @@ function App() {
           westernData,
           dramaData,
           warData,
+          fantasyData,
         ] = await Promise.all([
           getMovies.popular(),
           getMovies.nowPlaying(),
@@ -725,6 +734,7 @@ function App() {
           getMovies.byGenre(GENRES.WESTERN),
           getMovies.byGenre(GENRES.DRAMA),
           getMovies.byGenre(GENRES.WAR),
+          getMovies.byGenre(GENRES.FANTASY),
         ]);
 
         const backdropMovies = backdropData.results.slice(0, 5);
@@ -744,6 +754,7 @@ function App() {
           drama: dramaData.results,
           war: warData.results,
           backdrop: backdropMovies,
+          fantasy: fantasyData.results,
         });
 
         // 3. Ждем пока контент отрендерится
