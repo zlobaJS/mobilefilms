@@ -201,8 +201,7 @@ function MobileNavigation() {
           zIndex: 1300,
           display: { xs: "block", sm: "none" },
           pb: "env(safe-area-inset-bottom)",
-          background:
-            "linear-gradient(to top, rgba(20, 20, 20, 1) 0%, rgb(20 20 20 / 93%) 100%)",
+          backgroundColor: "#141414",
           boxShadow: "-4px 5px 72px 16px #39393a",
         }}
       >
