@@ -459,7 +459,7 @@ function SearchPage() {
   };
 
   return (
-    <Box sx={{ p: 3, position: "relative" }}>
+    <Box sx={{ p: 3, position: "relative", marginTop: 4 }}>
       <Paper
         component="form"
         sx={{
