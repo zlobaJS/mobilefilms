@@ -706,7 +706,7 @@ function AppRoutes() {
           </Routes>
         </AnimatePresence>
       </Box>
-      {!location.pathname.includes("/keyword") && <MobileNavigation />}
+      <MobileNavigation />
     </>
   );
 }
