@@ -13,6 +13,10 @@ import {
   ListItemButton,
   Typography,
   CircularProgress,
+  Grid,
+  InputBase,
+  Paper,
+  IconButton,
 } from "@mui/material";
 import HomeIcon from "@mui/icons-material/Home";
 import SearchIcon from "@mui/icons-material/Search";
@@ -21,7 +25,7 @@ import SettingsIcon from "@mui/icons-material/Settings";
 import InfoIcon from "@mui/icons-material/Info";
 import { MovieSlider } from "./components/MovieSlider";
 import { BackdropSlider } from "./components/BackdropSlider";
-import { getMovies, GENRES } from "./api/tmdb";
+import { getMovies, GENRES, searchMovies } from "./api/tmdb";
 import {
   BrowserRouter,
   Routes,
@@ -35,6 +39,7 @@ import { AnimatePresence } from "framer-motion";
 import { motion } from "framer-motion";
 import { KeywordPage } from "./pages/KeywordPage";
 import { FavoritesPage } from "./pages/FavoritesPage";
+import { MovieCard } from "./components/MovieCard";
 
 const darkTheme = createTheme({
   palette: {
@@ -416,6 +421,105 @@ function DesktopNavigation() {
   );
 }
 
+function SearchPage() {
+  const [query, setQuery] = useState("");
+  const [results, setResults] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
+
+  const handleSearch = async () => {
+    if (query) {
+      setIsLoading(true);
+      setTimeout(async () => {
+        const searchResults = await searchMovies(query);
+        setResults(searchResults);
+        setIsLoading(false);
+        navigate(`/search?query=${encodeURIComponent(query)}`);
+      }, 1500); // Задержка в 1.5 секунды
+    } else {
+      setResults([]);
+      navigate("/search");
+    }
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setQuery(value);
+    if (!value) {
+      setResults([]);
+      navigate("/search");
+    }
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      handleSearch();
+    }
+  };
+
+  return (
+    <Box sx={{ p: 3, position: "relative" }}>
+      <Paper
+        component="form"
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          mb: 2,
+          backgroundColor: "#333",
+          borderRadius: "8px",
+          p: "2px 4px",
+          boxShadow: "0 3px 5px rgba(0,0,0,0.2)",
+        }}
+      >
+        <InputBase
+          sx={{ ml: 1, flex: 1, color: "white" }}
+          placeholder="Поиск фильмов..."
+          value={query}
+          onChange={handleInputChange}
+          onKeyPress={handleKeyPress}
+          inputProps={{ "aria-label": "поиск фильмов" }}
+        />
+        <IconButton
+          type="button"
+          sx={{ p: "10px", color: "white" }}
+          aria-label="search"
+          onClick={handleSearch}
+        >
+          <SearchIcon />
+        </IconButton>
+      </Paper>
+      {isLoading && (
+        <Box
+          sx={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: "rgba(0, 0, 0, 0.5)",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            zIndex: 9999,
+          }}
+        >
+          <CircularProgress sx={{ color: "#0686ee" }} />
+        </Box>
+      )}
+      {!isLoading && (
+        <Grid container spacing={2}>
+          {results.map((movie) => (
+            <Grid item xs={6} sm={4} md={3} key={movie.id}>
+              <MovieCard movie={movie} showTitle={true} />
+            </Grid>
+          ))}
+        </Grid>
+      )}
+    </Box>
+  );
+}
+
 function AppRoutes({ movies }: { movies: any }) {
   const location = useLocation();
   const [_, setSelectedMovie] = useState<any>(null);
@@ -606,9 +710,7 @@ function AppRoutes({ movies }: { movies: any }) {
                   exit={{ opacity: 0 }}
                   transition={{ duration: 0.3 }}
                 >
-                  <Box sx={{ p: 3 }}>
-                    <Typography variant="h4">Поиск</Typography>
-                  </Box>
+                  <SearchPage />
                 </motion.div>
               }
             />

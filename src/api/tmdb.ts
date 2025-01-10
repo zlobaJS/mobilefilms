@@ -209,3 +209,16 @@ export const getMoviesByKeyword = async (keywordId: number, page = 1) => {
     return { results: [] };
   }
 };
+
+export const searchMovies = async (query: string, page = 1) => {
+  try {
+    const data = await fetchTMDB("/search/movie", {
+      query,
+      page: page.toString(),
+    });
+    return data.results || [];
+  } catch (error) {
+    console.error("Error searching movies:", error);
+    return [];
+  }
+};
