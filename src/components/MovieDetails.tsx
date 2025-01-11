@@ -46,7 +46,7 @@ declare module "@mui/material/styles" {
 }
 
 interface MovieDetailsProps {
-  movie: {
+  movie?: {
     id: number;
     title: string;
     backdrop_path: string;
@@ -67,9 +67,11 @@ interface MovieDetailsProps {
     };
     tagline?: string;
   } | null;
+  movieId?: number;
   open: boolean;
   onClose: () => void;
   onMovieSelect?: (movie: any) => void;
+  isPage?: boolean;
 }
 
 interface ProductionCountry {
@@ -128,10 +130,12 @@ const translateCountry = (englishName: string): string => {
 };
 
 export const MovieDetails = ({
-  movie,
+  movie: initialMovie,
+  movieId,
   open,
   onClose,
   onMovieSelect,
+  isPage = false,
 }: MovieDetailsProps) => {
   const theme = useTheme();
   theme.breakpoints.values = {
@@ -147,7 +151,7 @@ export const MovieDetails = ({
   const [cast, setCast] = useState<any[]>([]);
   const [collectionMovies, setCollectionMovies] = useState<any[]>([]);
   const [showCollection, setShowCollection] = useState(false);
-  const [currentMovie, setCurrentMovie] = useState(movie);
+  const [currentMovie, setCurrentMovie] = useState(initialMovie);
   const [isVisible, setIsVisible] = useState(false);
   const [isExpandedDescription, setIsExpandedDescription] = useState(false);
   const [recommendations, setRecommendations] = useState<any[]>([]);
@@ -203,13 +207,29 @@ export const MovieDetails = ({
     }
   };
 
-  // Обновляем эффект для открытия диалога
+  // Обновляем эффект для загрузки данных
   useEffect(() => {
-    if (open) {
-      setIsVisible(false);
-      fetchData(movie);
+    const loadMovieData = async () => {
+      if (movieId) {
+        setIsLoading(true);
+        try {
+          const movieDetails = await getMovieDetails(movieId);
+          setCurrentMovie(movieDetails);
+          fetchData(movieDetails);
+        } catch (error) {
+          console.error("Error loading movie:", error);
+          setIsLoading(false);
+        }
+      }
+    };
+
+    if (open && movieId) {
+      loadMovieData();
+    } else if (open && initialMovie) {
+      setCurrentMovie(initialMovie);
+      fetchData(initialMovie);
     }
-  }, [movie, open]);
+  }, [movieId, open, initialMovie]);
 
   // Обработчик для получения URL от Kinobox
   const handleMediaUrl = (url: string) => {
@@ -269,8 +289,8 @@ export const MovieDetails = ({
 
   // В useEffect добавляем обновление currentMovie при изменении movie
   useEffect(() => {
-    setCurrentMovie(movie);
-  }, [movie]);
+    setCurrentMovie(initialMovie);
+  }, [initialMovie]);
 
   useEffect(() => {
     if (open) {
@@ -347,26 +367,11 @@ export const MovieDetails = ({
   const handleRecommendationClick = async (movie: any) => {
     try {
       setIsUpdating(true);
-
-      const movieDetails = await getMovieDetails(movie.id);
-
-      if (movieDetails) {
-        setCurrentMovie(movieDetails);
-        setRecommendations([]);
-        fetchData(movieDetails);
-
-        if (onMovieSelect) {
-          setTimeout(() => {
-            onMovieSelect(movieDetails);
-          }, 50);
-        }
-      }
+      navigate(`/movie/${movie.id}`);
     } catch (error) {
       console.error("Error loading movie details:", error);
     } finally {
-      setTimeout(() => {
-        setIsUpdating(false);
-      }, 300);
+      setIsUpdating(false);
     }
   };
 
@@ -381,16 +386,16 @@ export const MovieDetails = ({
       setCast([]);
       setCollectionMovies([]);
       setShowCollection(false);
-      setCurrentMovie(movie);
+      setCurrentMovie(initialMovie);
       setIsVisible(false);
       setIsExpandedDescription(false);
       setRecommendations([]); // Очищаем рекомендации при закрытии
       setIsUpdating(false);
     } else {
       // При открытии устанавливаем начальный фильм
-      setCurrentMovie(movie);
+      setCurrentMovie(initialMovie);
     }
-  }, [open, movie]);
+  }, [open, initialMovie]);
 
   // Модифицируем обработчик закрытия
   const handleClose = () => {
@@ -484,11 +489,11 @@ export const MovieDetails = ({
   };
 
   const handleFavoriteClick = () => {
-    if (movie) {
-      if (isFavorite(movie.id)) {
-        removeFromFavorites(movie.id);
+    if (initialMovie) {
+      if (isFavorite(initialMovie.id)) {
+        removeFromFavorites(initialMovie.id);
       } else {
-        addToFavorites(movie);
+        addToFavorites(initialMovie);
       }
     }
   };
@@ -516,7 +521,7 @@ export const MovieDetails = ({
     }
   };
 
-  if (!movie) return null;
+  if (!currentMovie && !movieId) return null;
 
   // Функция форматирования времени
   const formatRuntime = (minutes: number | undefined) => {
@@ -576,8 +581,8 @@ export const MovieDetails = ({
           backgroundSize: "cover",
           backgroundPosition: "center",
           backgroundRepeat: "no-repeat",
-          opacity: 0,
-          animation: "fadeIn 0.4s ease-in-out forwards",
+          opacity: isPage ? 1 : 0,
+          animation: isPage ? "none" : "fadeIn 0.4s ease-in-out forwards",
           "@keyframes fadeIn": {
             from: { opacity: 0 },
             to: { opacity: 1 },
@@ -1074,20 +1079,20 @@ export const MovieDetails = ({
                         onClick={handleFavoriteClick}
                         sx={{
                           color: "white",
-                          background: isFavorite(movie?.id || 0)
+                          background: isFavorite(initialMovie?.id || 0)
                             ? "linear-gradient(45deg, #2196F3 30%, #21CBF3 90%)"
                             : "rgb(65 67 65 / 68%)",
-                          boxShadow: isFavorite(movie?.id || 0)
+                          boxShadow: isFavorite(initialMovie?.id || 0)
                             ? "0 3px 5px 2px rgba(33, 203, 243, .3)"
                             : "none",
                           "&:hover": {
-                            background: isFavorite(movie?.id || 0)
+                            background: isFavorite(initialMovie?.id || 0)
                               ? "linear-gradient(45deg, #1976D2 30%, #00B4E5 90%)"
                               : "rgb(65 67 65 / 88%)",
                           },
                         }}
                       >
-                        {isFavorite(movie?.id || 0) ? (
+                        {isFavorite(initialMovie?.id || 0) ? (
                           <BookmarkIcon />
                         ) : (
                           <BookmarkBorderIcon />

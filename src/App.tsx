@@ -43,7 +43,7 @@ import { FavoritesPage } from "./pages/FavoritesPage";
 import { MovieCard } from "./components/MovieCard";
 import { imageUrl } from "./api/tmdb";
 import { AllFavoritesPage } from "./pages/AllFavoritesPage";
-
+import { MovieDetailsPage } from "./pages/MovieDetailsPage";
 const darkTheme = createTheme({
   palette: {
     mode: "dark",
@@ -859,6 +859,19 @@ function AppRoutes({ movies }: { movies: any }) {
                   transition={{ duration: 0.3 }}
                 >
                   <AllFavoritesPage />
+                </motion.div>
+              }
+            />
+            <Route
+              path="/movie/:id"
+              element={
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <MovieDetailsPage />
                 </motion.div>
               }
             />
