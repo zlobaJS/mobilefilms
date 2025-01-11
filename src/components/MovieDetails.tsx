@@ -166,13 +166,6 @@ export const MovieDetails = ({
     if (movieData) {
       setIsLoading(true);
       try {
-        // Предварительно очищаем все данные
-        setLogo(null);
-        setDetails(null);
-        setCast([]);
-        setRecommendations([]);
-        setKeywords([]);
-
         const [images, movieDetails, credits, recommendedMovies, keywordsData] =
           await Promise.all([
             getMovieImages(movieData.id),
@@ -182,16 +175,16 @@ export const MovieDetails = ({
             getMovieKeywords(movieData.id),
           ]);
 
+        // Используем backdrop из images API вместо movieData.backdrop_path
+        if (movieDetails && images.backdrops?.[0]) {
+          movieDetails.backdrop_path = images.backdrops[0].file_path;
+        }
+
         let logoPath = null;
         let hasLogoTemp = false;
 
         if (images.logos && images.logos.length > 0) {
-          const russianLogo = images.logos.find(
-            (logo: any) => logo.iso_639_1 === "ru"
-          );
-          logoPath = russianLogo
-            ? russianLogo.file_path
-            : images.logos[0].file_path;
+          logoPath = images.logos[0].file_path;
           hasLogoTemp = true;
         }
 
@@ -201,8 +194,7 @@ export const MovieDetails = ({
         setCast(credits?.cast?.slice(0, 15) || []);
         setRecommendations(recommendedMovies || []);
         setKeywords(keywordsData);
-        setIsLogoLoading(false); // Завершаем загрузку лого
-
+        setIsLogoLoading(false);
         setIsLoading(false);
       } catch (error) {
         console.error(error);

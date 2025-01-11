@@ -69,6 +69,27 @@ export const clearCache = () => {
   console.log("Cache cleared");
 };
 
+// Вспомогательная функция для обогащения фильма изображениями
+const enrichMovieWithImages = async (movie: any) => {
+  try {
+    const images = await getMovieImages(movie.id);
+    if (images.backdrops?.[0]) {
+      movie.backdrop_path = images.backdrops[0].file_path;
+    }
+    if (images.posters && images.posters.length > 0) {
+      const russianPoster = images.posters.find(
+        (p: any) => p.iso_639_1 === "ru"
+      );
+      if (russianPoster) {
+        movie.poster_path = russianPoster.file_path;
+      }
+    }
+    return movie;
+  } catch (error) {
+    return movie;
+  }
+};
+
 export const getMovies = {
   nowPlaying: async (page = 1) => {
     return await fetchTMDB("/movie/now_playing", {
@@ -99,11 +120,17 @@ export const getMovies = {
   },
 
   byGenre: async (genreId: number, page = 1) => {
-    return await fetchTMDB("/discover/movie", {
+    const data = await fetchTMDB("/discover/movie", {
       with_genres: genreId.toString(),
       page: page.toString(),
       include_image_language: "ru,en,null",
     });
+
+    if (data.results && data.results.length > 0) {
+      data.results = await Promise.all(data.results.map(enrichMovieWithImages));
+    }
+
+    return data;
   },
 
   byCategory: async (category: string, page = 1) => {
@@ -146,6 +173,24 @@ export const getMovieImages = async (movieId: number) => {
       include_image_language: "ru,en,null",
     });
 
+    // Сортировка backdrops по приоритету языка и качеству
+    if (data.backdrops && data.backdrops.length > 0) {
+      // Сначала ищем русский backdrop
+      const russianBackdrop = data.backdrops.find(
+        (b: any) => b.iso_639_1 === "ru"
+      );
+
+      // Если русского нет, ищем backdrop без языка
+      const noLanguageBackdrop = data.backdrops.find((b: any) => !b.iso_639_1);
+
+      // Используем найденный backdrop или первый доступный
+      const bestBackdrop =
+        russianBackdrop || noLanguageBackdrop || data.backdrops[0];
+
+      data.backdrops = [bestBackdrop];
+    }
+
+    // Существующая логика для logos
     if (data.logos && data.logos.length > 0) {
       const russianLogo = data.logos.find(
         (logo: any) => logo.iso_639_1 === "ru"
@@ -160,26 +205,10 @@ export const getMovieImages = async (movieId: number) => {
       data.logos = bestLogo ? [bestLogo] : [];
     }
 
-    if (data.posters && data.posters.length > 0) {
-      data.posters.sort((a: any, b: any) => {
-        const getPriority = (lang: string | null) => {
-          if (lang === "ru") return 0;
-          if (lang === "en") return 1;
-          if (!lang) return 2;
-          return 3;
-        };
-
-        const priorityA = getPriority(a.iso_639_1);
-        const priorityB = getPriority(b.iso_639_1);
-
-        return priorityA - priorityB;
-      });
-    }
-
     return data;
   } catch (error) {
     console.error("Error fetching movie images:", error);
-    return { posters: [], logos: [] };
+    return { backdrops: [], logos: [], posters: [] };
   }
 };
 
@@ -264,32 +293,12 @@ export const searchMovies = async (query: string, page = 1) => {
     const data = await fetchTMDB("/search/movie", {
       query,
       page: page.toString(),
-      include_image_language: "ru,en,null", // Добавляем поддержку локализованных изображений
-      region: "RU", // Добавляем приоритет русского региона
+      include_image_language: "ru,en,null",
+      region: "RU",
     });
 
-    // Если есть результаты, получаем дополнительные изображения для каждого фильма
     if (data.results && data.results.length > 0) {
-      const moviesWithImages = await Promise.all(
-        data.results.map(async (movie: any) => {
-          try {
-            const images = await getMovieImages(movie.id);
-            // Если есть локализованный постер, используем его
-            if (images.posters && images.posters.length > 0) {
-              const russianPoster = images.posters.find(
-                (p: any) => p.iso_639_1 === "ru"
-              );
-              if (russianPoster) {
-                movie.poster_path = russianPoster.file_path;
-              }
-            }
-            return movie;
-          } catch (error) {
-            return movie; // Возвращаем оригинальный фильм в случае ошибки
-          }
-        })
-      );
-      return moviesWithImages;
+      data.results = await Promise.all(data.results.map(enrichMovieWithImages));
     }
 
     return data.results || [];
