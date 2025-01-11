@@ -1,17 +1,21 @@
 import { Box } from "@mui/material";
 import { FavoritesSlider } from "../components/FavoritesSlider";
-import { useCallback } from "react";
-import { useNavigate } from "react-router-dom";
+import { useCallback, useState } from "react";
+import { MovieDetails } from "../components/MovieDetails";
 
 export const FavoritesPage = () => {
-  const navigate = useNavigate();
+  const [selectedMovie, setSelectedMovie] = useState<any>(null);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-  const handleMovieSelect = useCallback(
-    (movie: any) => {
-      navigate(`/movie/${movie.id}`);
-    },
-    [navigate]
-  );
+  const handleMovieSelect = useCallback((movie: any) => {
+    setSelectedMovie(movie);
+    setIsDialogOpen(true);
+  }, []);
+
+  const handleDialogClose = useCallback(() => {
+    setIsDialogOpen(false);
+    setSelectedMovie(null);
+  }, []);
 
   return (
     <Box
@@ -22,6 +26,11 @@ export const FavoritesPage = () => {
       }}
     >
       <FavoritesSlider onMovieSelect={handleMovieSelect} />
+      <MovieDetails
+        movie={selectedMovie}
+        open={isDialogOpen}
+        onClose={handleDialogClose}
+      />
     </Box>
   );
 };
