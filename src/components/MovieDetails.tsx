@@ -415,11 +415,15 @@ export const MovieDetails = ({
 
   const handleKeywordClick = (keywordId: number, keywordName: string) => {
     const encodedKeywordName = encodeURIComponent(keywordName);
+    const path = `/keyword/${keywordId}/${encodedKeywordName}`;
 
     try {
       setIsUpdating(true);
       onClose();
-      navigate(`/keyword/${keywordId}/${encodedKeywordName}`);
+      // Добавим небольшую задержку перед навигацией
+      setTimeout(() => {
+        navigate(path);
+      }, 100);
     } catch (error) {
       console.error("Error navigating to keyword:", error);
     } finally {

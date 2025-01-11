@@ -53,8 +53,8 @@ export const CategoryPage = ({
   const params = useParams();
   const routeCategoryId = params.categoryId;
 
-  const categoryId = propsCategoryId || routeCategoryId;
-  const title = propsTitle || CATEGORY_TITLES[categoryId || ""];
+  const finalCategoryId = propsCategoryId || routeCategoryId;
+  const finalTitle = propsTitle || CATEGORY_TITLES[finalCategoryId || ""];
 
   const [movies, setMovies] = useState<Movie[]>([]);
   const [loading, setLoading] = useState(true);
@@ -72,7 +72,7 @@ export const CategoryPage = ({
     setLoading(true);
     setInitialLoading(true);
     setContentVisible(false);
-  }, [categoryId]);
+  }, [finalCategoryId]);
 
   const fetchCategoryMovies = async (pageNumber: number) => {
     const startTime = Date.now();
@@ -82,10 +82,10 @@ export const CategoryPage = ({
       setLoading(true);
 
       let data;
-      if (categoryType === "keyword") {
-        data = await getMoviesByKeyword(Number(categoryId), pageNumber);
+      if (categoryType === "keyword" && finalCategoryId) {
+        data = await getMoviesByKeyword(Number(finalCategoryId), pageNumber);
       } else {
-        data = await getMovies.byCategory(categoryId || "", pageNumber);
+        data = await getMovies.byCategory(finalCategoryId || "", pageNumber);
       }
 
       const newMovies = Array.isArray(data.results) ? data.results : [];
@@ -106,7 +106,7 @@ export const CategoryPage = ({
 
       setHasMore(newMovies.length === 20);
     } catch (error) {
-      console.error(error);
+      console.error("Error fetching movies:", error);
       setMovies([]);
     } finally {
       setLoading(false);
@@ -139,7 +139,7 @@ export const CategoryPage = ({
     if (page > 0) {
       fetchCategoryMovies(page);
     }
-  }, [page, categoryId, categoryType]);
+  }, [page, finalCategoryId, categoryType]);
 
   useEffect(() => {
     return () => {
@@ -205,7 +205,7 @@ export const CategoryPage = ({
                   color: "white",
                 }}
               >
-                {title}
+                {finalTitle}
               </Typography>
               <Box sx={{ position: "relative" }}>
                 <Grid container spacing={2}>
