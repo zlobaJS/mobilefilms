@@ -321,3 +321,15 @@ export const searchMovies = async (query: string, page = 1) => {
     return [];
   }
 };
+
+export const getMovieVideos = async (movieId: number) => {
+  try {
+    const data = await fetchTMDB(`/movie/${movieId}/videos`, {
+      language: "ru-RU,en-US",
+    });
+    return data.results || [];
+  } catch (error) {
+    console.error("Error fetching movie videos:", error);
+    return [];
+  }
+};

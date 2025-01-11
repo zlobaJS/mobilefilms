@@ -28,6 +28,7 @@ import {
   getCollection,
   getMovieRecommendations,
   getMovieKeywords,
+  getMovieVideos,
 } from "../api/tmdb";
 import { useEffect, useState } from "react";
 import { KinoboxPlayer } from "./KinoboxPlayer";
@@ -38,6 +39,7 @@ import "swiper/css";
 import { useNavigate } from "react-router-dom";
 import { useFavorites } from "../hooks/useFavorites";
 import { isIOS, isAndroid } from "react-device-detect";
+import ReactPlayer from "react-player";
 
 declare module "@mui/material/styles" {
   interface BreakpointOverrides {
@@ -164,6 +166,8 @@ export const MovieDetails = ({
   );
   const navigate = useNavigate();
   const { addToFavorites, removeFromFavorites, isFavorite } = useFavorites();
+  const [trailerUrl, setTrailerUrl] = useState<string | null>(null);
+  const [showTrailer, setShowTrailer] = useState(false);
 
   // Модифицируем fetchData
   const fetchData = async (movieData: any) => {
@@ -464,6 +468,79 @@ export const MovieDetails = ({
     }
   };
 
+  // Обновляем функцию fetchTrailer
+  const fetchTrailer = async (movieId: number) => {
+    try {
+      const videos = await getMovieVideos(movieId);
+
+      // Ищем сначала русский трейлер
+      let trailer = videos.find(
+        (video: any) =>
+          video.type === "Trailer" &&
+          video.site === "YouTube" &&
+          video.iso_639_1 === "ru"
+      );
+
+      // Если русского нет, ищем английский трейлер
+      if (!trailer) {
+        trailer = videos.find(
+          (video: any) =>
+            video.type === "Trailer" &&
+            video.site === "YouTube" &&
+            video.iso_639_1 === "en"
+        );
+      }
+
+      // Если трейлера нет, ищем тизер
+      if (!trailer) {
+        trailer = videos.find(
+          (video: any) => video.type === "Teaser" && video.site === "YouTube"
+        );
+      }
+
+      if (trailer) {
+        setTrailerUrl(`https://www.youtube.com/watch?v=${trailer.key}`);
+        setTimeout(() => {
+          setShowTrailer(true);
+        }, 3000);
+      }
+    } catch (error) {
+      console.error("Error fetching trailer:", error);
+    }
+  };
+
+  // Добавьте эффект для загрузки трейлера (после других useEffect)
+  useEffect(() => {
+    if (currentMovie?.id && open) {
+      setShowTrailer(false);
+      setTrailerUrl(null);
+      fetchTrailer(currentMovie.id);
+    }
+
+    return () => {
+      setShowTrailer(false);
+      setTrailerUrl(null);
+    };
+  }, [currentMovie?.id, open]);
+
+  // Добавьте новый useEffect для контроля времени воспроизведения трейлера
+  useEffect(() => {
+    let timer: number;
+
+    if (showTrailer && trailerUrl) {
+      timer = setTimeout(() => {
+        setShowTrailer(false);
+        setTrailerUrl(null);
+      }, 40000);
+    }
+
+    return () => {
+      if (timer) {
+        clearTimeout(timer);
+      }
+    };
+  }, [showTrailer, trailerUrl]);
+
   if (!currentMovie && !movieId) return null;
 
   // Функция форматирования времени
@@ -681,37 +758,93 @@ export const MovieDetails = ({
                     sm: "60vh",
                   },
                   mt: "-env(safe-area-inset-top)",
+                  overflow: "hidden",
                 }}
               >
-                <Box
-                  component="img"
-                  src={imageUrl(
-                    currentMovie?.backdrop_path ||
-                      currentMovie?.poster_path ||
-                      "",
-                    isMobile ? "w1280" : "original"
-                  )}
-                  alt={currentMovie?.title}
-                  sx={{
-                    width: "100%",
-                    height: "100%",
-                    objectFit: "cover",
-                    objectPosition: {
-                      xs: "center 15%",
-                      sm: "center top",
-                    },
-                    opacity: isBackdropLoaded ? 1 : 0,
-                    transition: "opacity 0.3s ease-out",
-                    transform: "scale(1.02)",
-                    backgroundColor: "#000",
-                    imageRendering: "high-quality",
-                    WebkitBackfaceVisibility: "hidden",
-                    MozBackfaceVisibility: "hidden",
-                    backfaceVisibility: "hidden",
-                    marginTop: "env(safe-area-inset-top)",
-                  }}
-                  onLoad={() => setIsBackdropLoaded(true)}
-                />
+                {showTrailer && trailerUrl ? (
+                  <Box
+                    sx={{
+                      position: "absolute",
+                      top: "50%",
+                      left: "50%",
+                      width: "100%",
+                      height: "100%",
+                      transform: "translate(-50%, -50%)",
+                      opacity: isBackdropLoaded ? 1 : 0,
+                      transition: "opacity 0.3s ease-out",
+                    }}
+                  >
+                    <ReactPlayer
+                      url={trailerUrl}
+                      width="100%"
+                      height="100%"
+                      playing={true}
+                      muted={true}
+                      loop={false}
+                      playsinline={true}
+                      config={{
+                        youtube: {
+                          playerVars: {
+                            controls: 0,
+                            modestbranding: 1,
+                            showinfo: 0,
+                            rel: 0,
+                            iv_load_policy: 3,
+                            playsinline: 1,
+                            origin: window.location.origin,
+                            start: 0,
+                          },
+                        },
+                      }}
+                      style={{
+                        position: "absolute",
+                        top: "50%",
+                        left: "50%",
+                        transform: "translate(-50%, -50%)",
+                        pointerEvents: "none",
+                      }}
+                      onError={(e) => {
+                        console.error("Player Error:", e);
+                        setShowTrailer(false);
+                      }}
+                      onReady={() => setIsBackdropLoaded(true)}
+                      onEnded={() => {
+                        setShowTrailer(false);
+                        setTrailerUrl(null);
+                      }}
+                    />
+                  </Box>
+                ) : (
+                  <Box
+                    component="img"
+                    src={imageUrl(
+                      currentMovie?.backdrop_path ||
+                        currentMovie?.poster_path ||
+                        "",
+                      isMobile ? "w1280" : "original"
+                    )}
+                    alt={currentMovie?.title}
+                    sx={{
+                      width: "100%",
+                      height: "100%",
+                      objectFit: "cover",
+                      objectPosition: {
+                        xs: "center 15%",
+                        sm: "center top",
+                      },
+                      opacity: isBackdropLoaded ? 1 : 0,
+                      transition: "opacity 0.3s ease-out",
+                      transform: "scale(1.02)",
+                      backgroundColor: "#000",
+                      imageRendering: "high-quality",
+                      WebkitBackfaceVisibility: "hidden",
+                      MozBackfaceVisibility: "hidden",
+                      backfaceVisibility: "hidden",
+                      marginTop: "env(safe-area-inset-top)",
+                    }}
+                    onLoad={() => setIsBackdropLoaded(true)}
+                  />
+                )}
                 <Box
                   sx={{
                     position: "absolute",
@@ -729,6 +862,7 @@ export const MovieDetails = ({
                     )`,
                     transition: "background 0.2s ease",
                     marginTop: "env(safe-area-inset-top)",
+                    pointerEvents: "none",
                   }}
                 />
               </Box>
