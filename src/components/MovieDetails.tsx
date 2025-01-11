@@ -489,11 +489,11 @@ export const MovieDetails = ({
   };
 
   const handleFavoriteClick = () => {
-    if (initialMovie) {
-      if (isFavorite(initialMovie.id)) {
-        removeFromFavorites(initialMovie.id);
+    if (currentMovie) {
+      if (isFavorite(currentMovie.id)) {
+        removeFromFavorites(currentMovie.id);
       } else {
-        addToFavorites(initialMovie);
+        addToFavorites(currentMovie);
       }
     }
   };
@@ -1079,20 +1079,20 @@ export const MovieDetails = ({
                         onClick={handleFavoriteClick}
                         sx={{
                           color: "white",
-                          background: isFavorite(initialMovie?.id || 0)
+                          background: isFavorite(currentMovie?.id || 0)
                             ? "linear-gradient(45deg, #2196F3 30%, #21CBF3 90%)"
                             : "rgb(65 67 65 / 68%)",
-                          boxShadow: isFavorite(initialMovie?.id || 0)
+                          boxShadow: isFavorite(currentMovie?.id || 0)
                             ? "0 3px 5px 2px rgba(33, 203, 243, .3)"
                             : "none",
                           "&:hover": {
-                            background: isFavorite(initialMovie?.id || 0)
+                            background: isFavorite(currentMovie?.id || 0)
                               ? "linear-gradient(45deg, #1976D2 30%, #00B4E5 90%)"
                               : "rgb(65 67 65 / 88%)",
                           },
                         }}
                       >
-                        {isFavorite(initialMovie?.id || 0) ? (
+                        {isFavorite(currentMovie?.id || 0) ? (
                           <BookmarkIcon />
                         ) : (
                           <BookmarkBorderIcon />
