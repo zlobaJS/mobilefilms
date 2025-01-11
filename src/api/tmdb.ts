@@ -43,6 +43,7 @@ export const fetchTMDB = async (
   const queryParams = new URLSearchParams({
     api_key: API_KEY,
     language: "ru-RU",
+    region: "RU",
     ...params,
   });
 
@@ -95,6 +96,8 @@ export const getMovies = {
     return await fetchTMDB("/movie/now_playing", {
       page: page.toString(),
       include_image_language: "ru,en,null",
+      region: "RU",
+      language: "ru-RU",
     });
   },
 
@@ -102,6 +105,8 @@ export const getMovies = {
     return await fetchTMDB("/trending/movie/day", {
       page: page.toString(),
       include_image_language: "ru,en,null",
+      region: "RU",
+      language: "ru-RU",
     });
   },
 
@@ -109,6 +114,8 @@ export const getMovies = {
     return await fetchTMDB("/trending/movie/week", {
       page: page.toString(),
       include_image_language: "ru,en,null",
+      region: "RU",
+      language: "ru-RU",
     });
   },
 
@@ -116,6 +123,8 @@ export const getMovies = {
     return await fetchTMDB("/movie/popular", {
       page: page.toString(),
       include_image_language: "ru,en,null",
+      region: "RU",
+      language: "ru-RU",
     });
   },
 
@@ -124,6 +133,8 @@ export const getMovies = {
       with_genres: genreId.toString(),
       page: page.toString(),
       include_image_language: "ru,en,null",
+      region: "RU",
+      language: "ru-RU",
     });
 
     if (data.results && data.results.length > 0) {
