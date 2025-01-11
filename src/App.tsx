@@ -17,6 +17,7 @@ import {
   InputBase,
   Paper,
   IconButton,
+  Skeleton,
 } from "@mui/material";
 import HomeIcon from "@mui/icons-material/Home";
 import SearchIcon from "@mui/icons-material/Search";
@@ -434,6 +435,73 @@ function DesktopNavigation() {
   );
 }
 
+function SearchResults({
+  query,
+  movies,
+  loading,
+}: {
+  query: string;
+  movies: Movie[];
+  loading: boolean;
+}) {
+  if (loading) {
+    return (
+      <Grid container spacing={2} sx={{ p: 2 }}>
+        {[...Array(20)].map((_, index) => (
+          <Grid item xs={6} sm={4} md={3} lg={2} key={index}>
+            <Box
+              sx={{
+                aspectRatio: "2/3",
+                width: "100%",
+                borderRadius: "12px",
+                overflow: "hidden",
+              }}
+            >
+              <Skeleton
+                variant="rectangular"
+                width="100%"
+                height="100%"
+                animation="wave"
+                sx={{
+                  bgcolor: "rgba(255,255,255,0.1)",
+                  borderRadius: "12px",
+                }}
+              />
+            </Box>
+          </Grid>
+        ))}
+      </Grid>
+    );
+  }
+
+  if (movies.length === 0) {
+    return (
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          minHeight: "200px",
+        }}
+      >
+        <Typography variant="h6" color="text.secondary">
+          {query ? "Ничего не найдено" : "Введите запрос для поиска"}
+        </Typography>
+      </Box>
+    );
+  }
+
+  return (
+    <Grid container spacing={2} sx={{ p: 2 }}>
+      {movies.map((movie) => (
+        <Grid item xs={6} sm={4} md={3} lg={2} key={movie.id}>
+          <MovieCard movie={movie} />
+        </Grid>
+      ))}
+    </Grid>
+  );
+}
+
 function SearchPage() {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<Movie[]>([]);
@@ -553,13 +621,7 @@ function SearchPage() {
           />
         </Box>
       )}
-      <Grid container spacing={2}>
-        {results.map((movie) => (
-          <Grid item xs={6} sm={4} md={3} key={movie.id}>
-            <MovieCard movie={movie} showTitle={true} />
-          </Grid>
-        ))}
-      </Grid>
+      <SearchResults query={query} movies={results} loading={isLoading} />
     </Box>
   );
 }

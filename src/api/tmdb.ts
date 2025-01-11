@@ -7,8 +7,13 @@ const tmdbProxy = {
 
 const API_KEY = "25d88f055e7a91d25fd272f3fd287165";
 
-export const imageUrl = (path: string, size: string = "w500") => {
-  if (!path) return "";
+export const imageUrl = (
+  path: string | null | undefined,
+  size: string = "original"
+) => {
+  if (!path) {
+    return "https://via.placeholder.com/500x750?text=No+Image";
+  }
   return `${tmdbProxy.path_image}/${size}${path}`;
 };
 
@@ -66,25 +71,38 @@ export const clearCache = () => {
 
 export const getMovies = {
   nowPlaying: async (page = 1) => {
-    return await fetchTMDB("/movie/now_playing", { page: page.toString() });
+    return await fetchTMDB("/movie/now_playing", {
+      page: page.toString(),
+      include_image_language: "ru,en,null",
+    });
   },
 
   trendingToday: async (page = 1) => {
-    return await fetchTMDB("/trending/movie/day", { page: page.toString() });
+    return await fetchTMDB("/trending/movie/day", {
+      page: page.toString(),
+      include_image_language: "ru,en,null",
+    });
   },
 
   trendingWeek: async (page = 1) => {
-    return await fetchTMDB("/trending/movie/week", { page: page.toString() });
+    return await fetchTMDB("/trending/movie/week", {
+      page: page.toString(),
+      include_image_language: "ru,en,null",
+    });
   },
 
   popular: async (page = 1) => {
-    return await fetchTMDB("/movie/popular", { page: page.toString() });
+    return await fetchTMDB("/movie/popular", {
+      page: page.toString(),
+      include_image_language: "ru,en,null",
+    });
   },
 
   byGenre: async (genreId: number, page = 1) => {
     return await fetchTMDB("/discover/movie", {
       with_genres: genreId.toString(),
       page: page.toString(),
+      include_image_language: "ru,en,null",
     });
   },
 
@@ -125,12 +143,43 @@ export const getMovies = {
 export const getMovieImages = async (movieId: number) => {
   try {
     const data = await fetchTMDB(`/movie/${movieId}/images`, {
-      include_image_language: "ru,null",
+      include_image_language: "ru,en,null",
     });
+
+    if (data.logos && data.logos.length > 0) {
+      const russianLogo = data.logos.find(
+        (logo: any) => logo.iso_639_1 === "ru"
+      );
+      const englishLogo = data.logos.find(
+        (logo: any) => logo.iso_639_1 === "en"
+      );
+      const neutralLogo = data.logos.find((logo: any) => !logo.iso_639_1);
+
+      const bestLogo =
+        russianLogo || englishLogo || neutralLogo || data.logos[0];
+      data.logos = bestLogo ? [bestLogo] : [];
+    }
+
+    if (data.posters && data.posters.length > 0) {
+      data.posters.sort((a: any, b: any) => {
+        const getPriority = (lang: string | null) => {
+          if (lang === "ru") return 0;
+          if (lang === "en") return 1;
+          if (!lang) return 2;
+          return 3;
+        };
+
+        const priorityA = getPriority(a.iso_639_1);
+        const priorityB = getPriority(b.iso_639_1);
+
+        return priorityA - priorityB;
+      });
+    }
+
     return data;
   } catch (error) {
     console.error("Error fetching movie images:", error);
-    return { logos: [] };
+    return { posters: [], logos: [] };
   }
 };
 
@@ -215,7 +264,34 @@ export const searchMovies = async (query: string, page = 1) => {
     const data = await fetchTMDB("/search/movie", {
       query,
       page: page.toString(),
+      include_image_language: "ru,en,null", // Добавляем поддержку локализованных изображений
+      region: "RU", // Добавляем приоритет русского региона
     });
+
+    // Если есть результаты, получаем дополнительные изображения для каждого фильма
+    if (data.results && data.results.length > 0) {
+      const moviesWithImages = await Promise.all(
+        data.results.map(async (movie: any) => {
+          try {
+            const images = await getMovieImages(movie.id);
+            // Если есть локализованный постер, используем его
+            if (images.posters && images.posters.length > 0) {
+              const russianPoster = images.posters.find(
+                (p: any) => p.iso_639_1 === "ru"
+              );
+              if (russianPoster) {
+                movie.poster_path = russianPoster.file_path;
+              }
+            }
+            return movie;
+          } catch (error) {
+            return movie; // Возвращаем оригинальный фильм в случае ошибки
+          }
+        })
+      );
+      return moviesWithImages;
+    }
+
     return data.results || [];
   } catch (error) {
     console.error("Error searching movies:", error);
