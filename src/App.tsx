@@ -42,6 +42,7 @@ import { KeywordPage } from "./pages/KeywordPage";
 import { FavoritesPage } from "./pages/FavoritesPage";
 import { MovieCard } from "./components/MovieCard";
 import { imageUrl } from "./api/tmdb";
+import { AllFavoritesPage } from "./pages/AllFavoritesPage";
 
 const darkTheme = createTheme({
   palette: {
@@ -220,8 +221,9 @@ function MobileNavigation() {
           zIndex: 1300,
           display: { xs: "block", sm: "none" },
           pb: "env(safe-area-inset-bottom)",
-          backgroundColor: "#141414",
-          boxShadow: "-4px 5px 72px 16px #39393a",
+          backgroundColor: "rgba(20, 20, 20, 0.8)",
+          backdropFilter: "blur(10px)",
+          WebkitBackdropFilter: "blur(10px)",
         }}
       >
         <BottomNavigation
@@ -229,112 +231,80 @@ function MobileNavigation() {
           onChange={(_, newValue) => handleNavigation(newValue)}
           sx={{
             bgcolor: "transparent",
-            backdropFilter: "blur(10px)",
-            WebkitBackdropFilter: "blur(10px)",
-            height: "64px",
-            position: "relative",
+            height: "56px",
             "& .MuiBottomNavigationAction-root": {
               minWidth: "auto",
               padding: 0,
               color: "rgba(255, 255, 255, 0.5)",
-              transition: "background-color 0.3s",
-              "&:focus": {
-                outline: "none",
-              },
-              "&.Mui-focusVisible": {
-                outline: "none",
-              },
-              "&:hover": {
-                backgroundColor: "transparent",
-              },
+              position: "relative",
               "&.Mui-selected": {
-                color: "white",
-                backgroundColor: "#0686ee",
+                color: "#0686ee",
+                "&::after": {
+                  content: '""',
+                  position: "absolute",
+                  bottom: "8px",
+                  left: "50%",
+                  transform: "translateX(-50%)",
+                  width: "20px",
+                  height: "2px",
+                  backgroundColor: "#0686ee",
+                  borderRadius: "2px",
+                },
               },
               "& .MuiSvgIcon-root": {
-                fontSize: "26px",
-                transition: "transform 0.2s",
-              },
-              "&.Mui-selected .MuiSvgIcon-root": {
-                transform: "scale(1.1)",
+                fontSize: "24px",
               },
             },
-            "& .MuiBottomNavigationAction-root:nth-of-type(2)": {
-              marginRight: "52px",
-            },
-            "& .MuiBottomNavigationAction-root:nth-of-type(4)": {
-              marginLeft: "52px",
-            },
-            "& .MuiBottomNavigationAction-root:nth-of-type(3)": {
-              position: "absolute",
-              left: "50%",
-              top: "-24px",
-              transform: "translateX(-50%)",
-              width: "60px",
-              height: "60px",
-              borderRadius: "50%",
-              backgroundColor: "#141414",
-              color: "rgba(255, 255, 255, 0.5)",
-              boxShadow: {
-                ...(value === 2 && {
-                  boxShadow: `
-                    0 -4px 12px rgba(6, 134, 238, 0.5),
-                    0 0 0 6px rgba(6, 134, 238, 0.1),
-                    0 0 0 3px rgba(6, 134, 238, 0.2)
-                  `,
-                }),
-              },
-              padding: 0,
-              minWidth: "50px",
-              margin: 0,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              "&::before": {
-                content: '""',
-                position: "absolute",
-                top: "-3px",
-                left: "-3px",
-                right: "-3px",
-                bottom: "-3px",
-                borderRadius: "50%",
-                background:
-                  "radial-gradient(circle at center, rgba(0,132,238,0.2) 0%, transparent 70%)",
-                animation: value === 2 ? "pulse 2s infinite" : "none",
-              },
-              "@keyframes pulse": {
-                "0%": {
-                  transform: "scale(1)",
-                  opacity: 0.8,
-                },
-                "70%": {
-                  transform: "scale(1.3)",
-                  opacity: 0,
-                },
-                "100%": {
-                  transform: "scale(1.3)",
-                  opacity: 0,
-                },
-              },
-              "&.Mui-selected": {
-                backgroundColor: "#0686ee",
-                color: "white",
-              },
-              "& .MuiSvgIcon-root": {
-                fontSize: "32px",
-                position: "static",
-                transform: "none",
-                margin: 0,
-                filter: "drop-shadow(0 0 4px rgba(255,255,255,0.3))",
-              },
+            "& .MuiBottomNavigationAction-label": {
+              fontSize: "0.625rem",
             },
           }}
         >
-          <BottomNavigationAction icon={<SearchIcon />} />
-          <BottomNavigationAction icon={<FavoriteIcon />} />
-          <BottomNavigationAction icon={<HomeIcon />} />
-          <BottomNavigationAction icon={<SettingsIcon />} />
-          <BottomNavigationAction icon={<InfoIcon />} />
+          <BottomNavigationAction
+            icon={<SearchIcon />}
+            sx={{
+              "&.Mui-selected .MuiSvgIcon-root": {
+                transform: "scale(1.1)",
+                transition: "transform 0.2s",
+              },
+            }}
+          />
+          <BottomNavigationAction
+            icon={<FavoriteIcon />}
+            sx={{
+              "&.Mui-selected .MuiSvgIcon-root": {
+                transform: "scale(1.1)",
+                transition: "transform 0.2s",
+              },
+            }}
+          />
+          <BottomNavigationAction
+            icon={<HomeIcon />}
+            sx={{
+              "&.Mui-selected .MuiSvgIcon-root": {
+                transform: "scale(1.1)",
+                transition: "transform 0.2s",
+              },
+            }}
+          />
+          <BottomNavigationAction
+            icon={<SettingsIcon />}
+            sx={{
+              "&.Mui-selected .MuiSvgIcon-root": {
+                transform: "scale(1.1)",
+                transition: "transform 0.2s",
+              },
+            }}
+          />
+          <BottomNavigationAction
+            icon={<InfoIcon />}
+            sx={{
+              "&.Mui-selected .MuiSvgIcon-root": {
+                transform: "scale(1.1)",
+                transition: "transform 0.2s",
+              },
+            }}
+          />
         </BottomNavigation>
       </Box>
     </>
@@ -876,6 +846,19 @@ function AppRoutes({ movies }: { movies: any }) {
                   key="keyword"
                 >
                   <KeywordPage />
+                </motion.div>
+              }
+            />
+            <Route
+              path="/favorites/all"
+              element={
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <AllFavoritesPage />
                 </motion.div>
               }
             />

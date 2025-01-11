@@ -13,7 +13,7 @@ export const useFavorites = () => {
   const addToFavorites = (movie: any) => {
     setFavorites((prev) => {
       if (!prev.some((item) => item.id === movie.id)) {
-        return [...prev, movie];
+        return [movie, ...prev];
       }
       return prev;
     });

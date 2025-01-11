@@ -1,27 +1,21 @@
-import { Box, Typography, Grid } from "@mui/material";
-import { MovieCard } from "../components/MovieCard";
-import { useFavorites } from "../hooks/useFavorites";
+import { Box } from "@mui/material";
+import { FavoritesSlider } from "../components/FavoritesSlider";
+import { useCallback } from "react";
 
 export const FavoritesPage = () => {
-  const { favorites } = useFavorites();
+  const handleMovieSelect = useCallback((movie: any) => {
+    // Обработка выбора фильма, если необходимо
+  }, []);
 
   return (
-    <Box sx={{ p: 3 }}>
-      <Typography variant="h4" sx={{ mb: 3 }}>
-        Избранное
-      </Typography>
-      <Grid container spacing={2}>
-        {favorites.map((movie) => (
-          <Grid item xs={6} sm={4} md={3} lg={2} key={movie.id}>
-            <MovieCard movie={movie} showTitle />
-          </Grid>
-        ))}
-        {favorites.length === 0 && (
-          <Typography sx={{ color: "grey.500", mt: 2 }}>
-            Список избранного пуст
-          </Typography>
-        )}
-      </Grid>
+    <Box
+      sx={{
+        minHeight: "100dvh",
+        pt: { xs: "calc(env(safe-area-inset-top) + 16px)", sm: 2 },
+        pb: { xs: "calc(56px + env(safe-area-inset-bottom))", sm: 2 },
+      }}
+    >
+      <FavoritesSlider onMovieSelect={handleMovieSelect} />
     </Box>
   );
 };

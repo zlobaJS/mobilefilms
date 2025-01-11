@@ -32,6 +32,8 @@ interface MovieSliderProps {
   loading?: boolean;
   categoryId: string;
   onMovieSelect?: (movie: any) => void;
+  showAllText?: string;
+  showAllRoute?: string;
 }
 
 export const MovieSlider = ({
@@ -40,6 +42,8 @@ export const MovieSlider = ({
   loading = false,
   categoryId,
   onMovieSelect,
+  showAllText = "Еще",
+  showAllRoute,
 }: MovieSliderProps) => {
   const theme = useTheme();
   const navigate = useNavigate();
@@ -47,7 +51,7 @@ export const MovieSlider = ({
   const isTablet = useMediaQuery(theme.breakpoints.down("md"));
 
   const handleMoreClick = () => {
-    navigate(`/category/${categoryId}`);
+    navigate(showAllRoute || `/category/${categoryId}`);
   };
 
   const memoizedMovies = useMemo(() => movies, [movies]);
@@ -188,7 +192,7 @@ export const MovieSlider = ({
             },
           }}
         >
-          Еще
+          {showAllText}
         </Button>
       </Box>
       <Swiper
