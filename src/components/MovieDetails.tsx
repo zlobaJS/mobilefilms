@@ -535,11 +535,6 @@ export const MovieDetails = ({
     return hours > 0 ? `${hours}ч ${mins}м` : `${mins}м`;
   };
 
-  // Функция для форматирования рейтинга
-  const formatRating = (rating: number) => {
-    return rating ? rating.toFixed(1) : "-";
-  };
-
   // Функция для форматирования количества голосов
   const formatVoteCount = (count: number) => {
     if (!count) return "-";
@@ -883,8 +878,9 @@ export const MovieDetails = ({
                     }}
                   >
                     {/* Рейтинг */}
-                    {currentMovie?.vote_average &&
-                      currentMovie.vote_average > 0 && (
+                    {currentMovie &&
+                      currentMovie.vote_average > 0 &&
+                      !isNaN(currentMovie.vote_average) && (
                         <Box
                           sx={{
                             display: "flex",
@@ -896,29 +892,21 @@ export const MovieDetails = ({
                           <Typography
                             sx={{
                               fontSize: "1rem",
-                              color: getRatingColor(
-                                currentMovie?.vote_average || 0
-                              ),
+                              color: getRatingColor(currentMovie.vote_average),
                             }}
                           >
-                            {formatRating(currentMovie?.vote_average || 0)}
+                            {currentMovie.vote_average.toFixed(1)}
                           </Typography>
-                          {typeof currentMovie?.vote_count === "number" &&
+                          {currentMovie?.vote_count &&
                             currentMovie.vote_count > 0 && (
                               <>
                                 <Typography
-                                  sx={{
-                                    color: "#888",
-                                    fontSize: "0.9rem",
-                                  }}
+                                  sx={{ color: "#888", fontSize: "0.9rem" }}
                                 >
                                   •
                                 </Typography>
                                 <Typography
-                                  sx={{
-                                    color: "#888",
-                                    fontSize: "1rem",
-                                  }}
+                                  sx={{ color: "#888", fontSize: "1rem" }}
                                 >
                                   {formatVoteCount(currentMovie.vote_count)}{" "}
                                   оценок
