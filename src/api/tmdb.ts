@@ -175,19 +175,22 @@ export const getMovieImages = async (movieId: number) => {
 
     // Сортировка backdrops по приоритету языка и качеству
     if (data.backdrops && data.backdrops.length > 0) {
-      // Сначала ищем русский backdrop
+      // Сначала ищем backdrop без языка
+      const noLanguageBackdrop = data.backdrops.find((b: any) => !b.iso_639_1);
+
+      // Если нет без языка, ищем русский backdrop
       const russianBackdrop = data.backdrops.find(
         (b: any) => b.iso_639_1 === "ru"
       );
 
-      // Если русского нет, ищем backdrop без языка
-      const noLanguageBackdrop = data.backdrops.find((b: any) => !b.iso_639_1);
-
       // Используем найденный backdrop или первый доступный
       const bestBackdrop =
-        russianBackdrop || noLanguageBackdrop || data.backdrops[0];
+        noLanguageBackdrop || russianBackdrop || data.backdrops[0];
 
-      data.backdrops = [bestBackdrop];
+      // Сортируем backdrops по размеру для лучшего качества
+      data.backdrops = [bestBackdrop].sort((a: any, b: any) => {
+        return b.width * b.height - a.width * a.height;
+      });
     }
 
     // Существующая логика для logos
