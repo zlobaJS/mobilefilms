@@ -1,11 +1,17 @@
 import { Box } from "@mui/material";
 import { FavoritesSlider } from "../components/FavoritesSlider";
 import { useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 
 export const FavoritesPage = () => {
-  const handleMovieSelect = useCallback((movie: any) => {
-    // Обработка выбора фильма, если необходимо
-  }, []);
+  const navigate = useNavigate();
+
+  const handleMovieSelect = useCallback(
+    (movie: any) => {
+      navigate(`/movie/${movie.id}`);
+    },
+    [navigate]
+  );
 
   return (
     <Box
