@@ -5,8 +5,10 @@
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta
       name="viewport"
-      content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no, maximum-scale=1"
     />
+    <meta name="theme-color" content="#141414" />
+    <meta name="description" content="Онлайн кинотеатр" />
 
     <!-- Мета-теги для iOS -->
     <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -22,45 +24,22 @@
     <link rel="apple-touch-icon" sizes="180x180" href="/ios-icon-180.png" />
     <link rel="apple-touch-icon" sizes="167x167" href="/ios-icon-167.png" />
 
-    <!-- Сплэш-скрины для разных устройств iOS -->
-    <link
-      rel="apple-touch-startup-image"
-      href="/splash-2048x2732.png"
-      media="(device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
-    />
-    <link
-      rel="apple-touch-startup-image"
-      href="/splash-1668x2388.png"
-      media="(device-width: 834px) and (device-height: 1194px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
-    />
-    <link
-      rel="apple-touch-startup-image"
-      href="/splash-1536x2048.png"
-      media="(device-width: 768px) and (device-height: 1024px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
-    />
-    <link
-      rel="apple-touch-startup-image"
-      href="/splash-1125x2436.png"
-      media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)"
-    />
-    <link
-      rel="apple-touch-startup-image"
-      href="/splash-1242x2688.png"
-      media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)"
-    />
-
     <!-- Манифест для PWA -->
     <link rel="manifest" href="/manifest.json" />
 
     <title>Кино</title>
 
     <style>
-      /* Предотвращаем резиновый эффект при скролле на iOS */
+      :root {
+        color-scheme: dark;
+      }
+
       html {
         position: fixed;
         width: 100%;
         height: 100%;
         overflow: hidden;
+        background-color: #141414;
       }
 
       body {
@@ -72,16 +51,20 @@
         background-color: #141414;
         margin: 0;
         padding: 0;
-        /* Отключаем выделение текста */
         -webkit-user-select: none;
         user-select: none;
-        /* Отключаем зум при двойном тапе */
         touch-action: manipulation;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          Helvetica, Arial, sans-serif;
       }
 
-      /* Убираем подсветку при тапе на iOS */
       * {
         -webkit-tap-highlight-color: transparent;
+        box-sizing: border-box;
+      }
+
+      #root {
+        height: 100%;
       }
     </style>
   </head>
