@@ -33,6 +33,7 @@ interface MovieSliderProps {
   onMovieSelect?: (movie: Movie) => void;
   showAllText?: string;
   showAllRoute?: string;
+  showTitle?: boolean;
 }
 
 export const MovieSlider = ({
@@ -43,6 +44,7 @@ export const MovieSlider = ({
   onMovieSelect,
   showAllText = "Еще",
   showAllRoute,
+  showTitle,
 }: MovieSliderProps) => {
   const theme = useTheme();
   const navigate = useNavigate();
@@ -233,6 +235,7 @@ export const MovieSlider = ({
                       onMovieSelect(movie);
                     }
                   }}
+                  showTitle={showTitle}
                 />
               </Box>
             </Box>

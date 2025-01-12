@@ -3,9 +3,13 @@ import { useFavorites } from "../hooks/useFavorites";
 
 interface FavoritesSliderProps {
   onMovieSelect?: (movie: any) => void;
+  showTitle?: boolean;
 }
 
-export const FavoritesSlider = ({ onMovieSelect }: FavoritesSliderProps) => {
+export const FavoritesSlider = ({
+  onMovieSelect,
+  showTitle = true,
+}: FavoritesSliderProps) => {
   const { favorites } = useFavorites();
 
   return (
@@ -17,6 +21,7 @@ export const FavoritesSlider = ({ onMovieSelect }: FavoritesSliderProps) => {
       onMovieSelect={onMovieSelect}
       showAllText="Показать все"
       showAllRoute="/favorites/all"
+      showTitle={showTitle}
     />
   );
 };

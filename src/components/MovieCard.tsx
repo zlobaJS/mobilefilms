@@ -18,6 +18,7 @@ interface Movie {
 interface MovieCardProps {
   movie: Movie;
   onClick?: () => void;
+  showTitle?: boolean;
 }
 
 export const MovieCardSkeleton = () => {
@@ -69,7 +70,11 @@ export const MovieCardSkeleton = () => {
   );
 };
 
-export const MovieCard = ({ movie, onClick }: MovieCardProps) => {
+export const MovieCard = ({
+  movie,
+  onClick,
+  showTitle = false,
+}: MovieCardProps) => {
   const navigate = useNavigate();
   const [imageLoaded, setImageLoaded] = useState(false);
 
@@ -81,124 +86,151 @@ export const MovieCard = ({ movie, onClick }: MovieCardProps) => {
     <Box
       onClick={onClick || handleOpenDetails}
       sx={{
-        cursor: "pointer",
-        position: "relative",
+        display: "flex",
+        flexDirection: "column",
         width: "100%",
-        paddingTop: "150%",
-        backgroundColor: "transparent",
-        borderRadius: "12px",
-        overflow: "hidden",
       }}
     >
-      {movie.poster_path ? (
-        <>
-          {!imageLoaded && (
-            <Box
+      <Box
+        sx={{
+          position: "relative",
+          width: "100%",
+          paddingTop: "150%",
+          backgroundColor: "transparent",
+          borderRadius: "12px",
+          overflow: "hidden",
+        }}
+      >
+        {movie.poster_path ? (
+          <>
+            {!imageLoaded && (
+              <Box
+                sx={{
+                  position: "absolute",
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  bgcolor: "rgba(255,255,255,0.05)",
+                  borderRadius: "12px",
+                }}
+              >
+                <MovieCardSkeleton />
+              </Box>
+            )}
+            <CardMedia
+              component="img"
+              image={imageUrl(movie.poster_path, "w342")}
+              alt={movie.title}
+              onLoad={() => setImageLoaded(true)}
               sx={{
                 position: "absolute",
                 top: 0,
-                left: 0,
-                right: 0,
-                bottom: 0,
-                bgcolor: "rgba(255,255,255,0.05)",
+                left: "50%",
+                transform: "translateX(-50%)",
+                width: "100%",
+                height: "100%",
+                objectFit: "cover",
                 borderRadius: "12px",
+                opacity: imageLoaded ? 1 : 0,
+                transition: "opacity 0.3s ease",
               }}
-            >
-              <MovieCardSkeleton />
-            </Box>
-          )}
-          <CardMedia
-            component="img"
-            image={imageUrl(movie.poster_path, "w342")}
-            alt={movie.title}
-            onLoad={() => setImageLoaded(true)}
+            />
+          </>
+        ) : (
+          <Box
             sx={{
               position: "absolute",
               top: 0,
-              left: "50%",
-              transform: "translateX(-50%)",
-              width: "100%",
-              height: "100%",
-              objectFit: "cover",
+              left: 0,
+              right: 0,
+              bottom: 0,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              backgroundColor: "rgba(255,255,255,0.05)",
               borderRadius: "12px",
-              opacity: imageLoaded ? 1 : 0,
-              transition: "opacity 0.3s ease",
-            }}
-          />
-        </>
-      ) : (
-        <Box
-          sx={{
-            position: "absolute",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            backgroundColor: "rgba(255,255,255,0.05)",
-            borderRadius: "12px",
-          }}
-        >
-          <ImageNotSupportedIcon
-            sx={{
-              fontSize: 48,
-              color: "rgba(255,255,255,0.3)",
-              mb: 1,
-            }}
-          />
-          <Typography
-            variant="caption"
-            sx={{
-              color: "rgba(255,255,255,0.5)",
-              textAlign: "center",
-              fontSize: "0.75rem",
             }}
           >
-            Постер отсутствует
-          </Typography>
-        </Box>
-      )}
-      {movie.release_quality && (
-        <Box
+            <ImageNotSupportedIcon
+              sx={{
+                fontSize: 48,
+                color: "rgba(255,255,255,0.3)",
+                mb: 1,
+              }}
+            />
+            <Typography
+              variant="caption"
+              sx={{
+                color: "rgba(255,255,255,0.5)",
+                textAlign: "center",
+                fontSize: "0.75rem",
+              }}
+            >
+              Постер отсутствует
+            </Typography>
+          </Box>
+        )}
+        {movie.release_quality && (
+          <Box
+            sx={{
+              position: "absolute",
+              top: 8,
+              right: 8,
+              color: "#000000",
+              textTransform: "uppercase",
+              fontWeight: "bold",
+              backgroundColor: "rgba(255,255,255,0.7)",
+              padding: "2px 8px",
+              borderRadius: "4px",
+              fontSize: "0.8rem",
+            }}
+          >
+            {movie.release_quality}
+          </Box>
+        )}
+        {movie.vote_average > 0 && !isNaN(movie.vote_average) && (
+          <Box
+            sx={{
+              position: "absolute",
+              top: 8,
+              left: 8,
+              bgcolor: (() => {
+                const rating = Number(movie.vote_average);
+                if (rating >= 7) return "#4CAF50";
+                if (rating >= 5.6) return "#888";
+                return "#FF5252";
+              })(),
+              color: "#fff",
+              padding: { xs: "2px 6px", sm: "4px 8px" },
+              borderRadius: { xs: "6px", sm: "8px" },
+              fontSize: { xs: "12px", sm: "14px" },
+              fontWeight: "bold",
+            }}
+          >
+            {movie.vote_average.toFixed(1)}
+          </Box>
+        )}
+      </Box>
+
+      {showTitle && (
+        <Typography
+          variant="subtitle1"
           sx={{
-            position: "absolute",
-            top: 8,
-            right: 8,
-            color: "#000000",
-            textTransform: "uppercase",
+            color: "white",
             fontWeight: "bold",
-            backgroundColor: "rgba(255,255,255,0.7)",
-            padding: "2px 8px",
-            borderRadius: "4px",
-            fontSize: "0.8rem",
+            fontSize: { xs: "0.875rem", sm: "1rem" },
+            mt: 1,
+            textAlign: "center",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            display: "-webkit-box",
+            WebkitLineClamp: 1,
+            WebkitBoxOrient: "vertical",
           }}
         >
-          {movie.release_quality}
-        </Box>
-      )}
-      {movie.vote_average > 0 && !isNaN(movie.vote_average) && (
-        <Box
-          sx={{
-            position: "absolute",
-            top: 8,
-            left: 8,
-            bgcolor: (() => {
-              const rating = Number(movie.vote_average);
-              if (rating >= 7) return "#4CAF50";
-              if (rating >= 5.6) return "#888";
-              return "#FF5252";
-            })(),
-            color: "#fff",
-            padding: { xs: "2px 6px", sm: "4px 8px" },
-            borderRadius: { xs: "6px", sm: "8px" },
-            fontSize: { xs: "12px", sm: "14px" },
-            fontWeight: "bold",
-          }}
-        >
-          {movie.vote_average.toFixed(1)}
-        </Box>
+          {movie.title}
+        </Typography>
       )}
     </Box>
   );

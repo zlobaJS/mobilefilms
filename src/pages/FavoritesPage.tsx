@@ -25,7 +25,7 @@ export const FavoritesPage = () => {
         pb: { xs: "calc(56px + env(safe-area-inset-bottom))", sm: 2 },
       }}
     >
-      <FavoritesSlider onMovieSelect={handleMovieSelect} />
+      <FavoritesSlider onMovieSelect={handleMovieSelect} showTitle={true} />
       <MovieDetails
         movie={selectedMovie}
         open={isDialogOpen}

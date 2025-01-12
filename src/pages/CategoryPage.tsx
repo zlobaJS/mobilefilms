@@ -404,6 +404,7 @@ export const CategoryPage = ({
                           <MovieCard
                             movie={movie}
                             onClick={() => handleMovieClick(movie)}
+                            showTitle={true}
                           />
                         </Grid>
                       ))}
