@@ -236,7 +236,49 @@ export const MovieDetails = ({
         setLogo(logoPath);
         setHasLogo(hasLogoTemp);
         setDetails(movieDetails || null);
-        setCast(credits?.cast?.slice(0, 15) || []);
+
+        // Разделяем актеров и создателей
+        const actors =
+          credits?.cast?.slice(0, 15).map((person) => ({
+            ...person,
+            isActor: true,
+            department: "Acting",
+          })) || [];
+
+        const creators =
+          credits?.crew
+            ?.filter(
+              (person: any) =>
+                person.job === "Director" ||
+                person.job === "Screenplay" ||
+                person.job === "Writer"
+            )
+            // Группируем по id человека
+            .reduce((acc: any[], person: any) => {
+              const existingPerson = acc.find((p) => p.id === person.id);
+              if (existingPerson) {
+                // Если человек уже есть, добавляем ему новую роль
+                existingPerson.jobs = [
+                  ...(existingPerson.jobs || []),
+                  person.job,
+                ];
+              } else {
+                // Если человека еще нет, добавляем его с первой ролью
+                acc.push({
+                  ...person,
+                  jobs: [person.job],
+                  isCreator: true,
+                  department: person.department,
+                });
+              }
+              return acc;
+            }, []) || [];
+
+        // Объединяем все данные в один массив, но помечаем создателей специальным флагом
+        const castAndCrew = [...actors, ...creators];
+
+        setCast(castAndCrew);
+
         setRecommendations(recommendedMovies || []);
         setKeywords(keywordsData);
         setCertification(releaseInfo);
@@ -1477,102 +1519,267 @@ export const MovieDetails = ({
                             width: "100%",
                           }}
                         >
-                          {cast.map((actor) => (
-                            <SwiperSlide
-                              key={actor.id}
-                              style={{
-                                width: "auto",
-                                marginRight: "4px",
-                              }}
-                            >
-                              <Box
-                                sx={{
-                                  aspectRatio: "2/3",
-                                  width: {
-                                    xs: "65px",
-                                    sm: "126px",
-                                  },
-                                  borderRadius: "8px",
-                                  overflow: "hidden",
-                                  position: "relative",
-                                  mb: 1,
+                          {cast
+                            .filter(
+                              (person) =>
+                                person.isActor &&
+                                person.department === "Acting" &&
+                                !person.isCreator
+                            )
+                            .map((actor) => (
+                              <SwiperSlide
+                                key={actor.id}
+                                style={{
+                                  width: "auto",
+                                  marginRight: "4px",
                                 }}
                               >
-                                {actor.profile_path ? (
-                                  <Box
-                                    component="img"
-                                    loading="lazy"
-                                    src={imageUrl(actor.profile_path, "w342")}
-                                    alt={actor.name}
+                                <Box
+                                  sx={{
+                                    aspectRatio: "2/3",
+                                    width: {
+                                      xs: "65px",
+                                      sm: "126px",
+                                    },
+                                    borderRadius: "8px",
+                                    overflow: "hidden",
+                                    position: "relative",
+                                    mb: 1,
+                                  }}
+                                >
+                                  {actor.profile_path ? (
+                                    <Box
+                                      component="img"
+                                      loading="lazy"
+                                      src={imageUrl(actor.profile_path, "w342")}
+                                      alt={actor.name}
+                                      sx={{
+                                        position: "absolute",
+                                        top: 0,
+                                        left: 0,
+                                        width: "100%",
+                                        height: "100%",
+                                        objectFit: "cover",
+                                        imageRendering: [
+                                          "crisp-edges",
+                                          "-webkit-optimize-contrast",
+                                        ],
+                                        backfaceVisibility: "hidden",
+                                      }}
+                                    />
+                                  ) : (
+                                    <Box
+                                      sx={{
+                                        position: "absolute",
+                                        top: 0,
+                                        left: 0,
+                                        width: "100%",
+                                        height: "100%",
+                                        display: "flex",
+                                        alignItems: "center",
+                                        justifyContent: "center",
+                                        color: "#666",
+                                      }}
+                                    >
+                                      No photo
+                                    </Box>
+                                  )}
+                                </Box>
+                                <Box
+                                  sx={{
+                                    width: {
+                                      xs: "65px",
+                                      sm: "126px",
+                                    },
+                                  }}
+                                >
+                                  <Typography
                                     sx={{
-                                      position: "absolute",
-                                      top: 0,
-                                      left: 0,
+                                      color: "white",
+                                      fontSize: {
+                                        xs: "0.8rem",
+                                        sm: "0.9rem",
+                                      },
+                                      fontWeight: 500,
+                                      mb: 0.5,
+                                      overflow: "hidden",
+                                      textOverflow: "ellipsis",
+                                      whiteSpace: "nowrap",
                                       width: "100%",
-                                      height: "100%",
-                                      objectFit: "cover",
-                                      imageRendering: [
-                                        "crisp-edges",
-                                        "-webkit-optimize-contrast",
-                                      ],
-                                      backfaceVisibility: "hidden",
-                                    }}
-                                  />
-                                ) : (
-                                  <Box
-                                    sx={{
-                                      position: "absolute",
-                                      top: 0,
-                                      left: 0,
-                                      width: "100%",
-                                      height: "100%",
-                                      display: "flex",
-                                      alignItems: "center",
-                                      justifyContent: "center",
-                                      color: "#666",
                                     }}
                                   >
-                                    No photo
-                                  </Box>
-                                )}
-                              </Box>
-                              <Box
-                                sx={{
-                                  width: {
-                                    xs: "65px",
-                                    sm: "126px",
-                                  },
+                                    {actor.name}
+                                  </Typography>
+                                  <Typography
+                                    sx={{
+                                      color: "#888",
+                                      fontSize: {
+                                        xs: "0.75rem",
+                                        sm: "0.8rem",
+                                      },
+                                      overflow: "hidden",
+                                      textOverflow: "ellipsis",
+                                      whiteSpace: "nowrap",
+                                      width: "100%",
+                                    }}
+                                  >
+                                    {actor.character}
+                                  </Typography>
+                                </Box>
+                              </SwiperSlide>
+                            ))}
+                        </Swiper>
+                      </Box>
+                    </Box>
+                  )}
+
+                  {/* Создатели */}
+                  {cast.length > 0 && isVisible && (
+                    <Box sx={{ mb: 4 }}>
+                      <Typography
+                        variant="h6"
+                        sx={{
+                          color: "#6b6868",
+                          fontSize: "0.9rem",
+                          fontWeight: 500,
+                          mb: 2,
+                          textAlign: "left",
+                        }}
+                      >
+                        Создатели
+                      </Typography>
+                      <Box sx={{ position: "relative" }}>
+                        <Swiper
+                          modules={[FreeMode]}
+                          slidesPerView="auto"
+                          spaceBetween={4}
+                          freeMode
+                          style={{
+                            padding: "4px",
+                            width: "100%",
+                          }}
+                        >
+                          {cast
+                            .filter((person) => person.isCreator)
+                            .map((person) => (
+                              <SwiperSlide
+                                key={person.id}
+                                style={{
+                                  width: "auto",
+                                  marginRight: "4px",
                                 }}
                               >
-                                <Typography
+                                <Box
                                   sx={{
-                                    color: "white",
-                                    fontSize: { xs: "0.8rem", sm: "0.9rem" },
-                                    fontWeight: 500,
-                                    mb: 0.5,
+                                    aspectRatio: "2/3",
+                                    width: {
+                                      xs: "65px",
+                                      sm: "126px",
+                                    },
+                                    borderRadius: "8px",
                                     overflow: "hidden",
-                                    textOverflow: "ellipsis",
-                                    whiteSpace: "nowrap",
-                                    width: "100%",
+                                    position: "relative",
+                                    mb: 1,
                                   }}
                                 >
-                                  {actor.name}
-                                </Typography>
-                                <Typography
+                                  {person.profile_path ? (
+                                    <Box
+                                      component="img"
+                                      loading="lazy"
+                                      src={imageUrl(
+                                        person.profile_path,
+                                        "w342"
+                                      )}
+                                      alt={person.name}
+                                      sx={{
+                                        position: "absolute",
+                                        top: 0,
+                                        left: 0,
+                                        width: "100%",
+                                        height: "100%",
+                                        objectFit: "cover",
+                                        imageRendering: [
+                                          "crisp-edges",
+                                          "-webkit-optimize-contrast",
+                                        ],
+                                        backfaceVisibility: "hidden",
+                                      }}
+                                    />
+                                  ) : (
+                                    <Box
+                                      sx={{
+                                        position: "absolute",
+                                        top: 0,
+                                        left: 0,
+                                        width: "100%",
+                                        height: "100%",
+                                        display: "flex",
+                                        alignItems: "center",
+                                        justifyContent: "center",
+                                        color: "#666",
+                                      }}
+                                    >
+                                      No photo
+                                    </Box>
+                                  )}
+                                </Box>
+                                <Box
                                   sx={{
-                                    color: "#888",
-                                    fontSize: { xs: "0.75rem", sm: "0.8rem" },
-                                    overflow: "hidden",
-                                    textOverflow: "ellipsis",
-                                    whiteSpace: "nowrap",
-                                    width: "100%",
+                                    width: {
+                                      xs: "65px",
+                                      sm: "126px",
+                                    },
                                   }}
                                 >
-                                  {actor.character}
-                                </Typography>
-                              </Box>
-                            </SwiperSlide>
-                          ))}
+                                  <Typography
+                                    sx={{
+                                      color: "white",
+                                      fontSize: {
+                                        xs: "0.8rem",
+                                        sm: "0.9rem",
+                                      },
+                                      fontWeight: 500,
+                                      mb: 0.5,
+                                      overflow: "hidden",
+                                      textOverflow: "ellipsis",
+                                      whiteSpace: "nowrap",
+                                      width: "100%",
+                                    }}
+                                  >
+                                    {person.name}
+                                  </Typography>
+                                  <Typography
+                                    sx={{
+                                      color: "#888",
+                                      fontSize: {
+                                        xs: "0.75rem",
+                                        sm: "0.8rem",
+                                      },
+                                      overflow: "hidden",
+                                      textOverflow: "ellipsis",
+                                      whiteSpace: "nowrap",
+                                      width: "100%",
+                                    }}
+                                  >
+                                    {(() => {
+                                      const isDirector =
+                                        person.jobs?.includes("Director");
+                                      const isWriter =
+                                        person.jobs?.includes("Screenplay") ||
+                                        person.jobs?.includes("Writer");
+
+                                      if (isDirector && isWriter) {
+                                        return "Режиссер, сценарист";
+                                      } else if (isDirector) {
+                                        return "Режиссер";
+                                      } else {
+                                        return "Сценарист";
+                                      }
+                                    })()}
+                                  </Typography>
+                                </Box>
+                              </SwiperSlide>
+                            ))}
                         </Swiper>
                       </Box>
                     </Box>
