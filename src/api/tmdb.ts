@@ -144,7 +144,7 @@ export const getMovies = {
     return data;
   },
 
-  byCategory: async (category: string, page = 1) => {
+  byCategory: async (category: string, page = 1, sortBy?: string) => {
     switch (category) {
       case "now-playing":
         return await getMovies.nowPlaying(page);
@@ -172,9 +172,32 @@ export const getMovies = {
         return await getMovies.byGenre(GENRES.DRAMA, page);
       case "war":
         return await getMovies.byGenre(GENRES.WAR, page);
+      case "ru-movies":
+        return await getMovies.byCountry("RU", page, sortBy);
       default:
         return await getMovies.popular(page);
     }
+  },
+
+  byCountry: async (
+    countryCode: string,
+    page = 1,
+    sortBy: string = "popularity.desc"
+  ) => {
+    const data = await fetchTMDB("/discover/movie", {
+      with_origin_country: countryCode,
+      page: page.toString(),
+      include_image_language: "ru,en,null",
+      region: "RU",
+      language: "ru-RU",
+      sort_by: sortBy,
+    });
+
+    if (data.results && data.results.length > 0) {
+      data.results = await Promise.all(data.results.map(enrichMovieWithImages));
+    }
+
+    return data;
   },
 };
 

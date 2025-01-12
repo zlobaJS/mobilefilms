@@ -7,6 +7,7 @@ import {
   Container,
   CircularProgress,
   Skeleton,
+  Button,
 } from "@mui/material";
 import { MovieCard } from "../components/MovieCard";
 import { getMovies, getMoviesByKeyword } from "../api/tmdb";
@@ -26,6 +27,7 @@ const CATEGORY_TITLES: { [key: string]: string } = {
   western: "Вестерны",
   drama: "Драмы",
   war: "Военные",
+  "ru-movies": "Российские фильмы",
 };
 
 interface Movie {
@@ -64,6 +66,7 @@ export const CategoryPage = ({
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [initialLoading, setInitialLoading] = useState(true);
   const [contentVisible, setContentVisible] = useState(false);
+  const [sortBy, setSortBy] = useState<string>("popularity.desc");
 
   useEffect(() => {
     setMovies([]);
@@ -72,7 +75,7 @@ export const CategoryPage = ({
     setLoading(true);
     setInitialLoading(true);
     setContentVisible(false);
-  }, [finalCategoryId]);
+  }, [finalCategoryId, sortBy]);
 
   const fetchCategoryMovies = async (pageNumber: number) => {
     const startTime = Date.now();
@@ -85,7 +88,11 @@ export const CategoryPage = ({
       if (categoryType === "keyword" && finalCategoryId) {
         data = await getMoviesByKeyword(Number(finalCategoryId), pageNumber);
       } else {
-        data = await getMovies.byCategory(finalCategoryId || "", pageNumber);
+        data = await getMovies.byCategory(
+          finalCategoryId || "",
+          pageNumber,
+          sortBy
+        );
       }
 
       const newMovies = Array.isArray(data.results) ? data.results : [];
@@ -139,13 +146,20 @@ export const CategoryPage = ({
     if (page > 0) {
       fetchCategoryMovies(page);
     }
-  }, [page, finalCategoryId, categoryType]);
+  }, [page, finalCategoryId, categoryType, sortBy]);
 
   useEffect(() => {
     return () => {
       setMovies([]);
     };
   }, []);
+
+  const handleSortChange = (event: any) => {
+    setSortBy(event.target.value);
+    setPage(1);
+    setMovies([]);
+    setHasMore(true);
+  };
 
   return (
     <>
@@ -197,16 +211,154 @@ export const CategoryPage = ({
             }}
           >
             <Container maxWidth="xl">
-              <Typography
-                variant="h4"
+              <Box
                 sx={{
+                  display: "flex",
+                  flexDirection: "column",
                   mb: 4,
-                  fontWeight: "bold",
-                  color: "white",
                 }}
               >
-                {finalTitle}
-              </Typography>
+                <Typography
+                  variant="h4"
+                  sx={{
+                    fontWeight: "bold",
+                    color: "white",
+                    mb: { xs: 2, sm: 3 },
+                    fontSize: { xs: "1.75rem", sm: "2.125rem" },
+                  }}
+                >
+                  {finalTitle}
+                </Typography>
+
+                {finalCategoryId === "ru-movies" && (
+                  <Box
+                    sx={{
+                      display: "flex",
+                      flexDirection: "row",
+                      flexWrap: "wrap",
+                      gap: 1,
+                      mx: -1,
+                      px: 1,
+                      pb: 1,
+                      mt: -1,
+                      pt: 1,
+                      "& .MuiButton-root": {
+                        mb: 1,
+                        flex: { xs: "1 1 auto", sm: "0 1 auto" },
+                        minWidth: { xs: "calc(50% - 8px)", sm: "auto" },
+                        maxWidth: { xs: "calc(50% - 8px)", sm: "none" },
+                      },
+                    }}
+                  >
+                    <Button
+                      variant={
+                        sortBy === "popularity.desc" ? "contained" : "outlined"
+                      }
+                      onClick={() =>
+                        handleSortChange({
+                          target: { value: "popularity.desc" },
+                        })
+                      }
+                      sx={{
+                        borderRadius: "20px",
+                        textTransform: "none",
+                        minWidth: "auto",
+                        whiteSpace: "nowrap",
+                        px: 2,
+                        py: 0.75,
+                        fontSize: "0.875rem",
+                        backgroundColor:
+                          sortBy === "popularity.desc"
+                            ? "primary.main"
+                            : "transparent",
+                        borderColor: "rgba(255, 255, 255, 0.23)",
+                        color: "white",
+                        "&:hover": {
+                          borderColor: "rgba(255, 255, 255, 0.5)",
+                          backgroundColor:
+                            sortBy === "popularity.desc"
+                              ? "primary.dark"
+                              : "rgba(255, 255, 255, 0.08)",
+                        },
+                      }}
+                    >
+                      По популярности
+                    </Button>
+                    <Button
+                      variant={
+                        sortBy === "primary_release_date.desc"
+                          ? "contained"
+                          : "outlined"
+                      }
+                      onClick={() =>
+                        handleSortChange({
+                          target: { value: "primary_release_date.desc" },
+                        })
+                      }
+                      sx={{
+                        borderRadius: "20px",
+                        textTransform: "none",
+                        minWidth: "auto",
+                        whiteSpace: "nowrap",
+                        px: 2,
+                        py: 0.75,
+                        fontSize: "0.875rem",
+                        backgroundColor:
+                          sortBy === "primary_release_date.desc"
+                            ? "primary.main"
+                            : "transparent",
+                        borderColor: "rgba(255, 255, 255, 0.23)",
+                        color: "white",
+                        "&:hover": {
+                          borderColor: "rgba(255, 255, 255, 0.5)",
+                          backgroundColor:
+                            sortBy === "primary_release_date.desc"
+                              ? "primary.dark"
+                              : "rgba(255, 255, 255, 0.08)",
+                        },
+                      }}
+                    >
+                      Сначала новые
+                    </Button>
+                    <Button
+                      variant={
+                        sortBy === "primary_release_date.asc"
+                          ? "contained"
+                          : "outlined"
+                      }
+                      onClick={() =>
+                        handleSortChange({
+                          target: { value: "primary_release_date.asc" },
+                        })
+                      }
+                      sx={{
+                        borderRadius: "20px",
+                        textTransform: "none",
+                        minWidth: "auto",
+                        whiteSpace: "nowrap",
+                        px: 2,
+                        py: 0.75,
+                        fontSize: "0.875rem",
+                        backgroundColor:
+                          sortBy === "primary_release_date.asc"
+                            ? "primary.main"
+                            : "transparent",
+                        borderColor: "rgba(255, 255, 255, 0.23)",
+                        color: "white",
+                        "&:hover": {
+                          borderColor: "rgba(255, 255, 255, 0.5)",
+                          backgroundColor:
+                            sortBy === "primary_release_date.asc"
+                              ? "primary.dark"
+                              : "rgba(255, 255, 255, 0.08)",
+                        },
+                      }}
+                    >
+                      Сначала старые
+                    </Button>
+                  </Box>
+                )}
+              </Box>
               <Box sx={{ position: "relative" }}>
                 <Grid container spacing={2}>
                   {loading && page === 1

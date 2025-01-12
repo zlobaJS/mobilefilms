@@ -760,6 +760,13 @@ function AppRoutes({ movies, isLoading }: { movies: any; isLoading: boolean }) {
                       categoryId="war"
                       onMovieSelect={handleMovieSelect}
                     />
+                    <MovieSlider
+                      title="Российские фильмы"
+                      movies={movies.ruMovies}
+                      loading={isLoading}
+                      categoryId="ru-movies"
+                      onMovieSelect={handleMovieSelect}
+                    />
                   </Box>
                 </motion.div>
               }
@@ -884,7 +891,23 @@ function AppRoutes({ movies, isLoading }: { movies: any; isLoading: boolean }) {
 function App() {
   const [isLoading, setIsLoading] = useState(true);
   const [contentLoaded, setContentLoaded] = useState(false);
-  const [movies, setMovies] = useState({
+  const [movies, setMovies] = useState<{
+    watchingToday: Movie[];
+    trendingToday: Movie[];
+    trendingWeek: Movie[];
+    popular: Movie[];
+    horror: Movie[];
+    action: Movie[];
+    comedy: Movie[];
+    scifi: Movie[];
+    thriller: Movie[];
+    western: Movie[];
+    drama: Movie[];
+    war: Movie[];
+    backdrop: Movie[];
+    fantasy: Movie[];
+    ruMovies: Movie[];
+  }>({
     watchingToday: [],
     trendingToday: [],
     trendingWeek: [],
@@ -899,6 +922,7 @@ function App() {
     war: [],
     backdrop: [],
     fantasy: [],
+    ruMovies: [],
   });
   const startTimeRef = useRef(Date.now());
   const contentRef = useRef<HTMLDivElement>(null);
@@ -906,7 +930,6 @@ function App() {
   useEffect(() => {
     const initializeApp = async () => {
       try {
-        // 1. Загружаем все данные
         const [
           backdropData,
           nowPlayingData,
@@ -922,6 +945,7 @@ function App() {
           dramaData,
           warData,
           fantasyData,
+          ruMoviesData,
         ] = await Promise.all([
           getMovies.popular(),
           getMovies.nowPlaying(),
@@ -937,11 +961,11 @@ function App() {
           getMovies.byGenre(GENRES.DRAMA),
           getMovies.byGenre(GENRES.WAR),
           getMovies.byGenre(GENRES.FANTASY),
+          getMovies.byCountry("RU"),
         ]);
 
         const backdropMovies = backdropData.results.slice(0, 5);
 
-        // 2. Устанавливаем данные
         setMovies({
           watchingToday: nowPlayingData.results,
           trendingToday: trendingTodayData.results,
@@ -957,18 +981,16 @@ function App() {
           war: warData.results,
           backdrop: backdropMovies,
           fantasy: fantasyData.results,
+          ruMovies: ruMoviesData.results,
         });
 
-        // 3. Отмечаем, что контент загружен
         setContentLoaded(true);
 
-        // 4. Вычисляем оставшееся время для splash screen
         const currentTime = Date.now();
         const elapsedTime = currentTime - startTimeRef.current;
         const minDisplayTime = 3000;
         const remainingTime = Math.max(minDisplayTime - elapsedTime, 500);
 
-        // 5. Ждем оставшееся время и скрываем splash
         setTimeout(() => {
           setIsLoading(false);
         }, remainingTime);
@@ -997,10 +1019,7 @@ function App() {
                 height: "100%",
               }}
             >
-              <AppRoutes
-                movies={movies}
-                isLoading={!contentLoaded} // Используем contentLoaded для скелетонов
-              />
+              <AppRoutes movies={movies} isLoading={!contentLoaded} />
             </div>
 
             <AnimatePresence mode="wait">
