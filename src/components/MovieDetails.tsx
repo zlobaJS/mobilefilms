@@ -1195,7 +1195,9 @@ export const MovieDetails = ({
                             },
                           }}
                         >
-                          {new Date(currentMovie?.release_date).getFullYear()}
+                          {new Date(
+                            currentMovie?.release_date || ""
+                          ).getFullYear()}
                         </Typography>
                       </Tooltip>
                     ) : (
@@ -1220,7 +1222,9 @@ export const MovieDetails = ({
                             },
                           }}
                         >
-                          {new Date(currentMovie?.release_date).getFullYear()}
+                          {new Date(
+                            currentMovie?.release_date || ""
+                          ).getFullYear()}
                         </Typography>
                       </Tooltip>
                     )}
