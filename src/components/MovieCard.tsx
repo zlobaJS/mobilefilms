@@ -1,8 +1,16 @@
-import { Box, CardMedia, Typography, Skeleton } from "@mui/material";
+import {
+  Box,
+  CardMedia,
+  Typography,
+  Skeleton,
+  IconButton,
+} from "@mui/material";
 import { useState } from "react";
 import { imageUrl } from "../api/tmdb";
 import { useNavigate } from "react-router-dom";
 import ImageNotSupportedIcon from "@mui/icons-material/ImageNotSupported";
+import BookmarkRemoveIcon from "@mui/icons-material/BookmarkRemove";
+import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 
 interface Movie {
   id: number;
@@ -19,6 +27,9 @@ interface MovieCardProps {
   movie: Movie;
   onClick?: () => void;
   showTitle?: boolean;
+  showRemoveButtons?: boolean;
+  onRemoveFromFavorites?: () => void;
+  onRemoveFromWatched?: () => void;
 }
 
 export const MovieCardSkeleton = () => {
@@ -74,11 +85,17 @@ export const MovieCard = ({
   movie,
   onClick,
   showTitle = false,
+  showRemoveButtons = false,
+  onRemoveFromFavorites,
+  onRemoveFromWatched,
 }: MovieCardProps) => {
   const navigate = useNavigate();
   const [imageLoaded, setImageLoaded] = useState(false);
 
-  const handleOpenDetails = () => {
+  const handleOpenDetails = (e: React.MouseEvent) => {
+    if ((e.target as HTMLElement).closest(".remove-button")) {
+      return;
+    }
     navigate(`/movie/${movie.id}`);
   };
 
@@ -89,8 +106,62 @@ export const MovieCard = ({
         display: "flex",
         flexDirection: "column",
         width: "100%",
+        position: "relative",
       }}
     >
+      {showRemoveButtons && (
+        <Box
+          className="remove-buttons"
+          sx={{
+            position: "absolute",
+            top: 8,
+            right: 8,
+            zIndex: 2,
+            display: "flex",
+            flexDirection: "column",
+            gap: 1,
+          }}
+        >
+          {onRemoveFromFavorites && (
+            <IconButton
+              className="remove-button"
+              size="small"
+              onClick={(e) => {
+                e.stopPropagation();
+                onRemoveFromFavorites();
+              }}
+              sx={{
+                bgcolor: "rgba(0, 0, 0, 0.6)",
+                color: "white",
+                "&:hover": {
+                  bgcolor: "rgba(255, 0, 0, 0.8)",
+                },
+              }}
+            >
+              <BookmarkRemoveIcon />
+            </IconButton>
+          )}
+          {onRemoveFromWatched && (
+            <IconButton
+              className="remove-button"
+              size="small"
+              onClick={(e) => {
+                e.stopPropagation();
+                onRemoveFromWatched();
+              }}
+              sx={{
+                bgcolor: "rgba(0, 0, 0, 0.6)",
+                color: "white",
+                "&:hover": {
+                  bgcolor: "rgba(255, 0, 0, 0.8)",
+                },
+              }}
+            >
+              <VisibilityOffIcon />
+            </IconButton>
+          )}
+        </Box>
+      )}
       <Box
         sx={{
           position: "relative",

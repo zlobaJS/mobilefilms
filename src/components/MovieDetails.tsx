@@ -17,10 +17,11 @@ import {
 import CloseIcon from "@mui/icons-material/Close";
 import ShareIcon from "@mui/icons-material/Share";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
-import DownloadIcon from "@mui/icons-material/Download";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import BookmarkBorderIcon from "@mui/icons-material/BookmarkBorder";
 import BookmarkIcon from "@mui/icons-material/Bookmark";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import {
   imageUrl,
   getMovieImages,
@@ -45,6 +46,7 @@ import { isIOS, isAndroid } from "react-device-detect";
 import ReactPlayer from "react-player";
 import { useSelector } from "react-redux";
 import { RootState } from "../store/store";
+import { useWatched } from "../hooks/useWatched";
 
 declare module "@mui/material/styles" {
   interface BreakpointOverrides {
@@ -79,6 +81,7 @@ interface MovieDetailsProps {
   onClose: () => void;
   onMovieSelect?: (movie: any) => void;
   isPage?: boolean;
+  updateTrigger?: number;
 }
 
 interface ProductionCountry {
@@ -162,6 +165,7 @@ export const MovieDetails = ({
   onClose,
   onMovieSelect,
   isPage = false,
+  updateTrigger = 0,
 }: MovieDetailsProps) => {
   const theme = useTheme();
   theme.breakpoints.values = {
@@ -197,6 +201,7 @@ export const MovieDetails = ({
   );
   const [certification, setCertification] = useState<string | null>(null);
   const [showMobileTooltip, setShowMobileTooltip] = useState(false);
+  const { addToWatched, removeFromWatched, isWatched } = useWatched();
 
   // Добавляем useMediaQuery для определения мобильного разрешения
   const isMobileView = useMediaQuery(theme.breakpoints.down("sm"));
@@ -647,6 +652,24 @@ export const MovieDetails = ({
   useEffect(() => {
     console.log("Current certification:", certification);
   }, [certification]);
+
+  const handleWatchedClick = () => {
+    if (currentMovie) {
+      if (isWatched(currentMovie.id)) {
+        removeFromWatched(currentMovie.id);
+      } else {
+        addToWatched(currentMovie);
+      }
+    }
+  };
+
+  // Добавим эффект для обновления состояния кнопок
+  useEffect(() => {
+    if (currentMovie) {
+      // Обновляем состояние при изменении updateTrigger
+      setCurrentMovie({ ...currentMovie });
+    }
+  }, [updateTrigger]);
 
   if (!currentMovie && !movieId) return null;
 
@@ -1435,15 +1458,27 @@ export const MovieDetails = ({
                         <ShareIcon />
                       </IconButton>
                       <IconButton
+                        onClick={handleWatchedClick}
                         sx={{
                           color: "white",
-                          bgcolor: "rgb(65 67 65 / 68%)",
+                          background: isWatched(currentMovie?.id || 0)
+                            ? "linear-gradient(45deg, #2196F3 30%, #21CBF3 90%)"
+                            : "rgb(65 67 65 / 68%)",
+                          boxShadow: isWatched(currentMovie?.id || 0)
+                            ? "0 3px 5px 2px rgba(33, 203, 243, .3)"
+                            : "none",
                           "&:hover": {
-                            bgcolor: "rgb(65 67 65 / 88%)",
+                            background: isWatched(currentMovie?.id || 0)
+                              ? "linear-gradient(45deg, #1976D2 30%, #00B4E5 90%)"
+                              : "rgb(65 67 65 / 88%)",
                           },
                         }}
                       >
-                        <DownloadIcon />
+                        {isWatched(currentMovie?.id || 0) ? (
+                          <VisibilityOffIcon />
+                        ) : (
+                          <VisibilityIcon />
+                        )}
                       </IconButton>
                       <IconButton
                         sx={{

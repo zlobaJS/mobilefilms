@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useCallback } from "react";
 
 export const useFavorites = () => {
   const [favorites, setFavorites] = useState<any[]>(() => {
@@ -6,26 +6,31 @@ export const useFavorites = () => {
     return saved ? JSON.parse(saved) : [];
   });
 
-  useEffect(() => {
-    localStorage.setItem("favorites", JSON.stringify(favorites));
-  }, [favorites]);
-
-  const addToFavorites = (movie: any) => {
+  const addToFavorites = useCallback((movie: any) => {
     setFavorites((prev) => {
       if (!prev.some((item) => item.id === movie.id)) {
-        return [movie, ...prev];
+        const updated = [movie, ...prev];
+        localStorage.setItem("favorites", JSON.stringify(updated));
+        return updated;
       }
       return prev;
     });
-  };
+  }, []);
 
-  const removeFromFavorites = (movieId: number) => {
-    setFavorites((prev) => prev.filter((movie) => movie.id !== movieId));
-  };
+  const removeFromFavorites = useCallback((movieId: number) => {
+    setFavorites((prev) => {
+      const updated = prev.filter((movie) => movie.id !== movieId);
+      localStorage.setItem("favorites", JSON.stringify(updated));
+      return updated;
+    });
+  }, []);
 
-  const isFavorite = (movieId: number) => {
-    return favorites.some((movie) => movie.id === movieId);
-  };
+  const isFavorite = useCallback(
+    (movieId: number) => {
+      return favorites.some((movie) => movie.id === movieId);
+    },
+    [favorites]
+  );
 
   return { favorites, addToFavorites, removeFromFavorites, isFavorite };
 };

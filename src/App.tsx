@@ -45,6 +45,7 @@ import { imageUrl } from "./api/tmdb";
 import { AllFavoritesPage } from "./pages/AllFavoritesPage";
 import { MovieDetailsPage } from "./pages/MovieDetailsPage";
 import { SettingsPage } from "./pages/SettingsPage";
+import { AllWatchedPage } from "./pages/AllWatchedPage";
 const darkTheme = createTheme({
   palette: {
     mode: "dark",
@@ -821,9 +822,10 @@ function AppRoutes({ movies, isLoading }: { movies: any; isLoading: boolean }) {
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
-                  transition={{ duration: 0.3 }}
                 >
-                  <FavoritesPage />
+                  <Box sx={{ pb: { xs: 7, sm: 0 } }}>
+                    <FavoritesPage />
+                  </Box>
                 </motion.div>
               }
             />
@@ -893,6 +895,19 @@ function AppRoutes({ movies, isLoading }: { movies: any; isLoading: boolean }) {
                   transition={{ duration: 0.3 }}
                 >
                   <MovieDetailsPage />
+                </motion.div>
+              }
+            />
+            <Route
+              path="/watched/all"
+              element={
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <AllWatchedPage />
                 </motion.div>
               }
             />

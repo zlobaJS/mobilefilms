@@ -34,6 +34,9 @@ interface MovieSliderProps {
   showAllText?: string;
   showAllRoute?: string;
   showTitle?: boolean;
+  showRemoveButtons?: boolean;
+  onRemoveFromFavorites?: (movieId: number) => void;
+  onRemoveFromWatched?: (movieId: number) => void;
 }
 
 export const MovieSlider = ({
@@ -45,6 +48,9 @@ export const MovieSlider = ({
   showAllText = "Еще",
   showAllRoute,
   showTitle,
+  showRemoveButtons = false,
+  onRemoveFromFavorites,
+  onRemoveFromWatched,
 }: MovieSliderProps) => {
   const theme = useTheme();
   const navigate = useNavigate();
@@ -55,24 +61,25 @@ export const MovieSlider = ({
     navigate(showAllRoute || `/category/${categoryId}`);
   };
 
-  const memoizedMovies = useMemo(() => movies, [movies]);
+  const validMovies = useMemo(
+    () =>
+      movies?.filter(
+        (movie) =>
+          movie &&
+          typeof movie.id === "number" &&
+          movie.title &&
+          (movie.vote_average === undefined ||
+            (typeof movie.vote_average === "number" &&
+              !isNaN(movie.vote_average)))
+      ) || [],
+    [movies]
+  );
 
   const getSlidesPerView = () => {
     if (isMobile) return 2.2;
     if (isTablet) return 4.2;
     return 6.2;
   };
-
-  const validMovies =
-    memoizedMovies?.filter(
-      (movie) =>
-        movie &&
-        typeof movie.id === "number" &&
-        movie.title &&
-        (movie.vote_average === undefined ||
-          (typeof movie.vote_average === "number" &&
-            !isNaN(movie.vote_average)))
-    ) || [];
 
   if (loading) {
     return (
@@ -236,6 +243,17 @@ export const MovieSlider = ({
                     }
                   }}
                   showTitle={showTitle}
+                  showRemoveButtons={showRemoveButtons}
+                  onRemoveFromFavorites={
+                    onRemoveFromFavorites
+                      ? () => onRemoveFromFavorites(movie.id)
+                      : undefined
+                  }
+                  onRemoveFromWatched={
+                    onRemoveFromWatched
+                      ? () => onRemoveFromWatched(movie.id)
+                      : undefined
+                  }
                 />
               </Box>
             </Box>
