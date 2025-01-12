@@ -38,7 +38,7 @@ import { FreeMode } from "swiper/modules";
 import "swiper/css";
 import { useNavigate } from "react-router-dom";
 import { useFavorites } from "../hooks/useFavorites";
-import { isIOS, isAndroid, isMobile } from "react-device-detect";
+import { isIOS, isAndroid } from "react-device-detect";
 import ReactPlayer from "react-player";
 
 declare module "@mui/material/styles" {
