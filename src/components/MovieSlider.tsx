@@ -11,7 +11,6 @@ import { useNavigate } from "react-router-dom";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import "swiper/css";
 import "swiper/css/navigation";
-import { Navigation } from "swiper/modules";
 import { useMemo } from "react";
 import { FreeMode } from "swiper/modules";
 
@@ -82,7 +81,7 @@ export const MovieSlider = ({
           zIndex: 5,
           ...(title === "Сейчас смотрят" && {
             mt: {
-              xs: 0,
+              xs: "-116px",
               sm: 0,
             },
           }),
@@ -111,19 +110,18 @@ export const MovieSlider = ({
           </Typography>
           <Button
             endIcon={<ArrowForwardIosIcon />}
-            onClick={handleMoreClick}
             disabled
             sx={{
-              color: "grey.400",
+              color: "rgba(255,255,255,0.3)",
             }}
           >
-            Еще
+            {showAllText}
           </Button>
         </Box>
         <Swiper
-          modules={[Navigation]}
-          navigation
-          spaceBetween={12}
+          modules={[FreeMode]}
+          freeMode={true}
+          spaceBetween={isMobile ? 0 : 12}
           slidesPerView={getSlidesPerView()}
           style={{ padding: "0 16px" }}
         >
@@ -133,10 +131,18 @@ export const MovieSlider = ({
                 sx={{
                   display: "flex",
                   flexDirection: "column",
+                  alignItems: "center",
                   height: "100%",
+                  width: "100%",
                 }}
               >
-                <Box sx={{ aspectRatio: "2/3", marginBottom: 1 }}>
+                <Box
+                  sx={{
+                    aspectRatio: isMobile ? "2/3" : "1/1.5",
+                    width: isMobile ? "95%" : "100%",
+                    marginBottom: 1,
+                  }}
+                >
                   <MovieCardSkeleton />
                 </Box>
               </Box>

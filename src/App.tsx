@@ -44,6 +44,7 @@ import { MovieCard } from "./components/MovieCard";
 import { imageUrl } from "./api/tmdb";
 import { AllFavoritesPage } from "./pages/AllFavoritesPage";
 import { MovieDetailsPage } from "./pages/MovieDetailsPage";
+import { SettingsPage } from "./pages/SettingsPage";
 const darkTheme = createTheme({
   palette: {
     mode: "dark",
@@ -596,7 +597,7 @@ function SearchPage() {
   );
 }
 
-function AppRoutes({ movies }: { movies: any }) {
+function AppRoutes({ movies, isLoading }: { movies: any; isLoading: boolean }) {
   const location = useLocation();
   const [_, setSelectedMovie] = useState<any>(null);
 
@@ -671,91 +672,91 @@ function AppRoutes({ movies }: { movies: any }) {
                     <MovieSlider
                       title="Сейчас смотрят"
                       movies={movies.watchingToday}
-                      loading={false}
+                      loading={isLoading}
                       categoryId="now-playing"
                       onMovieSelect={handleMovieSelect}
                     />
                     <MovieSlider
                       title="Сегодня в тренде"
                       movies={movies.trendingToday}
-                      loading={false}
+                      loading={isLoading}
                       categoryId="trending-today"
                       onMovieSelect={handleMovieSelect}
                     />
                     <MovieSlider
                       title="За неделю в тренде"
                       movies={movies.trendingWeek}
-                      loading={false}
+                      loading={isLoading}
                       categoryId="trending-week"
                       onMovieSelect={handleMovieSelect}
                     />
                     <MovieSlider
                       title="Популярное"
                       movies={movies.popular}
-                      loading={false}
+                      loading={isLoading}
                       categoryId="popular"
                       onMovieSelect={handleMovieSelect}
                     />
                     <MovieSlider
                       title="Ужасы"
                       movies={movies.horror}
-                      loading={false}
+                      loading={isLoading}
                       categoryId="horror"
                       onMovieSelect={handleMovieSelect}
                     />
                     <MovieSlider
                       title="Боевики"
                       movies={movies.action}
-                      loading={false}
+                      loading={isLoading}
                       categoryId="action"
                       onMovieSelect={handleMovieSelect}
                     />
                     <MovieSlider
                       title="Комедии"
                       movies={movies.comedy}
-                      loading={false}
+                      loading={isLoading}
                       categoryId="comedy"
                       onMovieSelect={handleMovieSelect}
                     />
                     <MovieSlider
                       title="Фантастика"
                       movies={movies.scifi}
-                      loading={false}
+                      loading={isLoading}
                       categoryId="scifi"
                       onMovieSelect={handleMovieSelect}
                     />
                     <MovieSlider
                       title="Фэнтези"
                       movies={movies.fantasy}
-                      loading={false}
+                      loading={isLoading}
                       categoryId="fantasy"
                       onMovieSelect={handleMovieSelect}
                     />
                     <MovieSlider
                       title="Триллеры"
                       movies={movies.thriller}
-                      loading={false}
+                      loading={isLoading}
                       categoryId="thriller"
                       onMovieSelect={handleMovieSelect}
                     />
                     <MovieSlider
                       title="Вестерны"
                       movies={movies.western}
-                      loading={false}
+                      loading={isLoading}
                       categoryId="western"
                       onMovieSelect={handleMovieSelect}
                     />
                     <MovieSlider
                       title="Драмы"
                       movies={movies.drama}
-                      loading={false}
+                      loading={isLoading}
                       categoryId="drama"
                       onMovieSelect={handleMovieSelect}
                     />
                     <MovieSlider
                       title="Военные"
                       movies={movies.war}
-                      loading={false}
+                      loading={isLoading}
                       categoryId="war"
                       onMovieSelect={handleMovieSelect}
                     />
@@ -813,9 +814,7 @@ function AppRoutes({ movies }: { movies: any }) {
                   transition={{ duration: 0.1 }}
                   key="settings"
                 >
-                  <Box sx={{ p: 3 }}>
-                    <Typography variant="h4">Настройки</Typography>
-                  </Box>
+                  <SettingsPage />
                 </motion.div>
               }
             />
@@ -884,6 +883,7 @@ function AppRoutes({ movies }: { movies: any }) {
 
 function App() {
   const [isLoading, setIsLoading] = useState(true);
+  const [contentLoaded, setContentLoaded] = useState(false);
   const [movies, setMovies] = useState({
     watchingToday: [],
     trendingToday: [],
@@ -959,37 +959,23 @@ function App() {
           fantasy: fantasyData.results,
         });
 
-        // 3. Ждем пока контент отрендерится
-        await new Promise((resolve) => setTimeout(resolve, 100));
+        // 3. Отмечаем, что контент загружен
+        setContentLoaded(true);
 
-        // 4. Предварительно загружаем изображения для backdrop
-        await Promise.all(
-          backdropMovies.map((movie: { backdrop_path: string }) => {
-            return new Promise((resolve) => {
-              const img = new Image();
-              img.src = `https://image.tmdb.org/t/p/original${movie.backdrop_path}`;
-              img.onload = resolve;
-              img.onerror = resolve;
-            });
-          })
-        );
-
-        // 5. Вычисляем оставшееся время для splash screen
+        // 4. Вычисляем оставшееся время для splash screen
         const currentTime = Date.now();
         const elapsedTime = currentTime - startTimeRef.current;
         const minDisplayTime = 3000;
         const remainingTime = Math.max(minDisplayTime - elapsedTime, 500);
 
-        // 6. Ждем оставшееся время и скрываем splash
+        // 5. Ждем оставшееся время и скрываем splash
         setTimeout(() => {
-          if (contentRef.current) {
-            contentRef.current.style.visibility = "visible";
-          }
           setIsLoading(false);
         }, remainingTime);
       } catch (error) {
         console.error("Error initializing app:", error);
         setIsLoading(false);
+        setContentLoaded(true);
       }
     };
 
@@ -1002,7 +988,6 @@ function App() {
         <CastProvider>
           <ThemeProvider theme={darkTheme}>
             <CssBaseline />
-            {/* Рендерим контент сразу, но скрываем его */}
             <div
               ref={contentRef}
               style={{
@@ -1012,10 +997,12 @@ function App() {
                 height: "100%",
               }}
             >
-              <AppRoutes movies={movies} />
+              <AppRoutes
+                movies={movies}
+                isLoading={!contentLoaded} // Используем contentLoaded для скелетонов
+              />
             </div>
 
-            {/* Показываем splash поверх контента */}
             <AnimatePresence mode="wait">
               {isLoading && (
                 <motion.div

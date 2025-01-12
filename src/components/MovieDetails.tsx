@@ -40,6 +40,8 @@ import { useNavigate } from "react-router-dom";
 import { useFavorites } from "../hooks/useFavorites";
 import { isIOS, isAndroid } from "react-device-detect";
 import ReactPlayer from "react-player";
+import { useSelector } from "react-redux";
+import { RootState } from "../store/store";
 
 declare module "@mui/material/styles" {
   interface BreakpointOverrides {
@@ -168,6 +170,9 @@ export const MovieDetails = ({
   const { addToFavorites, removeFromFavorites, isFavorite } = useFavorites();
   const [trailerUrl, setTrailerUrl] = useState<string | null>(null);
   const [showTrailer, setShowTrailer] = useState(false);
+  const autoplayTrailer = useSelector(
+    (state: RootState) => state.settings.autoplayTrailer
+  );
 
   // Модифицируем fetchData
   const fetchData = async (movieData: any) => {
@@ -468,60 +473,60 @@ export const MovieDetails = ({
     }
   };
 
-  // Обновляем функцию fetchTrailer
-  const fetchTrailer = async (movieId: number) => {
-    try {
-      const videos = await getMovieVideos(movieId);
-
-      // Ищем сначала русский трейлер
-      let trailer = videos.find(
-        (video: any) =>
-          video.type === "Trailer" &&
-          video.site === "YouTube" &&
-          video.iso_639_1 === "ru"
-      );
-
-      // Если русского нет, ищем английский трейлер
-      if (!trailer) {
-        trailer = videos.find(
-          (video: any) =>
-            video.type === "Trailer" &&
-            video.site === "YouTube" &&
-            video.iso_639_1 === "en"
-        );
-      }
-
-      // Если трейлера нет, ищем тизер
-      if (!trailer) {
-        trailer = videos.find(
-          (video: any) => video.type === "Teaser" && video.site === "YouTube"
-        );
-      }
-
-      if (trailer) {
-        setTrailerUrl(`https://www.youtube.com/watch?v=${trailer.key}`);
-        setTimeout(() => {
-          setShowTrailer(true);
-        }, 3000);
-      }
-    } catch (error) {
-      console.error("Error fetching trailer:", error);
-    }
-  };
-
   // Добавьте эффект для загрузки трейлера (после других useEffect)
   useEffect(() => {
     if (currentMovie?.id && open) {
       setShowTrailer(false);
       setTrailerUrl(null);
-      fetchTrailer(currentMovie.id);
+
+      const loadTrailer = async () => {
+        try {
+          const videos = await getMovieVideos(currentMovie.id);
+          let trailer = videos.find(
+            (video: any) =>
+              video.type === "Trailer" &&
+              video.site === "YouTube" &&
+              video.iso_639_1 === "ru"
+          );
+
+          if (!trailer) {
+            trailer = videos.find(
+              (video: any) =>
+                video.type === "Trailer" &&
+                video.site === "YouTube" &&
+                video.iso_639_1 === "en"
+            );
+          }
+
+          if (!trailer) {
+            trailer = videos.find(
+              (video: any) =>
+                video.type === "Teaser" && video.site === "YouTube"
+            );
+          }
+
+          if (trailer) {
+            setTrailerUrl(`https://www.youtube.com/watch?v=${trailer.key}`);
+            // Используем autoplayTrailer здесь
+            if (autoplayTrailer) {
+              setTimeout(() => {
+                setShowTrailer(true);
+              }, 3000);
+            }
+          }
+        } catch (error) {
+          console.error("Error fetching trailer:", error);
+        }
+      };
+
+      loadTrailer();
     }
 
     return () => {
       setShowTrailer(false);
       setTrailerUrl(null);
     };
-  }, [currentMovie?.id, open]);
+  }, [currentMovie?.id, open, autoplayTrailer]); // Добавляем autoplayTrailer в зависимости
 
   // Добавьте новый useEffect для контроля времени воспроизведения трейлера
   useEffect(() => {
@@ -540,6 +545,12 @@ export const MovieDetails = ({
       }
     };
   }, [showTrailer, trailerUrl]);
+
+  useEffect(() => {
+    if (open && autoplayTrailer) {
+      // Логика автовоспроизведения
+    }
+  }, [open, autoplayTrailer]);
 
   if (!currentMovie && !movieId) return null;
 
