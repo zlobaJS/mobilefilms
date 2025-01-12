@@ -91,6 +91,15 @@ interface Genre {
   name: string;
 }
 
+interface CrewMember {
+  id: number;
+  job: string;
+  department: string;
+  jobs?: string[];
+  isCreator?: boolean;
+  [key: string]: any;
+}
+
 // Добавляем объект с переводами стран
 const countryTranslations: { [key: string]: string } = {
   "United States of America": "США",
@@ -239,7 +248,7 @@ export const MovieDetails = ({
 
         // Разделяем актеров и создателей
         const actors =
-          credits?.cast?.slice(0, 15).map((person) => ({
+          credits?.cast?.slice(0, 15).map((person: CrewMember) => ({
             ...person,
             isActor: true,
             department: "Acting",
@@ -248,13 +257,13 @@ export const MovieDetails = ({
         const creators =
           credits?.crew
             ?.filter(
-              (person: any) =>
+              (person: CrewMember) =>
                 person.job === "Director" ||
                 person.job === "Screenplay" ||
                 person.job === "Writer"
             )
             // Группируем по id человека
-            .reduce((acc: any[], person: any) => {
+            .reduce((acc: CrewMember[], person: CrewMember) => {
               const existingPerson = acc.find((p) => p.id === person.id);
               if (existingPerson) {
                 // Если человек уже есть, добавляем ему новую роль
@@ -1521,7 +1530,7 @@ export const MovieDetails = ({
                         >
                           {cast
                             .filter(
-                              (person) =>
+                              (person: CrewMember) =>
                                 person.isActor &&
                                 person.department === "Acting" &&
                                 !person.isCreator
@@ -1660,7 +1669,7 @@ export const MovieDetails = ({
                           }}
                         >
                           {cast
-                            .filter((person) => person.isCreator)
+                            .filter((person: CrewMember) => person.isCreator)
                             .map((person) => (
                               <SwiperSlide
                                 key={person.id}
