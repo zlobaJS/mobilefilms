@@ -221,10 +221,9 @@ function MobileNavigation() {
           width: "100%",
           zIndex: 1300,
           display: { xs: "block", sm: "none" },
-          pb: "env(safe-area-inset-bottom)",
-          backgroundColor: "rgba(20, 20, 20, 0.8)",
-          backdropFilter: "blur(10px)",
-          WebkitBackdropFilter: "blur(10px)",
+          background:
+            "linear-gradient(to top, rgba(20, 20, 20, 1) 0%, rgba(20, 20, 20, 0) 100%)",
+          paddingTop: "20px",
         }}
       >
         <BottomNavigation
@@ -233,6 +232,7 @@ function MobileNavigation() {
           sx={{
             bgcolor: "transparent",
             height: "56px",
+            paddingBottom: "env(safe-area-inset-bottom)",
             "& .MuiBottomNavigationAction-root": {
               minWidth: "auto",
               padding: 0,
