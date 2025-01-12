@@ -677,6 +677,7 @@ function AppRoutes({ movies, isLoading }: { movies: any; isLoading: boolean }) {
                       loading={isLoading}
                       categoryId="now-playing"
                       onMovieSelect={handleMovieSelect}
+                      showTitle={true}
                     />
                     <MovieSlider
                       title="Сегодня в тренде"
@@ -684,6 +685,7 @@ function AppRoutes({ movies, isLoading }: { movies: any; isLoading: boolean }) {
                       loading={isLoading}
                       categoryId="trending-today"
                       onMovieSelect={handleMovieSelect}
+                      showTitle={true}
                     />
                     <MovieSlider
                       title="За неделю в тренде"
@@ -691,6 +693,7 @@ function AppRoutes({ movies, isLoading }: { movies: any; isLoading: boolean }) {
                       loading={isLoading}
                       categoryId="trending-week"
                       onMovieSelect={handleMovieSelect}
+                      showTitle={true}
                     />
                     <MovieSlider
                       title="Популярное"
@@ -698,6 +701,7 @@ function AppRoutes({ movies, isLoading }: { movies: any; isLoading: boolean }) {
                       loading={isLoading}
                       categoryId="popular"
                       onMovieSelect={handleMovieSelect}
+                      showTitle={true}
                     />
                     <MovieSlider
                       title="Ужасы"
@@ -705,6 +709,7 @@ function AppRoutes({ movies, isLoading }: { movies: any; isLoading: boolean }) {
                       loading={isLoading}
                       categoryId="horror"
                       onMovieSelect={handleMovieSelect}
+                      showTitle={true}
                     />
                     <MovieSlider
                       title="Боевики"
@@ -712,6 +717,7 @@ function AppRoutes({ movies, isLoading }: { movies: any; isLoading: boolean }) {
                       loading={isLoading}
                       categoryId="action"
                       onMovieSelect={handleMovieSelect}
+                      showTitle={true}
                     />
                     <MovieSlider
                       title="Комедии"
@@ -719,6 +725,7 @@ function AppRoutes({ movies, isLoading }: { movies: any; isLoading: boolean }) {
                       loading={isLoading}
                       categoryId="comedy"
                       onMovieSelect={handleMovieSelect}
+                      showTitle={true}
                     />
                     <MovieSlider
                       title="Фантастика"
@@ -726,6 +733,7 @@ function AppRoutes({ movies, isLoading }: { movies: any; isLoading: boolean }) {
                       loading={isLoading}
                       categoryId="scifi"
                       onMovieSelect={handleMovieSelect}
+                      showTitle={true}
                     />
                     <MovieSlider
                       title="Фэнтези"
@@ -733,6 +741,7 @@ function AppRoutes({ movies, isLoading }: { movies: any; isLoading: boolean }) {
                       loading={isLoading}
                       categoryId="fantasy"
                       onMovieSelect={handleMovieSelect}
+                      showTitle={true}
                     />
                     <MovieSlider
                       title="Триллеры"
@@ -740,6 +749,7 @@ function AppRoutes({ movies, isLoading }: { movies: any; isLoading: boolean }) {
                       loading={isLoading}
                       categoryId="thriller"
                       onMovieSelect={handleMovieSelect}
+                      showTitle={true}
                     />
                     <MovieSlider
                       title="Вестерны"
@@ -747,6 +757,7 @@ function AppRoutes({ movies, isLoading }: { movies: any; isLoading: boolean }) {
                       loading={isLoading}
                       categoryId="western"
                       onMovieSelect={handleMovieSelect}
+                      showTitle={true}
                     />
                     <MovieSlider
                       title="Драмы"
@@ -754,6 +765,7 @@ function AppRoutes({ movies, isLoading }: { movies: any; isLoading: boolean }) {
                       loading={isLoading}
                       categoryId="drama"
                       onMovieSelect={handleMovieSelect}
+                      showTitle={true}
                     />
                     <MovieSlider
                       title="Военные"
@@ -761,6 +773,7 @@ function AppRoutes({ movies, isLoading }: { movies: any; isLoading: boolean }) {
                       loading={isLoading}
                       categoryId="war"
                       onMovieSelect={handleMovieSelect}
+                      showTitle={true}
                     />
                     <MovieSlider
                       title="Российские фильмы"
@@ -768,6 +781,7 @@ function AppRoutes({ movies, isLoading }: { movies: any; isLoading: boolean }) {
                       loading={isLoading}
                       categoryId="ru-movies"
                       onMovieSelect={handleMovieSelect}
+                      showTitle={true}
                     />
                   </Box>
                 </motion.div>
