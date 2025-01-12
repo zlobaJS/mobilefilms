@@ -29,6 +29,8 @@ import {
   getMovieRecommendations,
   getMovieKeywords,
   getMovieVideos,
+  getMovieReleaseInfo,
+  AGE_RATINGS,
 } from "../api/tmdb";
 import { useEffect, useState } from "react";
 import { KinoboxPlayer } from "./KinoboxPlayer";
@@ -173,20 +175,35 @@ export const MovieDetails = ({
   const autoplayTrailer = useSelector(
     (state: RootState) => state.settings.autoplayTrailer
   );
+  const [certification, setCertification] = useState<string | null>(null);
 
   // Модифицируем fetchData
   const fetchData = async (movieData: any) => {
     if (movieData) {
       setIsLoading(true);
       try {
-        const [images, movieDetails, credits, recommendedMovies, keywordsData] =
-          await Promise.all([
-            getMovieImages(movieData.id),
-            getMovieDetails(movieData.id),
-            getMovieCredits(movieData.id),
-            getMovieRecommendations(movieData.id),
-            getMovieKeywords(movieData.id),
-          ]);
+        const [
+          images,
+          movieDetails,
+          credits,
+          recommendedMovies,
+          keywordsData,
+          releaseInfo,
+        ] = await Promise.all([
+          getMovieImages(movieData.id),
+          getMovieDetails(movieData.id),
+          getMovieCredits(movieData.id),
+          getMovieRecommendations(movieData.id),
+          getMovieKeywords(movieData.id),
+          getMovieReleaseInfo(movieData.id),
+        ]);
+
+        console.log("Movie ID:", movieData.id);
+        console.log("Release Info from API:", releaseInfo);
+        console.log("Current certification state:", certification);
+
+        // Добавим логирование для отладки
+        console.log("Release Info:", releaseInfo);
 
         // Используем backdrop из images API вместо movieData.backdrop_path
         if (movieDetails && images.backdrops?.[0]) {
@@ -207,10 +224,11 @@ export const MovieDetails = ({
         setCast(credits?.cast?.slice(0, 15) || []);
         setRecommendations(recommendedMovies || []);
         setKeywords(keywordsData);
+        setCertification(releaseInfo);
         setIsLogoLoading(false);
         setIsLoading(false);
       } catch (error) {
-        console.error(error);
+        console.error("Error in fetchData:", error);
         setIsLoading(false);
       }
     }
@@ -551,6 +569,10 @@ export const MovieDetails = ({
       // Логика автовоспроизведения
     }
   }, [open, autoplayTrailer]);
+
+  useEffect(() => {
+    console.log("Current certification:", certification);
+  }, [certification]);
 
   if (!currentMovie && !movieId) return null;
 
@@ -1060,7 +1082,7 @@ export const MovieDetails = ({
                         </Box>
                       )}
 
-                    {/* Страны производства (максимум 2) */}
+                    {/* Страны производства */}
                     {details?.production_countries && (
                       <Box
                         sx={{
@@ -1146,7 +1168,7 @@ export const MovieDetails = ({
                         </Typography>
                       )}
 
-                    {/* Жанры (максимум 2) */}
+                    {/* Жанры */}
                     {details?.genres && (
                       <Typography
                         sx={{
@@ -1161,6 +1183,30 @@ export const MovieDetails = ({
                           .join(", ")}
                       </Typography>
                     )}
+
+                    {/* Возрастной рейтинг */}
+                    {certification && (
+                      <Chip
+                        label={AGE_RATINGS[certification] || certification}
+                        sx={{
+                          backgroundColor: "transparent",
+                          color: "#888",
+                          fontSize: "0.9rem",
+                          height: "20px",
+                          minWidth: "34px",
+                          border: "1px solid rgba(255, 255, 255, 0.2)",
+                          borderRadius: "4px",
+                          "& .MuiChip-label": {
+                            padding: "0 6px",
+                            fontWeight: "500",
+                            lineHeight: 1,
+                          },
+                          "&:hover": {
+                            backgroundColor: "transparent",
+                          },
+                        }}
+                      />
+                    )}
                   </Box>
 
                   <Box
@@ -1169,6 +1215,7 @@ export const MovieDetails = ({
                       flexDirection: "row",
                       gap: isMobile ? "8px" : "16px",
                       mb: 2,
+                      mt: "21px",
                       alignItems: "center",
                       justifyContent: { xs: "center", sm: "flex-start" },
                       flexWrap: { xs: "wrap", sm: "nowrap" },
@@ -1656,7 +1703,13 @@ export const MovieDetails = ({
                                     color: "#888",
                                   }}
                                 >
-                                  {new Date(movie.release_date).getFullYear()}
+                                  {new Date(
+                                    movie.release_date
+                                  ).toLocaleDateString("ru-RU", {
+                                    day: "2-digit",
+                                    month: "2-digit",
+                                    year: "numeric",
+                                  })}
                                 </Typography>
                               </Grid>
                             ))}
@@ -1775,7 +1828,13 @@ export const MovieDetails = ({
                                     },
                                   }}
                                 >
-                                  {new Date(movie.release_date).getFullYear()}
+                                  {new Date(
+                                    movie.release_date
+                                  ).toLocaleDateString("ru-RU", {
+                                    day: "2-digit",
+                                    month: "2-digit",
+                                    year: "numeric",
+                                  })}
                                 </Typography>
                               </Box>
                             </SwiperSlide>

@@ -333,3 +333,66 @@ export const getMovieVideos = async (movieId: number) => {
     return [];
   }
 };
+
+export const getMovieReleaseInfo = async (movieId: number) => {
+  try {
+    const data = await fetchTMDB(`/movie/${movieId}/release_dates`, {});
+    console.log("Raw release dates data:", data); // Для отладки
+
+    if (!data.results) {
+      return null;
+    }
+
+    // Ищем рейтинг сначала для России
+    const ruRelease = data.results.find((r: any) => r.iso_3166_1 === "RU");
+    if (ruRelease?.release_dates?.[0]?.certification) {
+      return ruRelease.release_dates[0].certification;
+    }
+
+    // Если нет российского, ищем США
+    const usRelease = data.results.find((r: any) => r.iso_3166_1 === "US");
+    if (usRelease?.release_dates?.[0]?.certification) {
+      return usRelease.release_dates[0].certification;
+    }
+
+    // Если нет ни российского, ни американского - берем первый доступный
+    for (const country of data.results) {
+      if (country.release_dates?.[0]?.certification) {
+        return country.release_dates[0].certification;
+      }
+    }
+
+    return null;
+  } catch (error) {
+    console.error("Error fetching movie release info:", error);
+    return null;
+  }
+};
+
+export const AGE_RATINGS: { [key: string]: string } = {
+  G: "0+",
+  PG: "6+",
+  "PG-13": "13+",
+  R: "17+",
+  "NC-17": "18+",
+  // Российские рейтинги
+  "0+": "0+",
+  "6+": "6+",
+  "12+": "12+",
+  "16+": "16+",
+  "18+": "18+",
+  // Дополнительные рейтинги
+  TV14: "14+",
+  "TV-14": "14+",
+  "TV-MA": "17+",
+  "TV-PG": "6+",
+  "TV-G": "0+",
+  // Европейские рейтинги
+  U: "0+",
+  UA: "6+",
+  "12": "12+",
+  "12A": "12+",
+  "15": "15+",
+  "16": "16+",
+  "18": "18+",
+};
