@@ -765,10 +765,15 @@ export const MovieDetails = ({
                   position: "relative",
                   width: "100%",
                   height: {
-                    xs: "calc(100vw * 1.2 + env(safe-area-inset-top))",
-                    sm: "60vh",
+                    xs: "calc(100vw * 0.95 * 0.95)",
+                    sm: "105vh",
                   },
                   overflow: "hidden",
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  mt: 0,
+                  mb: { xs: 2, sm: 0 },
                 }}
               >
                 {showTrailer && trailerUrl ? (
@@ -859,39 +864,75 @@ export const MovieDetails = ({
                       width: "100%",
                       height: "100%",
                       objectFit: "cover",
-                      objectPosition: {
-                        xs: "center 15%",
-                        sm: "center top",
-                      },
+                      objectPosition: "center center",
                       opacity: isBackdropLoaded ? 1 : 0,
                       transition: "opacity 0.3s ease-out",
-                      transform: "scale(1.02)",
+                      transform: "scale(1)",
                       backgroundColor: "#000",
                       imageRendering: "high-quality",
                       WebkitBackfaceVisibility: "hidden",
                       MozBackfaceVisibility: "hidden",
                       backfaceVisibility: "hidden",
+                      borderRadius: 0,
                     }}
                     onLoad={() => setIsBackdropLoaded(true)}
                   />
                 )}
+
+                <Box
+                  sx={{
+                    position: "absolute",
+                    left: 0,
+                    bottom: 0,
+                    width: "100%",
+                    height: "75%",
+                    background: `linear-gradient(
+                      0deg,
+                      rgb(20 20 20) 0%,
+                      rgba(20, 20, 20, 0.9) 25%,
+                      rgba(20, 20, 20, 0.7) 50%,
+                      rgba(20, 20, 20, 0) 100%
+                    )`,
+                    pointerEvents: "none",
+                    zIndex: 1,
+                  }}
+                />
+
                 <Box
                   sx={{
                     position: "absolute",
                     left: 0,
                     top: 0,
-                    width: "100%",
-                    height: "calc(100% + 120px)",
+                    width: "35%",
+                    height: "100%",
                     background: `linear-gradient(
-                      rgb(103 58 183 / 0%) 0%,
-                      rgba(20, 20, 20, 0.2) 40%,
-                      rgb(20 20 20) 65%,
-                      rgb(20 20 20) 80%,
-                      rgb(20 20 20) 90%,
-                      rgb(20 20 20) 100%
+                      90deg,
+                      rgb(20 20 20) 0%,
+                      rgba(20, 20, 20, 0.8) 30%,
+                      rgba(20, 20, 20, 0.4) 60%,
+                      rgba(20, 20, 20, 0) 100%
                     )`,
-                    transition: "background 0.2s ease",
                     pointerEvents: "none",
+                    zIndex: 1,
+                  }}
+                />
+
+                <Box
+                  sx={{
+                    position: "absolute",
+                    right: 0,
+                    top: 0,
+                    width: "35%",
+                    height: "100%",
+                    background: `linear-gradient(
+                      -90deg,
+                      rgb(20 20 20) 0%,
+                      rgba(20, 20, 20, 0.8) 30%,
+                      rgba(20, 20, 20, 0.4) 60%,
+                      rgba(20, 20, 20, 0) 100%
+                    )`,
+                    pointerEvents: "none",
+                    zIndex: 1,
                   }}
                 />
               </Box>
