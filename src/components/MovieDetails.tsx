@@ -38,7 +38,7 @@ import { FreeMode } from "swiper/modules";
 import "swiper/css";
 import { useNavigate } from "react-router-dom";
 import { useFavorites } from "../hooks/useFavorites";
-import { isIOS, isAndroid } from "react-device-detect";
+import { isIOS, isAndroid, isMobile } from "react-device-detect";
 import ReactPlayer from "react-player";
 
 declare module "@mui/material/styles" {
@@ -793,6 +793,21 @@ export const MovieDetails = ({
                             playsinline: 1,
                             origin: window.location.origin,
                             start: 0,
+                            autoplay: 1,
+                            mute: 1,
+                            enablejsapi: 1,
+                            ...(isMobile && {
+                              playsinline: 1,
+                              fs: 0,
+                              controls: 0,
+                              disablekb: 1,
+                            }),
+                          },
+                          embedOptions: {
+                            autoplay: 1,
+                            controls: 0,
+                            muted: 1,
+                            playsinline: 1,
                           },
                         },
                       }}
@@ -800,14 +815,20 @@ export const MovieDetails = ({
                         position: "absolute",
                         top: "50%",
                         left: "50%",
-                        transform: "translate(-50%, -50%)",
+                        transform: "translate(-50%, -50%) scale(1.5)",
                         pointerEvents: "none",
+                        objectFit: "cover",
                       }}
                       onError={(e) => {
                         console.error("Player Error:", e);
                         setShowTrailer(false);
                       }}
-                      onReady={() => setIsBackdropLoaded(true)}
+                      onReady={(player) => {
+                        setIsBackdropLoaded(true);
+                        if (isMobile) {
+                          player.getInternalPlayer()?.playVideo();
+                        }
+                      }}
                       onEnded={() => {
                         setShowTrailer(false);
                         setTrailerUrl(null);
