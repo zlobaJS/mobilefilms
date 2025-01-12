@@ -768,7 +768,10 @@ export const MovieDetails = ({
                     xs: "calc(100vw * 1.2 + env(safe-area-inset-top))",
                     sm: "60vh",
                   },
-                  mt: "-env(safe-area-inset-top)",
+                  mt: {
+                    xs: "-env(safe-area-inset-top)",
+                    sm: 0,
+                  },
                   overflow: "hidden",
                 }}
               >
@@ -872,7 +875,10 @@ export const MovieDetails = ({
                       WebkitBackfaceVisibility: "hidden",
                       MozBackfaceVisibility: "hidden",
                       backfaceVisibility: "hidden",
-                      marginTop: "env(safe-area-inset-top)",
+                      marginTop: {
+                        xs: "env(safe-area-inset-top)",
+                        sm: 0,
+                      },
                     }}
                     onLoad={() => setIsBackdropLoaded(true)}
                   />
@@ -893,7 +899,10 @@ export const MovieDetails = ({
                       rgb(20 20 20) 100%
                     )`,
                     transition: "background 0.2s ease",
-                    marginTop: "env(safe-area-inset-top)",
+                    marginTop: {
+                      xs: "env(safe-area-inset-top)",
+                      sm: 0,
+                    },
                     pointerEvents: "none",
                   }}
                 />
