@@ -112,8 +112,7 @@ export const AllFavoritesPage = () => {
                   <Grid item xs={6} sm={4} md={3} lg={2} key={movie.id}>
                     <MovieCard
                       movie={movie}
-                      onMovieSelect={handleMovieSelect}
-                      showTitle={true}
+                      onClick={() => handleMovieSelect(movie)}
                     />
                   </Grid>
                 ))}

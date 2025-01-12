@@ -469,10 +469,18 @@ export const MovieDetails = ({
   };
 
   const handleShare = async () => {
+    if (!currentMovie) return;
+
+    // Создаем абсолютный URL для фильма
+    const movieUrl = new URL(
+      `/movie/${currentMovie.id}`,
+      window.location.origin
+    ).href;
+
     const shareData = {
-      title: currentMovie?.title,
-      text: `Смотреть ${currentMovie?.title} онлайн`,
-      url: window.location.href,
+      title: currentMovie.title,
+      text: `Смотреть ${currentMovie.title} онлайн`,
+      url: movieUrl, // Используем абсолютный URL вместо текущего URL
     };
 
     try {
@@ -482,7 +490,7 @@ export const MovieDetails = ({
       } else {
         // Fallback для десктопов или устройств без поддержки Web Share API
         if (navigator.clipboard) {
-          await navigator.clipboard.writeText(window.location.href);
+          await navigator.clipboard.writeText(movieUrl);
           // Здесь можно добавить уведомление о копировании ссылки
         }
       }

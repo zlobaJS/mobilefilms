@@ -63,8 +63,7 @@ interface Movie {
   overview: string;
   vote_average: number;
   release_date: string;
-  release_quality?: string; // Если это свойство не обязательно
-  // Добавьте другие свойства, если необходимо
+  release_quality?: string;
 }
 
 function SplashScreen() {
@@ -599,39 +598,21 @@ function SearchPage() {
 
 function AppRoutes({ movies, isLoading }: { movies: any; isLoading: boolean }) {
   const location = useLocation();
-  const [_, setSelectedMovie] = useState<any>(null);
+  const navigate = useNavigate();
 
-  const handleMovieSelect = useCallback((movie: any) => {
-    setSelectedMovie(null);
-    setTimeout(() => {
-      setSelectedMovie(movie);
-    }, 50);
-  }, []);
+  const handleMovieSelect = useCallback(
+    (movie: Movie) => {
+      navigate(`/movie/${movie.id}`);
+    },
+    [navigate]
+  );
 
   return (
     <>
       <DesktopNavigation />
-      <Box
-        sx={{
-          ml: { xs: 0, sm: "72px" },
-          minHeight: "100dvh",
-          pt: "env(safe-area-inset-top)",
-          pb: "env(safe-area-inset-bottom)",
-          backgroundColor: "#141414",
-          position: "relative",
-          zIndex: 1,
-          overflowX: "hidden",
-          overflowY: "auto",
-          height: "100dvh",
-          "&::-webkit-scrollbar": {
-            display: "none",
-          },
-          scrollbarWidth: "none",
-          msOverflowStyle: "none",
-        }}
-      >
+      <Box>
         <AnimatePresence mode="wait">
-          <Routes location={location} key={location.pathname}>
+          <Routes location={location}>
             <Route
               path="/"
               element={

@@ -12,6 +12,7 @@ import {
 import { MovieCard } from "../components/MovieCard";
 import { getMovies, getMoviesByKeyword } from "../api/tmdb";
 import { motion } from "framer-motion";
+import { MovieDetails } from "../components/MovieDetails";
 
 const CATEGORY_TITLES: { [key: string]: string } = {
   "now-playing": "Сейчас смотрят",
@@ -67,6 +68,7 @@ export const CategoryPage = ({
   const [initialLoading, setInitialLoading] = useState(true);
   const [contentVisible, setContentVisible] = useState(false);
   const [sortBy, setSortBy] = useState<string>("popularity.desc");
+  const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null);
 
   useEffect(() => {
     setMovies([]);
@@ -159,6 +161,10 @@ export const CategoryPage = ({
     setPage(1);
     setMovies([]);
     setHasMore(true);
+  };
+
+  const handleMovieClick = (movie: Movie) => {
+    setSelectedMovie(movie);
   };
 
   return (
@@ -395,7 +401,10 @@ export const CategoryPage = ({
                               : undefined
                           }
                         >
-                          <MovieCard movie={movie} />
+                          <MovieCard
+                            movie={movie}
+                            onClick={() => handleMovieClick(movie)}
+                          />
                         </Grid>
                       ))}
                 </Grid>
@@ -435,6 +444,14 @@ export const CategoryPage = ({
           </Box>
         </motion.div>
       )}
+      <MovieDetails
+        movie={selectedMovie}
+        open={!!selectedMovie}
+        onClose={() => {
+          setSelectedMovie(null);
+        }}
+        isPage={false}
+      />
     </>
   );
 };

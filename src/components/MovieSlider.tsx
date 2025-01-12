@@ -30,7 +30,7 @@ interface MovieSliderProps {
   movies: Movie[];
   loading?: boolean;
   categoryId: string;
-  onMovieSelect?: (movie: any) => void;
+  onMovieSelect?: (movie: Movie) => void;
   showAllText?: string;
   showAllRoute?: string;
 }
@@ -228,14 +228,11 @@ export const MovieSlider = ({
               >
                 <MovieCard
                   movie={movie}
-                  onMovieSelect={(selectedMovie) => {
+                  onClick={() => {
                     if (onMovieSelect) {
-                      setTimeout(() => {
-                        onMovieSelect(selectedMovie);
-                      }, 0);
+                      onMovieSelect(movie);
                     }
                   }}
-                  showTitle={true}
                 />
               </Box>
             </Box>
