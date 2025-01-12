@@ -610,7 +610,25 @@ function AppRoutes({ movies, isLoading }: { movies: any; isLoading: boolean }) {
   return (
     <>
       <DesktopNavigation />
-      <Box>
+      <Box
+        sx={{
+          ml: { xs: 0, sm: "72px" },
+          minHeight: "100dvh",
+          pt: "env(safe-area-inset-top)",
+          pb: "env(safe-area-inset-bottom)",
+          backgroundColor: "#141414",
+          position: "relative",
+          zIndex: 1,
+          overflowX: "hidden",
+          overflowY: "auto",
+          height: "100dvh",
+          "&::-webkit-scrollbar": {
+            display: "none",
+          },
+          scrollbarWidth: "none",
+          msOverflowStyle: "none",
+        }}
+      >
         <AnimatePresence mode="wait">
           <Routes location={location}>
             <Route
