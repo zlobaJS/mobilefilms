@@ -672,7 +672,7 @@ export const MovieDetails = ({
   // Добавим функцию для определения цвета рейтинга
   const getRatingColor = (rating: number | undefined) => {
     if (!rating) return "#888"; // серый для undefined
-    if (rating >= 7) return "#4CAF50";
+    if (rating >= 7) return "#57de94";
     if (rating >= 5.6) return "#888";
     return "#FF5252";
   };
@@ -1133,6 +1133,10 @@ export const MovieDetails = ({
                             sx={{
                               fontSize: "1rem",
                               color: getRatingColor(currentMovie.vote_average),
+                              filter:
+                                currentMovie.vote_average >= 7
+                                  ? "drop-shadow(2px 4px 6px #59ffa4)"
+                                  : "none",
                             }}
                           >
                             {currentMovie.vote_average.toFixed(1)}
