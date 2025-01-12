@@ -12,6 +12,7 @@ import {
   Backdrop,
   Chip,
   CircularProgress,
+  Tooltip,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import ShareIcon from "@mui/icons-material/Share";
@@ -135,6 +136,16 @@ const translateCountry = (englishName: string): string => {
   return countryTranslations[englishName] || englishName;
 };
 
+// Функция форматирования даты
+const formatReleaseDate = (dateString: string) => {
+  const date = new Date(dateString);
+  return date.toLocaleDateString("ru-RU", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
+};
+
 export const MovieDetails = ({
   movie: initialMovie,
   movieId,
@@ -176,6 +187,10 @@ export const MovieDetails = ({
     (state: RootState) => state.settings.autoplayTrailer
   );
   const [certification, setCertification] = useState<string | null>(null);
+  const [showMobileTooltip, setShowMobileTooltip] = useState(false);
+
+  // Добавляем useMediaQuery для определения мобильного разрешения
+  const isMobileView = useMediaQuery(theme.breakpoints.down("sm"));
 
   // Модифицируем fetchData
   const fetchData = async (movieData: any) => {
@@ -1150,16 +1165,64 @@ export const MovieDetails = ({
                     )}
 
                     {/* Год */}
-                    {currentMovie?.release_date && (
-                      <Typography
-                        sx={{
-                          color: "#888",
-                          fontSize: "1rem",
-                          flexShrink: 0,
+                    {isMobileView ? (
+                      <Tooltip
+                        open={showMobileTooltip}
+                        onClose={() => setShowMobileTooltip(false)}
+                        title={
+                          currentMovie?.release_date
+                            ? formatReleaseDate(currentMovie.release_date)
+                            : ""
+                        }
+                        arrow
+                        placement="top"
+                        PopperProps={{
+                          disablePortal: true,
                         }}
                       >
-                        {new Date(currentMovie?.release_date).getFullYear()}
-                      </Typography>
+                        <Typography
+                          onClick={() =>
+                            setShowMobileTooltip(!showMobileTooltip)
+                          }
+                          sx={{
+                            color: "#888",
+                            fontSize: "1rem",
+                            cursor: "pointer",
+                            borderBottom: "1px dotted rgba(255,255,255,0.3)",
+                            display: "inline-block",
+                            "&:active": {
+                              borderBottom: "1px dotted rgba(255,255,255,0.5)",
+                            },
+                          }}
+                        >
+                          {new Date(currentMovie?.release_date).getFullYear()}
+                        </Typography>
+                      </Tooltip>
+                    ) : (
+                      <Tooltip
+                        title={
+                          currentMovie?.release_date
+                            ? formatReleaseDate(currentMovie.release_date)
+                            : ""
+                        }
+                        arrow
+                        placement="top"
+                      >
+                        <Typography
+                          sx={{
+                            color: "#888",
+                            fontSize: "1rem",
+                            cursor: "help",
+                            borderBottom: "1px dotted rgba(255,255,255,0.3)",
+                            display: "inline-block",
+                            "&:hover": {
+                              borderBottom: "1px dotted rgba(255,255,255,0.5)",
+                            },
+                          }}
+                        >
+                          {new Date(currentMovie?.release_date).getFullYear()}
+                        </Typography>
+                      </Tooltip>
                     )}
 
                     {/* Продолжительность */}
