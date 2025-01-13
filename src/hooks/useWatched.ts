@@ -8,9 +8,12 @@ export const useWatched = () => {
 
   const addToWatched = useCallback((movie: any) => {
     setWatchedMovies((prev) => {
-      const updated = [...prev, movie];
-      localStorage.setItem("watchedMovies", JSON.stringify(updated));
-      return updated;
+      if (!prev.some((item) => item.id === movie.id)) {
+        const updated = [movie, ...prev];
+        localStorage.setItem("watchedMovies", JSON.stringify(updated));
+        return updated;
+      }
+      return prev;
     });
   }, []);
 

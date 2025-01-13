@@ -24,6 +24,7 @@ import SearchIcon from "@mui/icons-material/Search";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import SettingsIcon from "@mui/icons-material/Settings";
 import InfoIcon from "@mui/icons-material/Info";
+import PersonIcon from "@mui/icons-material/Person";
 import { MovieSlider } from "./components/MovieSlider";
 import { BackdropSlider } from "./components/BackdropSlider";
 import { getMovies, GENRES, searchMovies } from "./api/tmdb";
@@ -46,6 +47,7 @@ import { AllFavoritesPage } from "./pages/AllFavoritesPage";
 import { MovieDetailsPage } from "./pages/MovieDetailsPage";
 import { SettingsPage } from "./pages/SettingsPage";
 import { AllWatchedPage } from "./pages/AllWatchedPage";
+import { ProfilePage } from "./pages/ProfilePage";
 const darkTheme = createTheme({
   palette: {
     mode: "dark",
@@ -141,11 +143,14 @@ function MobileNavigation() {
       case "/favorites":
         setValue(1);
         break;
-      case "/settings":
+      case "/profile":
         setValue(3);
         break;
-      case "/about":
+      case "/settings":
         setValue(4);
+        break;
+      case "/about":
+        setValue(5);
         break;
       default:
         if (location.pathname.includes("/category")) {
@@ -158,7 +163,6 @@ function MobileNavigation() {
     setIsLoading(true);
     setValue(newValue);
 
-    // Плавная прокрутка вверх
     window.scrollTo({ top: 0, behavior: "smooth" });
 
     let path = "/";
@@ -173,16 +177,18 @@ function MobileNavigation() {
         path = "/";
         break;
       case 3:
-        path = "/settings";
+        path = "/profile";
         break;
       case 4:
+        path = "/settings";
+        break;
+      case 5:
         path = "/about";
         break;
     }
 
     navigate(path);
 
-    // Задержка для анимации загрузки
     setTimeout(() => {
       setIsLoading(false);
     }, 500);
@@ -281,6 +287,15 @@ function MobileNavigation() {
           />
           <BottomNavigationAction
             icon={<HomeIcon />}
+            sx={{
+              "&.Mui-selected .MuiSvgIcon-root": {
+                transform: "scale(1.1)",
+                transition: "transform 0.2s",
+              },
+            }}
+          />
+          <BottomNavigationAction
+            icon={<PersonIcon />}
             sx={{
               "&.Mui-selected .MuiSvgIcon-root": {
                 transform: "scale(1.1)",
@@ -908,6 +923,19 @@ function AppRoutes({ movies, isLoading }: { movies: any; isLoading: boolean }) {
                   transition={{ duration: 0.3 }}
                 >
                   <AllWatchedPage />
+                </motion.div>
+              }
+            />
+            <Route
+              path="/profile"
+              element={
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <ProfilePage />
                 </motion.div>
               }
             />
