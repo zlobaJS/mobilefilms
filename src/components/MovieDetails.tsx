@@ -663,6 +663,8 @@ export const MovieDetails = ({
       } else {
         addToWatched(currentMovie);
       }
+      // Обновляем состояние текущего фильма для обновления UI
+      setCurrentMovie({ ...currentMovie });
     }
   };
 

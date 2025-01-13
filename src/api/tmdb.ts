@@ -449,3 +449,34 @@ export const getPersonImages = async (personId: number) => {
     return [];
   }
 };
+
+export const getMoviesByStudio = async (studioName: string, page = 1) => {
+  try {
+    // Сначала получаем ID студии по её имени
+    const searchCompany = await fetchTMDB("/search/company", {
+      query: studioName,
+      page: "1",
+    });
+
+    if (!searchCompany.results?.[0]?.id) {
+      return { results: [] };
+    }
+
+    const companyId = searchCompany.results[0].id;
+
+    // Затем получаем все фильмы этой студии
+    const data = await fetchTMDB("/discover/movie", {
+      with_companies: companyId.toString(),
+      page: page.toString(),
+      sort_by: "popularity.desc",
+      include_image_language: "ru,en,null",
+      region: "RU",
+      language: "ru-RU",
+    });
+
+    return data;
+  } catch (error) {
+    console.error("Error fetching movies by studio:", error);
+    return { results: [] };
+  }
+};

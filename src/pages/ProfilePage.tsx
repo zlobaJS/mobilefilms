@@ -11,6 +11,7 @@ import { getMovieDetails } from "../api/tmdb";
 import MovieFilterIcon from "@mui/icons-material/MovieFilter";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import VisibilityIcon from "@mui/icons-material/Visibility";
+import { StudiosSlider } from "../components/StudiosSlider";
 
 // Добавляем объект с переводами стран (можно вынести в отдельный файл)
 const countryTranslations: { [key: string]: string } = {
@@ -63,6 +64,14 @@ interface ProductionCountry {
   name: string;
 }
 
+// Добавляем интерфейс для типа студии
+interface ProductionCompany {
+  id: number;
+  logo_path: string | null;
+  name: string;
+  origin_country: string;
+}
+
 export const ProfilePage = () => {
   // Состояния для MovieDetails
   const [selectedMovie, setSelectedMovie] = useState<any>(null);
@@ -72,6 +81,14 @@ export const ProfilePage = () => {
     Array<{
       country: string;
       countryCode: string;
+      count: number;
+      percentage: number;
+    }>
+  >([]);
+  const [studioStats, setStudioStats] = useState<
+    Array<{
+      name: string;
+      logo_path: string | null;
       count: number;
       percentage: number;
     }>
@@ -188,6 +205,61 @@ export const ProfilePage = () => {
     };
 
     calculateCountryStats();
+  }, [watchedMovies, updateTrigger]);
+
+  // Обновляем расчет статистики, добавляя студии
+  useEffect(() => {
+    const calculateStats = async () => {
+      if (watchedMovies.length === 0) {
+        setCountryStats([]);
+        setStudioStats([]);
+        return;
+      }
+
+      const movieDetailsPromises = watchedMovies.map((movie) =>
+        getMovieDetails(movie.id)
+      );
+
+      try {
+        const movieDetails = await Promise.all(movieDetailsPromises);
+        const studioCount: {
+          [key: string]: { count: number; logo_path: string | null };
+        } = {};
+
+        movieDetails.forEach((details) => {
+          if (details?.production_companies) {
+            details.production_companies.forEach(
+              (studio: ProductionCompany) => {
+                if (!studioCount[studio.name]) {
+                  studioCount[studio.name] = {
+                    count: 0,
+                    logo_path: studio.logo_path,
+                  };
+                }
+                studioCount[studio.name].count += 1;
+              }
+            );
+          }
+        });
+
+        const studios = Object.entries(studioCount)
+          .sort(([, a], [, b]) => b.count - a.count)
+          .slice(0, 50)
+          .map(([name, data]) => ({
+            name,
+            logo_path: data.logo_path,
+            count: data.count,
+            percentage: Math.round((data.count / watchedMovies.length) * 100),
+          }));
+
+        setStudioStats(studios);
+      } catch (error) {
+        console.error("Error calculating studio stats:", error);
+        setStudioStats([]);
+      }
+    };
+
+    calculateStats();
   }, [watchedMovies, updateTrigger]);
 
   // Компонент для отображения пустого состояния
@@ -386,7 +458,7 @@ export const ProfilePage = () => {
             ))}
           </Grid>
 
-          {/* Добавляем секцию со статистикой по странам */}
+          {/* Объединенная секция статистики */}
           <Paper
             elevation={0}
             sx={{
@@ -396,16 +468,6 @@ export const ProfilePage = () => {
               borderRadius: 2,
             }}
           >
-            <Typography
-              variant="h6"
-              sx={{
-                color: "white",
-                fontWeight: "bold",
-                mb: 3,
-              }}
-            >
-              Топ стран по просмотрам
-            </Typography>
             {countryStats.length > 0 ? (
               <Grid container spacing={2}>
                 {countryStats.map(
@@ -566,6 +628,35 @@ export const ProfilePage = () => {
                 />
               </Paper>
             )}
+
+            {/* Добавляем слайдер студий */}
+            <Box sx={{ mb: { xs: 7, sm: 4 } }}>
+              {studioStats.length > 0 ? (
+                <StudiosSlider
+                  studios={studioStats.map((stat) => ({
+                    name: stat.name,
+                    logo_path: stat.logo_path,
+                    movieCount: stat.count,
+                  }))}
+                />
+              ) : (
+                <Paper
+                  elevation={0}
+                  sx={{
+                    p: 3,
+                    mb: 3,
+                    backgroundColor: "rgba(255, 255, 255, 0.05)",
+                    borderRadius: 2,
+                  }}
+                >
+                  <EmptyState
+                    icon={MovieFilterIcon}
+                    title="Нет данных о киностудиях"
+                    description="Добавьте фильмы в просмотренные, чтобы увидеть статистику по киностудиям"
+                  />
+                </Paper>
+              )}
+            </Box>
           </Box>
 
           {/* Диалог с деталями фильма */}

@@ -48,6 +48,7 @@ import { MovieDetailsPage } from "./pages/MovieDetailsPage";
 import { SettingsPage } from "./pages/SettingsPage";
 import { AllWatchedPage } from "./pages/AllWatchedPage";
 import { ProfilePage } from "./pages/ProfilePage";
+import { StudioMoviesPage } from "./pages/StudioMoviesPage";
 const darkTheme = createTheme({
   palette: {
     mode: "dark",
@@ -936,6 +937,19 @@ function AppRoutes({ movies, isLoading }: { movies: any; isLoading: boolean }) {
                   transition={{ duration: 0.3 }}
                 >
                   <ProfilePage />
+                </motion.div>
+              }
+            />
+            <Route
+              path="/studio/:studioName"
+              element={
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <StudioMoviesPage />
                 </motion.div>
               }
             />
