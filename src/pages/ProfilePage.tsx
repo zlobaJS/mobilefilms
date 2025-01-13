@@ -12,6 +12,10 @@ import MovieFilterIcon from "@mui/icons-material/MovieFilter";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import { StudiosSlider } from "../components/StudiosSlider";
+import { FavoritePersonsSlider } from "../components/FavoritePersonsSlider";
+import { useFavoritePersons } from "../hooks/useFavoritePersons";
+import PersonIcon from "@mui/icons-material/Person";
+import { useNavigate } from "react-router-dom";
 
 // Добавляем объект с переводами стран (можно вынести в отдельный файл)
 const countryTranslations: { [key: string]: string } = {
@@ -73,6 +77,7 @@ interface ProductionCompany {
 }
 
 export const ProfilePage = () => {
+  const navigate = useNavigate();
   // Состояния для MovieDetails
   const [selectedMovie, setSelectedMovie] = useState<any>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -97,6 +102,7 @@ export const ProfilePage = () => {
   // Получаем данные из хуков
   const { favorites, removeFromFavorites } = useFavorites();
   const { watchedMovies, removeFromWatched } = useWatched();
+  const { favoritePersons, removeFromFavoritePersons } = useFavoritePersons();
 
   // Обработчики событий
   const handleMovieSelect = useCallback((movie: any) => {
@@ -313,6 +319,13 @@ export const ProfilePage = () => {
         {description}
       </Typography>
     </Box>
+  );
+
+  const handlePersonSelect = useCallback(
+    (personId: number) => {
+      navigate(`/person/${personId}`);
+    },
+    [navigate]
   );
 
   return (
@@ -657,6 +670,32 @@ export const ProfilePage = () => {
                 </Paper>
               )}
             </Box>
+
+            {favoritePersons.length > 0 ? (
+              <FavoritePersonsSlider
+                persons={favoritePersons}
+                showTitle={true}
+                showRemoveButtons={true}
+                onRemoveFromFavorites={removeFromFavoritePersons}
+                onPersonSelect={handlePersonSelect}
+              />
+            ) : (
+              <Paper
+                elevation={0}
+                sx={{
+                  p: 3,
+                  mb: 3,
+                  backgroundColor: "rgba(255, 255, 255, 0.05)",
+                  borderRadius: 2,
+                }}
+              >
+                <EmptyState
+                  icon={PersonIcon}
+                  title="Нет избранных персон"
+                  description="Подпишитесь на персон, чтобы они появились здесь"
+                />
+              </Paper>
+            )}
           </Box>
 
           {/* Диалог с деталями фильма */}

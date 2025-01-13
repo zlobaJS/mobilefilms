@@ -21,6 +21,9 @@ import { FreeMode } from "swiper/modules";
 import "swiper/css";
 import { MovieCard } from "./MovieCard";
 import * as Flags from "country-flag-icons/react/3x2";
+import { useFavoritePersons } from "../hooks/useFavoritePersons";
+import NotificationsNoneIcon from "@mui/icons-material/NotificationsNone";
+import NotificationsActiveIcon from "@mui/icons-material/NotificationsActive";
 
 interface PersonDetailsProps {
   personId: number;
@@ -79,6 +82,9 @@ export const PersonDetails = ({
   const [images, setImages] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [isExpandedBiography, setIsExpandedBiography] = useState(false);
+  const { addToFavoritePersons, removeFromFavoritePersons, isPersonFavorite } =
+    useFavoritePersons();
+  const [isFavorite, setIsFavorite] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -98,6 +104,26 @@ export const PersonDetails = ({
 
     fetchData();
   }, [personId, open]);
+
+  useEffect(() => {
+    if (details?.id) {
+      setIsFavorite(isPersonFavorite(details.id));
+    }
+  }, [details?.id, isPersonFavorite]);
+
+  const handleFavoriteClick = () => {
+    if (isFavorite) {
+      removeFromFavoritePersons(details.id);
+    } else {
+      addToFavoritePersons({
+        id: details.id,
+        name: details.name,
+        profile_path: details.profile_path,
+        known_for_department: details.known_for_department,
+      });
+    }
+    setIsFavorite(!isFavorite);
+  };
 
   if (!open) return null;
 
@@ -306,7 +332,7 @@ export const PersonDetails = ({
               <Typography
                 variant="h4"
                 sx={{
-                  mb: 1,
+                  mb: 0.5,
                   color: "white",
                   textAlign: { xs: "center", sm: "left" },
                   fontSize: { xs: "2rem", sm: "2.125rem" },
@@ -317,6 +343,39 @@ export const PersonDetails = ({
               >
                 {details.name}
               </Typography>
+
+              <Box
+                sx={{
+                  mb: 2,
+                  textAlign: { xs: "center", sm: "left" },
+                }}
+              >
+                <Button
+                  variant="contained"
+                  onClick={handleFavoriteClick}
+                  startIcon={
+                    isFavorite ? (
+                      <NotificationsActiveIcon />
+                    ) : (
+                      <NotificationsNoneIcon />
+                    )
+                  }
+                  sx={{
+                    backgroundColor: isFavorite ? "#0686ee" : "white",
+                    color: isFavorite ? "white" : "#141414",
+                    "&:hover": {
+                      backgroundColor: isFavorite ? "#0571cc" : "#e0e0e0",
+                    },
+                    textTransform: "none",
+                    fontWeight: 500,
+                    fontSize: "0.9rem",
+                    minWidth: "140px",
+                    height: "36px",
+                  }}
+                >
+                  {isFavorite ? "Вы подписаны" : "Подписаться"}
+                </Button>
+              </Box>
 
               <Box
                 sx={{
