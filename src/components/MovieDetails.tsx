@@ -47,6 +47,7 @@ import ReactPlayer from "react-player";
 import { useSelector } from "react-redux";
 import { RootState } from "../store/store";
 import { useWatched } from "../hooks/useWatched";
+import { PersonDetails } from "./PersonDetails";
 
 declare module "@mui/material/styles" {
   interface BreakpointOverrides {
@@ -202,6 +203,8 @@ export const MovieDetails = ({
   const [certification, setCertification] = useState<string | null>(null);
   const [showMobileTooltip, setShowMobileTooltip] = useState(false);
   const { addToWatched, removeFromWatched, isWatched } = useWatched();
+  const [selectedPerson, setSelectedPerson] = useState<number | null>(null);
+  const [isPersonDetailsOpen, setIsPersonDetailsOpen] = useState(false);
 
   // Добавляем useMediaQuery для определения мобильного разрешения
   const isMobileView = useMediaQuery(theme.breakpoints.down("sm"));
@@ -670,6 +673,30 @@ export const MovieDetails = ({
       setCurrentMovie({ ...currentMovie });
     }
   }, [updateTrigger]);
+
+  const handlePersonClick = (personId: number) => {
+    setSelectedPerson(personId);
+    setIsPersonDetailsOpen(true);
+  };
+
+  const handlePersonMovieSelect = (movieId: number) => {
+    // Загружаем данные нового фильма
+    const fetchMovieData = async () => {
+      setIsLoading(true);
+      try {
+        const movieDetails = await getMovieDetails(movieId);
+        if (movieDetails) {
+          setCurrentMovie(movieDetails);
+          await fetchData(movieDetails);
+        }
+      } catch (error) {
+        console.error("Error fetching movie details:", error);
+      }
+      setIsLoading(false);
+    };
+
+    fetchMovieData();
+  };
 
   if (!currentMovie && !movieId) return null;
 
@@ -1580,7 +1607,9 @@ export const MovieDetails = ({
                                 style={{
                                   width: "auto",
                                   marginRight: "4px",
+                                  cursor: "pointer",
                                 }}
+                                onClick={() => handlePersonClick(actor.id)}
                               >
                                 <Box
                                   sx={{
@@ -1593,6 +1622,10 @@ export const MovieDetails = ({
                                     overflow: "hidden",
                                     position: "relative",
                                     mb: 1,
+                                    transition: "transform 0.2s",
+                                    "&:hover": {
+                                      transform: "scale(1.05)",
+                                    },
                                   }}
                                 >
                                   {actor.profile_path ? (
@@ -1715,7 +1748,9 @@ export const MovieDetails = ({
                                 style={{
                                   width: "auto",
                                   marginRight: "4px",
+                                  cursor: "pointer",
                                 }}
+                                onClick={() => handlePersonClick(person.id)}
                               >
                                 <Box
                                   sx={{
@@ -1728,6 +1763,10 @@ export const MovieDetails = ({
                                     overflow: "hidden",
                                     position: "relative",
                                     mb: 1,
+                                    transition: "transform 0.2s",
+                                    "&:hover": {
+                                      transform: "scale(1.05)",
+                                    },
                                   }}
                                 >
                                   {person.profile_path ? (
@@ -2223,6 +2262,17 @@ export const MovieDetails = ({
           )}
         </Box>
       </Box>
+      {selectedPerson && (
+        <PersonDetails
+          personId={selectedPerson}
+          open={isPersonDetailsOpen}
+          onClose={() => {
+            setIsPersonDetailsOpen(false);
+            setSelectedPerson(null);
+          }}
+          onMovieSelect={handlePersonMovieSelect}
+        />
+      )}
     </Dialog>
   );
 };

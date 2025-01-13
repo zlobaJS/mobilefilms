@@ -419,3 +419,33 @@ export const AGE_RATINGS: { [key: string]: string } = {
   "16": "16+",
   "18": "18+",
 };
+
+export const getPersonDetails = async (personId: number) => {
+  try {
+    const data = await fetchTMDB(`/person/${personId}`, {});
+    return data;
+  } catch (error) {
+    console.error("Error fetching person details:", error);
+    return null;
+  }
+};
+
+export const getPersonMovieCredits = async (personId: number) => {
+  try {
+    const data = await fetchTMDB(`/person/${personId}/movie_credits`, {});
+    return data;
+  } catch (error) {
+    console.error("Error fetching person movie credits:", error);
+    return null;
+  }
+};
+
+export const getPersonImages = async (personId: number) => {
+  try {
+    const data = await fetchTMDB(`/person/${personId}/images`, {});
+    return data.profiles || [];
+  } catch (error) {
+    console.error("Error fetching person images:", error);
+    return [];
+  }
+};
