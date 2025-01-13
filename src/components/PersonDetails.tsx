@@ -5,6 +5,8 @@ import {
   IconButton,
   Grid,
   Button,
+  CircularProgress,
+  Backdrop,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import { useEffect, useState } from "react";
@@ -16,6 +18,7 @@ import {
 } from "../api/tmdb";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { FreeMode } from "swiper/modules";
+import "swiper/css";
 import { MovieCard } from "./MovieCard";
 import * as Flags from "country-flag-icons/react/3x2";
 
@@ -96,7 +99,49 @@ export const PersonDetails = ({
     fetchData();
   }, [personId, open]);
 
-  if (!open || loading) return null;
+  if (!open) return null;
+
+  if (loading) {
+    return (
+      <Dialog
+        open={open}
+        fullScreen
+        PaperProps={{
+          sx: {
+            backgroundColor: "#141414",
+            backgroundImage: "none",
+          },
+        }}
+      >
+        <Backdrop
+          open={true}
+          sx={{
+            backgroundColor: "#141414",
+            zIndex: (theme) => theme.zIndex.drawer + 1,
+            display: "flex",
+            flexDirection: "column",
+            gap: 2,
+          }}
+        >
+          <CircularProgress
+            size={60}
+            thickness={4}
+            sx={{
+              color: "#21CBF3",
+            }}
+          />
+          <Typography
+            sx={{
+              color: "white",
+              fontSize: "1.2rem",
+            }}
+          >
+            Загрузка персоны...
+          </Typography>
+        </Backdrop>
+      </Dialog>
+    );
+  }
 
   const formatDate = (date: string) => {
     return new Date(date).toLocaleDateString("ru-RU", {
@@ -460,11 +505,14 @@ export const PersonDetails = ({
                     slidesPerView="auto"
                     spaceBetween={16}
                     freeMode
+                    watchSlidesProgress={true}
+                    observer={true}
+                    observeParents={true}
                   >
                     {[...(credits.cast || []), ...(credits.crew || [])]
                       .filter(
                         (movie: any) => movie && movie.id && movie.release_date
-                      ) // Фильтруем невалидные данные
+                      )
                       .reduce((unique: any[], movie: any) => {
                         if (!unique.some((m) => m.id === movie.id)) {
                           unique.push(movie);
