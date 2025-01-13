@@ -35,6 +35,7 @@ const countryTranslations: { [key: string]: string } = {
   Germany: "Германия",
   Italy: "Италия",
   Spain: "Испания",
+  Australia: "Австралия",
   // ... добавьте другие страны по необходимости
 };
 
@@ -52,6 +53,7 @@ const getCountryCode = (placeName: string): string | null => {
     Germany: "DE",
     Italy: "IT",
     Spain: "ES",
+    Australia: "AU",
     // ... добавьте другие страны
   };
 
@@ -437,19 +439,20 @@ export const PersonDetails = ({
                         fontSize: "0.9rem",
                       }}
                     >
-                      {
-                        [
+                      {(() => {
+                        const uniqueMovies = [
                           ...(credits.cast || []),
                           ...(credits.crew || []),
-                        ].reduce((unique: any[], movie: any) => {
-                          const exists = unique.find((m) => m.id === movie.id);
-                          if (!exists) {
-                            unique.push(movie);
-                          }
-                          return unique;
-                        }, []).length
-                      }{" "}
-                      фильмов
+                        ]
+                          .filter((movie: any) => movie && movie.id) // Проверяем наличие id
+                          .reduce((unique: any[], movie: any) => {
+                            if (!unique.some((m) => m.id === movie.id)) {
+                              unique.push(movie);
+                            }
+                            return unique;
+                          }, []);
+                        return `${uniqueMovies.length} фильмов`;
+                      })()}
                     </Typography>
                   </Box>
                   <Swiper
@@ -459,17 +462,19 @@ export const PersonDetails = ({
                     freeMode
                   >
                     {[...(credits.cast || []), ...(credits.crew || [])]
+                      .filter(
+                        (movie: any) => movie && movie.id && movie.release_date
+                      ) // Фильтруем невалидные данные
                       .reduce((unique: any[], movie: any) => {
-                        const exists = unique.find((m) => m.id === movie.id);
-                        if (!exists) {
+                        if (!unique.some((m) => m.id === movie.id)) {
                           unique.push(movie);
                         }
                         return unique;
                       }, [])
                       .sort((a: any, b: any) => {
-                        const dateA = new Date(a.release_date || 0);
-                        const dateB = new Date(b.release_date || 0);
-                        return dateB.getTime() - dateA.getTime();
+                        const dateA = new Date(a.release_date || 0).getTime();
+                        const dateB = new Date(b.release_date || 0).getTime();
+                        return dateB - dateA;
                       })
                       .map((movie: any) => (
                         <SwiperSlide key={movie.id} style={{ width: "150px" }}>
