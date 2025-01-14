@@ -30,7 +30,7 @@ interface MovieSliderProps {
   movies: Movie[];
   loading?: boolean;
   categoryId: string;
-  onMovieSelect?: (movie: Movie) => void;
+  onMovieSelect?: ((movie: Movie) => void) | ((movieId: number) => void);
   showAllText?: string;
   showAllRoute?: string;
   showTitle?: boolean;

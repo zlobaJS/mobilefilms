@@ -13,7 +13,7 @@ export const PersonPage = () => {
 
   const handleMovieSelect = useCallback(
     (movieId: number) => {
-      navigate(`/movie/${movieId}`);
+      navigate(`/movie/${movieId}`, { replace: true });
     },
     [navigate]
   );

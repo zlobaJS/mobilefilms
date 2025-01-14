@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback, useRef } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import {
   Box,
   Grid,
@@ -55,6 +55,7 @@ export const CategoryPage = ({
 }: CategoryPageProps) => {
   const params = useParams();
   const routeCategoryId = params.categoryId;
+  const navigate = useNavigate();
 
   const finalCategoryId = propsCategoryId || routeCategoryId;
   const finalTitle = propsTitle || CATEGORY_TITLES[finalCategoryId || ""];
@@ -69,6 +70,8 @@ export const CategoryPage = ({
   const [contentVisible, setContentVisible] = useState(false);
   const [sortBy, setSortBy] = useState<string>("popularity.desc");
   const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [updateTrigger, setUpdateTrigger] = useState(0);
 
   useEffect(() => {
     setMovies([]);
@@ -163,9 +166,32 @@ export const CategoryPage = ({
     setHasMore(true);
   };
 
-  const handleMovieClick = (movie: Movie) => {
+  const handleMovieSelectDialog = useCallback((movie: Movie) => {
     setSelectedMovie(movie);
-  };
+    setIsDialogOpen(true);
+  }, []);
+
+  const handleDialogClose = useCallback(() => {
+    setSelectedMovie(null);
+  }, []);
+
+  const handlePersonSelect = useCallback(
+    (personId: number) => {
+      navigate(`/person/${personId}`);
+    },
+    [navigate]
+  );
+
+  const handleMovieSelect = useCallback(
+    (movieId: number) => {
+      navigate(`/movie/${movieId}`);
+    },
+    [navigate]
+  );
+
+  const handleMovieClick = useCallback((movie: Movie) => {
+    setSelectedMovie(movie);
+  }, []);
 
   return (
     <>
@@ -448,10 +474,10 @@ export const CategoryPage = ({
       <MovieDetails
         movie={selectedMovie}
         open={!!selectedMovie}
-        onClose={() => {
-          setSelectedMovie(null);
-        }}
+        onClose={handleDialogClose}
         isPage={false}
+        onPersonSelect={handlePersonSelect}
+        onMovieSelect={handleMovieSelect}
       />
     </>
   );

@@ -178,7 +178,6 @@ export const PersonDetails = ({
   };
 
   const handleMovieClick = (movieId: number) => {
-    onClose();
     onMovieSelect?.(movieId);
   };
 

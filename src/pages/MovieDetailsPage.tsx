@@ -1,7 +1,7 @@
 import { MovieDetails } from "../components/MovieDetails";
 import { useNavigate, useParams } from "react-router-dom";
 import { Box } from "@mui/material";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { getMovieDetails } from "../api/tmdb";
 
 export const MovieDetailsPage = () => {
@@ -13,7 +13,14 @@ export const MovieDetailsPage = () => {
     navigate(-1);
   };
 
-  // Добавим эффект для проверки существования фильма
+  // Добавляем обработчик для перехода к персоне
+  const handlePersonSelect = useCallback(
+    (personId: number) => {
+      navigate(`/person/${personId}`);
+    },
+    [navigate]
+  );
+
   useEffect(() => {
     const checkMovie = async () => {
       try {
@@ -44,6 +51,7 @@ export const MovieDetailsPage = () => {
         open={true}
         onClose={handleClose}
         isPage={true}
+        onPersonSelect={handlePersonSelect}
       />
     </Box>
   );

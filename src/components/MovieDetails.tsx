@@ -56,31 +56,12 @@ declare module "@mui/material/styles" {
 }
 
 interface MovieDetailsProps {
-  movie?: {
-    id: number;
-    title: string;
-    backdrop_path: string;
-    poster_path: string;
-    overview: string;
-    vote_average: number;
-    release_date: string;
-    runtime?: number;
-    genres?: { id: number; name: string }[];
-    production_countries?: { iso_3166_1: string; name: string }[];
-    vote_count?: number;
-    release_quality?: string;
-    belongs_to_collection?: {
-      id: number;
-      name: string;
-      poster_path: string;
-      backdrop_path: string;
-    };
-    tagline?: string;
-  } | null;
+  movie?: any;
   movieId?: number;
   open: boolean;
   onClose: () => void;
-  onMovieSelect?: (movie: any) => void;
+  onMovieSelect?: (movieId: number) => void;
+  onPersonSelect?: (personId: number) => void;
   isPage?: boolean;
   updateTrigger?: number;
 }
@@ -165,6 +146,7 @@ export const MovieDetails = ({
   open,
   onClose,
   onMovieSelect,
+  onPersonSelect,
   isPage = false,
   updateTrigger = 0,
 }: MovieDetailsProps) => {
@@ -677,27 +659,18 @@ export const MovieDetails = ({
   }, [updateTrigger]);
 
   const handlePersonClick = (personId: number) => {
-    setSelectedPerson(personId);
     setIsPersonDetailsOpen(true);
+    setSelectedPerson(personId);
   };
 
   const handlePersonMovieSelect = (movieId: number) => {
-    // Загружаем данные нового фильма
-    const fetchMovieData = async () => {
-      setIsLoading(true);
-      try {
-        const movieDetails = await getMovieDetails(movieId);
-        if (movieDetails) {
-          setCurrentMovie(movieDetails);
-          await fetchData(movieDetails);
-        }
-      } catch (error) {
-        console.error("Error fetching movie details:", error);
-      }
-      setIsLoading(false);
-    };
-
-    fetchMovieData();
+    setIsPersonDetailsOpen(false);
+    setSelectedPerson(null);
+    if (onMovieSelect) {
+      onMovieSelect(movieId);
+    } else {
+      navigate(`/movie/${movieId}`);
+    }
   };
 
   if (!currentMovie && !movieId) return null;

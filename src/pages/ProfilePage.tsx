@@ -105,10 +105,17 @@ export const ProfilePage = () => {
   const { favoritePersons, removeFromFavoritePersons } = useFavoritePersons();
 
   // Обработчики событий
-  const handleMovieSelect = useCallback((movie: any) => {
+  const handleMovieSelectDialog = useCallback((movie: any) => {
     setSelectedMovie(movie);
     setIsDialogOpen(true);
   }, []);
+
+  const handleMovieSelect = useCallback(
+    (movieId: number) => {
+      navigate(`/movie/${movieId}`);
+    },
+    [navigate]
+  );
 
   const handleDialogClose = useCallback(() => {
     setIsDialogOpen(false);
@@ -596,7 +603,7 @@ export const ProfilePage = () => {
           <Box sx={{ mt: 4 }}>
             {favorites.length > 0 ? (
               <FavoritesSlider
-                onMovieSelect={handleMovieSelect}
+                onMovieSelect={handleMovieSelectDialog}
                 {...sliderProps}
                 onRemoveFromFavorites={handleRemoveFromFavorites}
               />
@@ -620,7 +627,7 @@ export const ProfilePage = () => {
 
             {watchedMovies.length > 0 ? (
               <WatchedSlider
-                onMovieSelect={handleMovieSelect}
+                onMovieSelect={handleMovieSelectDialog}
                 {...sliderProps}
                 onRemoveFromWatched={handleRemoveFromWatched}
               />
@@ -704,6 +711,8 @@ export const ProfilePage = () => {
             open={isDialogOpen}
             onClose={handleDialogClose}
             updateTrigger={updateTrigger}
+            onPersonSelect={handlePersonSelect}
+            onMovieSelect={handleMovieSelect}
           />
         </Container>
       </Box>

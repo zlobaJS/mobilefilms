@@ -110,6 +110,13 @@ export const StudioMoviesPage = () => {
     setSelectedMovie(movie);
   };
 
+  const handlePersonSelect = useCallback(
+    (personId: number) => {
+      navigate(`/person/${personId}`);
+    },
+    [navigate]
+  );
+
   return (
     <>
       {initialLoading ? (
@@ -272,6 +279,7 @@ export const StudioMoviesPage = () => {
         open={!!selectedMovie}
         onClose={() => setSelectedMovie(null)}
         isPage={false}
+        onPersonSelect={handlePersonSelect}
       />
     </>
   );

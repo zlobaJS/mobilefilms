@@ -619,8 +619,9 @@ function AppRoutes({ movies, isLoading }: { movies: any; isLoading: boolean }) {
   const navigate = useNavigate();
 
   const handleMovieSelect = useCallback(
-    (movie: Movie) => {
-      navigate(`/movie/${movie.id}`);
+    (movieOrId: Movie | number) => {
+      const movieId = typeof movieOrId === "number" ? movieOrId : movieOrId.id;
+      navigate(`/movie/${movieId}`);
     },
     [navigate]
   );
