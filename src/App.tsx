@@ -618,6 +618,10 @@ function AppRoutes({ movies, isLoading }: { movies: any; isLoading: boolean }) {
   const location = useLocation();
   const navigate = useNavigate();
 
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [location.pathname]);
+
   const handleMovieSelect = useCallback(
     (movieOrId: Movie | number) => {
       const movieId = typeof movieOrId === "number" ? movieOrId : movieOrId.id;
