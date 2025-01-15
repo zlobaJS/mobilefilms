@@ -16,6 +16,7 @@ import { FavoritePersonsSlider } from "../components/FavoritePersonsSlider";
 import { useFavoritePersons } from "../hooks/useFavoritePersons";
 import PersonIcon from "@mui/icons-material/Person";
 import { useNavigate } from "react-router-dom";
+import { Movie } from "../types/movie";
 
 // Добавляем объект с переводами стран (можно вынести в отдельный файл)
 const countryTranslations: { [key: string]: string } = {
@@ -104,12 +105,21 @@ export const ProfilePage = () => {
   const { watchedMovies, removeFromWatched } = useWatched();
   const { favoritePersons, removeFromFavoritePersons } = useFavoritePersons();
 
-  // Обработчики событий
-  const handleMovieSelectDialog = useCallback((movie: any) => {
-    setSelectedMovie(movie);
-    setIsDialogOpen(true);
+  // Обновляем обработчик для диалога
+  const handleMovieSelectDialog = useCallback((movie: Movie | number) => {
+    // Если передан ID, получаем детали фильма
+    if (typeof movie === "number") {
+      getMovieDetails(movie).then((movieData) => {
+        setSelectedMovie(movieData);
+        setIsDialogOpen(true);
+      });
+    } else {
+      setSelectedMovie(movie);
+      setIsDialogOpen(true);
+    }
   }, []);
 
+  // Обработчик для навигации к странице фильма
   const handleMovieSelect = useCallback(
     (movieId: number) => {
       navigate(`/movie/${movieId}`);

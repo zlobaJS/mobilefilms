@@ -51,124 +51,100 @@ interface CategoryPageProps {
 export const CategoryPage = ({
   categoryType = "regular",
   categoryId: propsCategoryId,
-  title: propsTitle,
+  title,
 }: CategoryPageProps) => {
-  const params = useParams();
-  const routeCategoryId = params.categoryId;
+  const { categoryId: paramsCategoryId } = useParams();
   const navigate = useNavigate();
 
-  const finalCategoryId = propsCategoryId || routeCategoryId;
-  const finalTitle = propsTitle || CATEGORY_TITLES[finalCategoryId || ""];
+  // Определяем effectiveCategoryId в начале компонента
+  const effectiveCategoryId = propsCategoryId || paramsCategoryId;
 
   const [movies, setMovies] = useState<Movie[]>([]);
   const [loading, setLoading] = useState(true);
-  const [page, setPage] = useState(1);
-  const [hasMore, setHasMore] = useState(true);
-  const observer = useRef<IntersectionObserver | null>(null);
-  const [isLoadingMore, setIsLoadingMore] = useState(false);
-  const [initialLoading, setInitialLoading] = useState(true);
   const [contentVisible, setContentVisible] = useState(false);
-  const [sortBy, setSortBy] = useState<string>("popularity.desc");
   const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [updateTrigger, setUpdateTrigger] = useState(0);
+  const [sortBy, setSortBy] = useState<string>("popularity.desc");
+  const [page, setPage] = useState(1);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
 
+  // Сбрасываем состояние пагинации при изменении effectiveCategoryId
   useEffect(() => {
-    setMovies([]);
     setPage(1);
+    setMovies([]);
     setHasMore(true);
-    setLoading(true);
-    setInitialLoading(true);
-    setContentVisible(false);
-  }, [finalCategoryId, sortBy]);
+  }, [effectiveCategoryId]);
 
-  const fetchCategoryMovies = async (pageNumber: number) => {
-    const startTime = Date.now();
-
-    try {
-      setIsLoadingMore(pageNumber > 1);
-      setLoading(true);
-
-      let data;
-      if (categoryType === "keyword" && finalCategoryId) {
-        data = await getMoviesByKeyword(Number(finalCategoryId), pageNumber);
-      } else {
-        data = await getMovies.byCategory(
-          finalCategoryId || "",
-          pageNumber,
-          sortBy
-        );
-      }
-
-      const newMovies = Array.isArray(data.results) ? data.results : [];
-
-      if (pageNumber === 1) {
-        const elapsedTime = Date.now() - startTime;
-        const remainingTime = Math.max(0, 1000 - elapsedTime);
-        await new Promise((resolve) => setTimeout(resolve, remainingTime));
-
-        setMovies(newMovies);
-      } else {
-        const elapsedTime = Date.now() - startTime;
-        const remainingTime = Math.max(0, 1500 - elapsedTime);
-        await new Promise((resolve) => setTimeout(resolve, remainingTime));
-
-        setMovies((prev) => [...prev, ...newMovies]);
-      }
-
-      setHasMore(newMovies.length === 20);
-    } catch (error) {
-      console.error("Error fetching movies:", error);
-      setMovies([]);
-    } finally {
-      setLoading(false);
-      setIsLoadingMore(false);
-      setInitialLoading(false);
-      setTimeout(() => {
-        setContentVisible(true);
-      }, 300);
-    }
-  };
-
+  // Добавляем ref для последнего элемента
+  const observer = useRef<IntersectionObserver>();
   const lastMovieRef = useCallback(
-    (node: HTMLDivElement) => {
-      if (loading) return;
-
+    (node: HTMLElement | null) => {
+      if (loading || isLoadingMore) return;
       if (observer.current) observer.current.disconnect();
 
       observer.current = new IntersectionObserver((entries) => {
         if (entries[0].isIntersecting && hasMore) {
+          setIsLoadingMore(true);
           setPage((prevPage) => prevPage + 1);
         }
       });
 
       if (node) observer.current.observe(node);
     },
-    [loading, hasMore]
+    [loading, isLoadingMore, hasMore]
   );
 
   useEffect(() => {
-    if (page > 0) {
-      fetchCategoryMovies(page);
-    }
-  }, [page, finalCategoryId, categoryType, sortBy]);
+    const fetchMovies = async () => {
+      // Устанавливаем loading только для первой загрузки
+      if (page === 1) {
+        setLoading(true);
+      }
 
-  useEffect(() => {
-    return () => {
-      setMovies([]);
+      try {
+        let response;
+        if (effectiveCategoryId) {
+          if (categoryType === "keyword") {
+            console.log("Fetching keyword movies:", effectiveCategoryId);
+            response = await getMoviesByKeyword(
+              Number(effectiveCategoryId),
+              page
+            );
+          } else {
+            response = await getMovies.byCategory(
+              effectiveCategoryId,
+              page,
+              sortBy
+            );
+          }
+        }
+        if (response?.results) {
+          if (page === 1) {
+            setMovies(response.results);
+          } else {
+            setMovies((prev) => [...prev, ...response.results]);
+          }
+          setHasMore(response.results.length === 20);
+        }
+      } catch (error) {
+        console.error("Error fetching movies:", error);
+        navigate("/");
+      } finally {
+        setLoading(false);
+        setIsLoadingMore(false); // Сбрасываем флаг загрузки
+        if (page === 1) {
+          setTimeout(() => setContentVisible(true), 100);
+        }
+      }
     };
-  }, []);
 
-  const handleSortChange = (event: any) => {
-    setSortBy(event.target.value);
-    setPage(1);
-    setMovies([]);
-    setHasMore(true);
-  };
+    if (effectiveCategoryId) {
+      fetchMovies();
+    }
+  }, [effectiveCategoryId, page, categoryType, sortBy, navigate]);
 
-  const handleMovieSelectDialog = useCallback((movie: Movie) => {
+  const handleMovieSelect = useCallback((movie: Movie) => {
     setSelectedMovie(movie);
-    setIsDialogOpen(true);
   }, []);
 
   const handleDialogClose = useCallback(() => {
@@ -182,20 +158,19 @@ export const CategoryPage = ({
     [navigate]
   );
 
-  const handleMovieSelect = useCallback(
-    (movieId: number) => {
-      navigate(`/movie/${movieId}`);
+  const handleSortChange = useCallback(
+    (event: { target: { value: string } }) => {
+      setSortBy(event.target.value);
     },
-    [navigate]
+    []
   );
 
-  const handleMovieClick = useCallback((movie: Movie) => {
-    setSelectedMovie(movie);
-  }, []);
+  // Используем title из пропсов если он есть
+  const categoryTitle = title || CATEGORY_TITLES[effectiveCategoryId || ""];
 
   return (
     <>
-      {initialLoading ? (
+      {loading ? (
         <Box
           sx={{
             position: "fixed",
@@ -259,10 +234,10 @@ export const CategoryPage = ({
                     fontSize: { xs: "1.75rem", sm: "2.125rem" },
                   }}
                 >
-                  {finalTitle}
+                  {categoryTitle}
                 </Typography>
 
-                {finalCategoryId === "ru-movies" && (
+                {effectiveCategoryId === "ru-movies" && (
                   <Box
                     sx={{
                       display: "flex",
@@ -429,7 +404,7 @@ export const CategoryPage = ({
                         >
                           <MovieCard
                             movie={movie}
-                            onClick={() => handleMovieClick(movie)}
+                            onClick={() => handleMovieSelect(movie)}
                             showTitle={true}
                           />
                         </Grid>
@@ -477,7 +452,7 @@ export const CategoryPage = ({
         onClose={handleDialogClose}
         isPage={false}
         onPersonSelect={handlePersonSelect}
-        onMovieSelect={handleMovieSelect}
+        onMovieSelect={(movieId: number) => navigate(`/movie/${movieId}`)}
       />
     </>
   );

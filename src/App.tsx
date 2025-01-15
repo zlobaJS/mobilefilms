@@ -165,8 +165,6 @@ function MobileNavigation() {
     setIsLoading(true);
     setValue(newValue);
 
-    window.scrollTo({ top: 0, behavior: "smooth" });
-
     let path = "/";
     switch (newValue) {
       case 0:
@@ -189,32 +187,37 @@ function MobileNavigation() {
         break;
     }
 
-    navigate(path);
+    // Сначала скроллим наверх
+    const contentContainer = document.querySelector(".MuiBox-root");
+    if (contentContainer) {
+      contentContainer.scrollTo({
+        top: 0,
+        behavior: "instant",
+      });
+    }
 
+    // Выполняем навигацию и выключаем загрузку после небольшой задержки
+    navigate(path);
     setTimeout(() => {
       setIsLoading(false);
-    }, 500);
+    }, 200);
   };
 
   return (
     <>
       {isLoading && (
         <Box
-          component={motion.div}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
           sx={{
             position: "fixed",
             top: 0,
             left: 0,
             right: 0,
             bottom: 0,
+            backgroundColor: "rgba(0, 0, 0, 0.5)",
+            zIndex: 9999,
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            backgroundColor: "rgba(0,0,0,0.8)",
-            zIndex: 1299,
           }}
         >
           <CircularProgress sx={{ color: "white" }} />
@@ -622,6 +625,16 @@ function AppRoutes({ movies, isLoading }: { movies: any; isLoading: boolean }) {
     window.scrollTo(0, 0);
   }, [location.pathname]);
 
+  useEffect(() => {
+    const contentContainer = document.querySelector(".MuiBox-root");
+    if (contentContainer) {
+      contentContainer.scrollTo({
+        top: 0,
+        behavior: "instant",
+      });
+    }
+  }, [location.pathname]);
+
   const handleMovieSelect = useCallback(
     (movieOrId: Movie | number) => {
       const movieId = typeof movieOrId === "number" ? movieOrId : movieOrId.id;
@@ -645,6 +658,8 @@ function AppRoutes({ movies, isLoading }: { movies: any; isLoading: boolean }) {
           overflowX: "hidden",
           overflowY: "auto",
           height: "100dvh",
+          WebkitOverflowScrolling: "touch",
+          scrollBehavior: "smooth",
           "&::-webkit-scrollbar": {
             display: "none",
           },
@@ -653,15 +668,16 @@ function AppRoutes({ movies, isLoading }: { movies: any; isLoading: boolean }) {
         }}
       >
         <AnimatePresence mode="wait">
-          <Routes location={location}>
+          <Routes location={location} key={location.pathname}>
             <Route
               path="/"
               element={
                 <motion.div
+                  key={location.pathname}
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
-                  transition={{ duration: 0.3 }}
+                  transition={{ duration: 0.2 }}
                 >
                   <Box
                     sx={{
@@ -814,11 +830,11 @@ function AppRoutes({ movies, isLoading }: { movies: any; isLoading: boolean }) {
               path="/category/:categoryId"
               element={
                 <motion.div
+                  key={location.pathname}
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 1 }}
                   transition={{ duration: 0.1 }}
-                  key="category"
                 >
                   <CategoryPage />
                 </motion.div>
@@ -828,10 +844,11 @@ function AppRoutes({ movies, isLoading }: { movies: any; isLoading: boolean }) {
               path="/search"
               element={
                 <motion.div
+                  key={location.pathname}
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
-                  transition={{ duration: 0.3 }}
+                  transition={{ duration: 0.2 }}
                 >
                   <SearchPage />
                 </motion.div>
@@ -841,9 +858,11 @@ function AppRoutes({ movies, isLoading }: { movies: any; isLoading: boolean }) {
               path="/favorites"
               element={
                 <motion.div
+                  key={location.pathname}
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
+                  transition={{ duration: 0.2 }}
                 >
                   <Box sx={{ pb: { xs: 7, sm: 0 } }}>
                     <FavoritesPage />
@@ -855,11 +874,11 @@ function AppRoutes({ movies, isLoading }: { movies: any; isLoading: boolean }) {
               path="/settings"
               element={
                 <motion.div
+                  key={location.pathname}
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 1 }}
                   transition={{ duration: 0.1 }}
-                  key="settings"
                 >
                   <SettingsPage />
                 </motion.div>
@@ -869,11 +888,11 @@ function AppRoutes({ movies, isLoading }: { movies: any; isLoading: boolean }) {
               path="/about"
               element={
                 <motion.div
+                  key={location.pathname}
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 1 }}
                   transition={{ duration: 0.1 }}
-                  key="about"
                 >
                   <Box sx={{ p: 3 }}>
                     <Typography variant="h4">О приложении</Typography>
@@ -885,10 +904,11 @@ function AppRoutes({ movies, isLoading }: { movies: any; isLoading: boolean }) {
               path="/keyword/:keywordId/:keywordName"
               element={
                 <motion.div
+                  key={location.pathname}
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
-                  transition={{ duration: 0.3 }}
+                  transition={{ duration: 0.2 }}
                 >
                   <KeywordPage />
                 </motion.div>
@@ -898,10 +918,11 @@ function AppRoutes({ movies, isLoading }: { movies: any; isLoading: boolean }) {
               path="/favorites/all"
               element={
                 <motion.div
+                  key={location.pathname}
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
-                  transition={{ duration: 0.3 }}
+                  transition={{ duration: 0.2 }}
                 >
                   <AllFavoritesPage />
                 </motion.div>
@@ -911,10 +932,11 @@ function AppRoutes({ movies, isLoading }: { movies: any; isLoading: boolean }) {
               path="/movie/:id"
               element={
                 <motion.div
+                  key={location.pathname}
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
-                  transition={{ duration: 0.3 }}
+                  transition={{ duration: 0.2 }}
                 >
                   <MovieDetailsPage />
                 </motion.div>
@@ -924,10 +946,11 @@ function AppRoutes({ movies, isLoading }: { movies: any; isLoading: boolean }) {
               path="/watched/all"
               element={
                 <motion.div
+                  key={location.pathname}
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
-                  transition={{ duration: 0.3 }}
+                  transition={{ duration: 0.2 }}
                 >
                   <AllWatchedPage />
                 </motion.div>
@@ -937,10 +960,11 @@ function AppRoutes({ movies, isLoading }: { movies: any; isLoading: boolean }) {
               path="/profile"
               element={
                 <motion.div
+                  key={location.pathname}
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
-                  transition={{ duration: 0.3 }}
+                  transition={{ duration: 0.2 }}
                 >
                   <ProfilePage />
                 </motion.div>
@@ -950,10 +974,11 @@ function AppRoutes({ movies, isLoading }: { movies: any; isLoading: boolean }) {
               path="/studio/:studioName"
               element={
                 <motion.div
+                  key={location.pathname}
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
-                  transition={{ duration: 0.3 }}
+                  transition={{ duration: 0.2 }}
                 >
                   <StudioMoviesPage />
                 </motion.div>
@@ -963,10 +988,11 @@ function AppRoutes({ movies, isLoading }: { movies: any; isLoading: boolean }) {
               path="/person/:personId"
               element={
                 <motion.div
+                  key={location.pathname}
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
-                  transition={{ duration: 0.3 }}
+                  transition={{ duration: 0.2 }}
                 >
                   <PersonPage />
                 </motion.div>

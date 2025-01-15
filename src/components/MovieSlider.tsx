@@ -30,7 +30,7 @@ interface MovieSliderProps {
   movies: Movie[];
   loading?: boolean;
   categoryId: string;
-  onMovieSelect?: ((movie: Movie) => void) | ((movieId: number) => void);
+  onMovieSelect?: (movie: Movie | number) => void;
   showAllText?: string;
   showAllRoute?: string;
   showTitle?: boolean;
@@ -239,7 +239,7 @@ export const MovieSlider = ({
                   movie={movie}
                   onClick={() => {
                     if (onMovieSelect) {
-                      onMovieSelect(movie);
+                      onMovieSelect(movie.id);
                     }
                   }}
                   showTitle={showTitle}

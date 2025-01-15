@@ -146,7 +146,6 @@ export const MovieDetails = ({
   open,
   onClose,
   onMovieSelect,
-  onPersonSelect,
   isPage = false,
   updateTrigger = 0,
 }: MovieDetailsProps) => {

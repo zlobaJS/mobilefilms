@@ -5,6 +5,8 @@ import { useCallback, useState, useMemo } from "react";
 import { MovieDetails } from "../components/MovieDetails";
 import { useFavorites } from "../hooks/useFavorites";
 import { useWatched } from "../hooks/useWatched";
+import { getMovieDetails } from "../api/tmdb";
+import { Movie } from "../types/movie";
 
 export const FavoritesPage = () => {
   const [selectedMovie, setSelectedMovie] = useState<any>(null);
@@ -14,9 +16,16 @@ export const FavoritesPage = () => {
   const { removeFromFavorites } = useFavorites();
   const { removeFromWatched } = useWatched();
 
-  const handleMovieSelect = useCallback((movie: any) => {
-    setSelectedMovie(movie);
-    setIsDialogOpen(true);
+  const handleMovieSelect = useCallback((movie: Movie | number) => {
+    if (typeof movie === "number") {
+      getMovieDetails(movie).then((movieData) => {
+        setSelectedMovie(movieData);
+        setIsDialogOpen(true);
+      });
+    } else {
+      setSelectedMovie(movie);
+      setIsDialogOpen(true);
+    }
   }, []);
 
   const handleDialogClose = useCallback(() => {
