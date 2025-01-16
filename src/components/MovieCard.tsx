@@ -258,7 +258,7 @@ export const MovieCard = ({
               backgroundColor: "rgba(255,255,255,0.7)",
               padding: "2px 8px",
               borderRadius: "4px",
-              fontSize: "0.8rem",
+              fontSize: "0.7rem",
             }}
           >
             {movie.release_quality}
