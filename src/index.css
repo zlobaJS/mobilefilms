@@ -197,6 +197,7 @@ body {
 /* Добавляем поддержку для iPhone home indicator area */
 @supports (padding-bottom: env(safe-area-inset-bottom)) {
   .bottom-navigation-container {
+    margin-bottom: calc(-1 * env(safe-area-inset-bottom));
     &::after {
       content: "";
       position: absolute;

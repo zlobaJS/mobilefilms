@@ -235,7 +235,8 @@ function MobileNavigation() {
           display: { xs: "block", sm: "none" },
           paddingTop: "20px",
           backgroundColor: "transparent",
-          pb: "env(safe-area-inset-bottom)",
+          marginBottom: "env(safe-area-inset-bottom)",
+          transform: "translateY(env(safe-area-inset-bottom))",
         }}
       >
         <BottomNavigation
