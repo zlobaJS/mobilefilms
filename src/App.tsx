@@ -233,6 +233,7 @@ function MobileNavigation() {
           zIndex: 1300,
           display: { xs: "block", sm: "none" },
           paddingTop: "20px",
+          backgroundColor: "transparent",
           "&::after": {
             content: '""',
             position: "absolute",
@@ -240,6 +241,8 @@ function MobileNavigation() {
             left: 0,
             right: 0,
             zIndex: -1,
+            height: "env(safe-area-inset-bottom)",
+            backgroundColor: "transparent",
           },
         }}
       >
@@ -251,6 +254,7 @@ function MobileNavigation() {
             height: "56px",
             background: "rgba(20, 20, 20, 0.8)",
             transform: "translateY(calc(-1 * var(--sab)))",
+            backdropFilter: "blur(10px)",
             "& .MuiBottomNavigationAction-root": {
               minWidth: "auto",
               padding: 0,
