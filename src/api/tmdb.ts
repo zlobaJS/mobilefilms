@@ -494,7 +494,16 @@ export const getMoviesByStudio = async (studioName: string, page = 1) => {
   }
 };
 
-// Добавляем новую функцию для получения позиции фильма в рейтинге по количеству оценок
+// Добавляем интерфейс для хранения позиций
+interface RankHistory {
+  movieId: number;
+  rank: number;
+  timestamp: number;
+}
+
+// Создаем Map для хранения истории позиций
+const rankHistoryMap = new Map<number, RankHistory>();
+
 export const getMovieRankByVoteCount = async (movieId: number) => {
   try {
     const movieDetails = await getMovieDetails(movieId);
@@ -506,9 +515,25 @@ export const getMovieRankByVoteCount = async (movieId: number) => {
       page: "1",
     });
 
-    // Вычисляем позицию и возвращаем только если она меньше или равна 5000
-    const position = data.total_results;
-    return position <= 5000 ? position : null;
+    const currentRank = data.total_results <= 5000 ? data.total_results : null;
+
+    // Получаем предыдущую позицию
+    const previousData = rankHistoryMap.get(movieId);
+    const rankChange = previousData ? previousData.rank - currentRank : 0;
+
+    // Сохраняем текущую позицию
+    if (currentRank !== null) {
+      rankHistoryMap.set(movieId, {
+        movieId,
+        rank: currentRank,
+        timestamp: Date.now(),
+      });
+    }
+
+    return {
+      rank: currentRank,
+      change: rankChange !== 0 ? rankChange : null,
+    };
   } catch (error) {
     console.error("Error getting movie rank:", error);
     return null;

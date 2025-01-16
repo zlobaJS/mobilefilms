@@ -141,6 +141,12 @@ const formatReleaseDate = (dateString: string) => {
   });
 };
 
+// Добавим интерфейс для ранга
+interface RankData {
+  rank: number | null;
+  change: number | null;
+}
+
 export const MovieDetails = ({
   movie: initialMovie,
   movieId,
@@ -187,7 +193,7 @@ export const MovieDetails = ({
   const { addToWatched, removeFromWatched, isWatched } = useWatched();
   const [selectedPerson, setSelectedPerson] = useState<number | null>(null);
   const [isPersonDetailsOpen, setIsPersonDetailsOpen] = useState(false);
-  const [voteRank, setVoteRank] = useState<number | null>(null);
+  const [rankData, setRankData] = useState<RankData | null>(null);
 
   // Добавляем useMediaQuery для определения мобильного разрешения
   const isMobileView = useMediaQuery(theme.breakpoints.down("sm"));
@@ -286,7 +292,7 @@ export const MovieDetails = ({
         setCertification(releaseInfo);
         setIsLogoLoading(false);
         setIsLoading(false);
-        setVoteRank(rank);
+        setRankData(rank);
       } catch (error) {
         console.error("Error in fetchData:", error);
         setIsLoading(false);
@@ -1372,38 +1378,64 @@ export const MovieDetails = ({
                           }}
                         />
                       )}
-                      {voteRank !== null && voteRank <= 5000 && (
-                        <Typography
-                          sx={{
-                            color: "#888",
-                            fontSize: "0.9rem",
-                            display: "flex",
-                            alignItems: "center",
-                            "&::before": {
-                              content: '"•"',
-                              marginRight: "8px",
-                            },
-                          }}
-                        >
-                          {voteRank <= 1000 && (
-                            <Box
-                              component="img"
-                              src="https://yastatic.net/s3/kinopoisk-frontend/hd-www/release/_next/static/media/lightning-3x.8986661f.png"
-                              alt="top"
-                              sx={{
-                                width: "16px",
-                                height: "16px",
-                                marginRight: "4px",
-                                opacity: 0.8,
-                              }}
-                            />
-                          )}
-                          {(voteRank === 0 ? 1 : voteRank).toLocaleString(
-                            "ru-RU"
-                          )}{" "}
-                          место
-                        </Typography>
-                      )}
+                      {rankData?.rank !== null &&
+                        rankData?.rank !== undefined &&
+                        rankData?.rank <= 5000 && (
+                          <Typography
+                            sx={{
+                              color: "#888",
+                              fontSize: "0.9rem",
+                              display: "flex",
+                              alignItems: "center",
+                              "&::before": {
+                                content: '"•"',
+                                marginRight: "8px",
+                              },
+                            }}
+                          >
+                            {rankData?.rank <= 1000 && (
+                              <Box
+                                component="img"
+                                src="https://yastatic.net/s3/kinopoisk-frontend/hd-www/release/_next/static/media/lightning-3x.8986661f.png"
+                                alt="top"
+                                sx={{
+                                  width: "16px",
+                                  height: "16px",
+                                  marginRight: "4px",
+                                  opacity: 0.8,
+                                }}
+                              />
+                            )}
+                            {(
+                              (rankData?.rank === 0 ? 1 : rankData?.rank) ?? 0
+                            ).toLocaleString("ru-RU")}{" "}
+                            место
+                            {rankData?.change && (
+                              <Box
+                                sx={{
+                                  display: "flex",
+                                  alignItems: "center",
+                                  marginLeft: "8px",
+                                  color:
+                                    rankData.change > 0 ? "#4CAF50" : "#FF5252",
+                                  fontSize: "0.8rem",
+                                }}
+                              >
+                                {rankData.change > 0 ? "▲" : "▼"}
+                                <Typography
+                                  component="span"
+                                  sx={{
+                                    marginLeft: "2px",
+                                    fontSize: "inherit",
+                                    color: "inherit",
+                                  }}
+                                >
+                                  {Math.abs(rankData.change)}
+                                </Typography>
+                              </Box>
+                            )}
+                          </Typography>
+                        )}
                     </Box>
                   </Box>
 
