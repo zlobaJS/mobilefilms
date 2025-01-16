@@ -1367,7 +1367,7 @@ export const MovieDetails = ({
                     sx={{
                       display: "flex",
                       flexDirection: "row",
-                      gap: isMobile ? "8px" : "16px",
+                      gap: "8px",
                       mb: 2,
                       mt: "21px",
                       alignItems: "center",
@@ -1377,35 +1377,16 @@ export const MovieDetails = ({
                   >
                     <Button
                       onClick={() => setShowPlayer(true)}
-                      startIcon={
-                        <PlayArrowIcon
-                          sx={{
-                            fontSize: isMobile ? 20 : 24,
-                            marginRight: isMobile ? 0 : 1,
-                            marginLeft: isMobile ? 0 : -0.5,
-                          }}
-                        />
-                      }
                       sx={{
+                        color: "white",
                         background:
                           "linear-gradient(45deg, #2196F3 30%, #21CBF3 90%)",
                         boxShadow: "0 3px 5px 2px rgba(33, 203, 243, .3)",
-                        color: "white",
-                        padding: isMobile ? "8px" : "8px 24px",
-                        borderRadius: isMobile ? "50%" : "50px",
-                        transition: "all 0.3s ease",
-                        textTransform: "none",
-                        fontSize: { xs: "0.9rem", sm: "1rem" },
-                        fontWeight: 500,
-                        minWidth: isMobile ? "40px" : "auto",
-                        width: isMobile ? "40px" : "auto",
-                        height: isMobile ? "40px" : "auto",
-                        "& .MuiButton-startIcon": {
-                          margin: isMobile ? 0 : "auto",
-                          position: isMobile ? "absolute" : "relative",
-                          left: isMobile ? "50%" : "auto",
-                          transform: isMobile ? "translateX(-50%)" : "none",
-                        },
+                        width: "40px",
+                        height: "40px",
+                        minWidth: "40px",
+                        borderRadius: "50%",
+                        padding: 0,
                         "&:hover": {
                           background:
                             "linear-gradient(45deg, #1976D2 30%, #00B4E5 90%)",
@@ -1414,7 +1395,7 @@ export const MovieDetails = ({
                         },
                       }}
                     >
-                      {!isMobile && "Смотреть"}
+                      <PlayArrowIcon sx={{ fontSize: 24 }} />
                     </Button>
 
                     <Box
