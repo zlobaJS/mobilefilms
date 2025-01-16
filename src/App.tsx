@@ -233,7 +233,7 @@ function MobileNavigation() {
           zIndex: 1300,
           display: { xs: "block", sm: "none" },
           background:
-            "linear-gradient(to top, rgba(20, 20, 20, 1) 0%, rgba(20, 20, 20, 0) 100%)",
+            "linear-gradient(to top, transparent 0%, transparent 100%)",
           paddingTop: "20px",
           paddingBottom: "env(safe-area-inset-bottom)",
           "&::after": {
@@ -254,6 +254,8 @@ function MobileNavigation() {
           sx={{
             bgcolor: "transparent",
             height: "56px",
+            background:
+              "linear-gradient(to top, rgba(20, 20, 20, 1) 0%, rgba(20, 20, 20, 0.8) 100%)",
             "& .MuiBottomNavigationAction-root": {
               minWidth: "auto",
               padding: 0,

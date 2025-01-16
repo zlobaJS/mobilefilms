@@ -152,6 +152,7 @@ body {
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  background-color: transparent;
 }
 
 /* Обновляем стили для основного контейнера контента */
@@ -160,6 +161,7 @@ body {
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   padding-bottom: 0;
+  background-color: transparent;
 }
 
 @supports (padding-bottom: env(safe-area-inset-bottom)) {
