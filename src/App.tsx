@@ -249,9 +249,8 @@ function MobileNavigation() {
           sx={{
             bgcolor: "transparent",
             height: "56px",
-            background:
-              "linear-gradient(to top, rgba(20, 20, 20, 1) 0%, rgba(20, 20, 20, 0.8) 100%)",
-            marginBottom: "env(safe-area-inset-bottom)",
+            background: "rgba(20, 20, 20, 0.8)",
+            transform: "translateY(calc(-1 * var(--sab)))",
             "& .MuiBottomNavigationAction-root": {
               minWidth: "auto",
               padding: 0,
