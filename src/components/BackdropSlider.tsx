@@ -426,8 +426,9 @@ export const BackdropSlider = ({ movies }: BackdropSliderProps) => {
                 height: "70%",
                 background: `linear-gradient(
                   0deg,
-                  rgba(20,20,20,1) 0%,
-                  rgba(20,20,20,0.8) 40%,
+                  rgba(14,18,28,1) 0%,
+                  rgba(14,18,28,0.92) 30%,
+                  rgba(16,20,32,0.85) 50%,
                   rgba(20,20,20,0) 100%
                 )`,
                 zIndex: 1,
@@ -442,15 +443,80 @@ export const BackdropSlider = ({ movies }: BackdropSliderProps) => {
                 position: "absolute",
                 left: 0,
                 top: 0,
-                width: "60%",
+                width: "70%",
                 height: "100%",
                 background: `linear-gradient(
                   90deg,
-                  rgba(20,20,20,0.95) 0%,
-                  rgba(20,20,20,0.8) 50%,
+                  rgba(10,15,25,1) 0%,
+                  rgba(10,15,25,0.98) 20%,
+                  rgba(12,18,28,0.95) 40%,
+                  rgba(14,20,32,0.8) 60%,
                   rgba(20,20,20,0) 100%
                 )`,
                 zIndex: 1,
+              }}
+            />
+
+            {/* Градиент справа */}
+            <Box
+              sx={{
+                display: { xs: "none", md: "block" },
+                position: "absolute",
+                right: 0,
+                top: 0,
+                width: "40%",
+                height: "100%",
+                background: `linear-gradient(
+                  270deg,
+                  rgba(10,15,25,1) 0%,
+                  rgba(10,15,25,0.98) 20%,
+                  rgba(12,18,28,0.95) 40%,
+                  rgba(14,20,32,0.8) 60%,
+                  rgba(20,20,20,0) 100%
+                )`,
+                zIndex: 1,
+                pointerEvents: "none",
+              }}
+            />
+
+            {/* Мобильные градиенты по бокам */}
+            <Box
+              sx={{
+                display: { xs: "block", md: "none" },
+                position: "absolute",
+                left: 0,
+                top: 0,
+                width: "25%",
+                height: "100%",
+                background: `linear-gradient(
+                  90deg,
+                  rgba(10,15,25,0.98) 0%,
+                  rgba(12,18,28,0.9) 40%,
+                  rgba(14,20,32,0.7) 70%,
+                  rgba(20,20,20,0) 100%
+                )`,
+                zIndex: 1,
+                pointerEvents: "none",
+              }}
+            />
+
+            <Box
+              sx={{
+                display: { xs: "block", md: "none" },
+                position: "absolute",
+                right: 0,
+                top: 0,
+                width: "25%",
+                height: "100%",
+                background: `linear-gradient(
+                  270deg,
+                  rgba(10,15,25,0.98) 0%,
+                  rgba(12,18,28,0.9) 40%,
+                  rgba(14,20,32,0.7) 70%,
+                  rgba(20,20,20,0) 100%
+                )`,
+                zIndex: 1,
+                pointerEvents: "none",
               }}
             />
 
