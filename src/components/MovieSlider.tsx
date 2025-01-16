@@ -10,10 +10,10 @@ import { MovieCard, MovieCardSkeleton } from "./MovieCard";
 import { useNavigate } from "react-router-dom";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import "swiper/css";
-import "swiper/css/navigation";
-import "swiper/css/effect-coverflow";
-import { useMemo } from "react";
-import { FreeMode, EffectCoverflow } from "swiper/modules";
+import "swiper/swiper-bundle.css";
+import { useMemo, useEffect, useRef } from "react";
+import { EffectCoverflow, FreeMode } from "swiper/modules";
+import type { Swiper as SwiperType } from "swiper";
 
 interface Movie {
   id: number;
@@ -48,7 +48,7 @@ export const MovieSlider = ({
   onMovieSelect,
   showAllText = "Еще",
   showAllRoute,
-  showTitle,
+  showTitle = true,
   showRemoveButtons = false,
   onRemoveFromFavorites,
   onRemoveFromWatched,
@@ -57,6 +57,7 @@ export const MovieSlider = ({
   const navigate = useNavigate();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const isTablet = useMediaQuery(theme.breakpoints.down("md"));
+  const swiperRef = useRef<SwiperType>();
 
   const handleMoreClick = () => {
     navigate(showAllRoute || `/category/${categoryId}`);
@@ -88,16 +89,20 @@ export const MovieSlider = ({
         effect: "coverflow",
         grabCursor: true,
         centeredSlides: true,
-        slidesPerView: isMobile ? 2.2 : 1.8,
+        slidesPerView: isMobile ? 1.8 : 1.8,
         coverflowEffect: {
-          rotate: isMobile ? 35 : 0,
+          rotate: isMobile ? 45 : 0,
           stretch: isMobile ? 0 : 0,
-          depth: isMobile ? 100 : 150,
-          modifier: isMobile ? 1 : 1.5,
+          depth: isMobile ? 150 : 150,
+          modifier: isMobile ? 1.5 : 1.5,
           slideShadows: false,
         },
         modules: [EffectCoverflow],
-        spaceBetween: isMobile ? -30 : 0,
+        spaceBetween: 0,
+        initialSlide: 1,
+        onSwiper: (swiper: SwiperType) => {
+          swiperRef.current = swiper;
+        },
       };
     }
 
@@ -105,8 +110,17 @@ export const MovieSlider = ({
       slidesPerView: getSlidesPerView(),
       spaceBetween: 16,
       freeMode: true,
+      modules: [FreeMode],
     };
   };
+
+  useEffect(() => {
+    if (title === "Сейчас смотрят" && swiperRef.current) {
+      setTimeout(() => {
+        swiperRef.current?.update();
+      }, 100);
+    }
+  }, [title]);
 
   if (loading) {
     return (
@@ -203,23 +217,39 @@ export const MovieSlider = ({
           "& .swiper-slide": {
             transition: "transform 0.3s",
             ...(isMobile && {
-              opacity: 0.5,
               transform: "scale(0.75)",
               transformOrigin: "center",
               perspective: "1000px",
+              "& > div": {
+                position: "relative",
+                "&::after": {
+                  content: '""',
+                  position: "absolute",
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  background: "rgba(0, 0, 0, 0.5)",
+                  transition: "opacity 0.3s",
+                  zIndex: 1,
+                  pointerEvents: "none",
+                },
+              },
             }),
           },
           "& .swiper-slide-active": {
             transform: isMobile ? "scale(0.9)" : "scale(1.05)",
             zIndex: 2,
-            opacity: 1,
             rotate: "0deg",
+            "& > div::after": {
+              opacity: 0,
+            },
           },
-          "& .swiper-slide-prev": {
-            transformOrigin: "right center",
-          },
-          "& .swiper-slide-next": {
-            transformOrigin: "left center",
+          "& .swiper-slide-prev, & .swiper-slide-next": {
+            transformOrigin: "center",
+            "& > div::after": {
+              opacity: 1,
+            },
           },
         }),
       }}
@@ -264,18 +294,23 @@ export const MovieSlider = ({
             <Box
               sx={{
                 px: 1,
-                ...(title === "Сейчас смотрят" && {
-                  transform: "scale(0.9)",
-                  transition: "transform 0.3s",
-                }),
               }}
             >
               <MovieCard
                 movie={movie}
-                onSelect={onMovieSelect}
-                showRemoveButton={showRemoveButtons}
-                onRemoveFromFavorites={onRemoveFromFavorites}
-                onRemoveFromWatched={onRemoveFromWatched}
+                onClick={() => onMovieSelect?.(movie)}
+                showRemoveButtons={showRemoveButtons}
+                showTitle={title === "Сейчас смотрят" ? false : showTitle}
+                onRemoveFromFavorites={
+                  onRemoveFromFavorites
+                    ? () => onRemoveFromFavorites(movie.id)
+                    : undefined
+                }
+                onRemoveFromWatched={
+                  onRemoveFromWatched
+                    ? () => onRemoveFromWatched(movie.id)
+                    : undefined
+                }
               />
             </Box>
           </SwiperSlide>
