@@ -10,8 +10,9 @@ import { MovieCard, MovieCardSkeleton } from "./MovieCard";
 import { useNavigate } from "react-router-dom";
 import "swiper/css";
 import "swiper/swiper-bundle.css";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { FreeMode } from "swiper/modules";
+import { Swiper as SwiperType } from "swiper";
 
 interface Movie {
   id: number;
@@ -55,6 +56,7 @@ export const MovieSlider = ({
   const navigate = useNavigate();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const isTablet = useMediaQuery(theme.breakpoints.down("md"));
+  const [isEnd, setIsEnd] = useState(false);
 
   const handleMoreClick = () => {
     navigate(showAllRoute || `/category/${categoryId}`);
@@ -86,6 +88,11 @@ export const MovieSlider = ({
       spaceBetween: 8,
       freeMode: true,
       modules: [FreeMode],
+      onReachEnd: () => setIsEnd(true),
+      onFromEdge: () => setIsEnd(false),
+      onSlideChange: (swiper: SwiperType) => {
+        setIsEnd(swiper.isEnd);
+      },
     };
   };
 
@@ -237,34 +244,56 @@ export const MovieSlider = ({
           {showAllText}
         </Button>
       </Box>
-      <Swiper {...getSliderConfig()}>
-        {validMovies.map((movie) => (
-          <SwiperSlide key={movie.id}>
-            <Box
-              sx={{
-                px: 1,
-              }}
-            >
-              <MovieCard
-                movie={movie}
-                onClick={() => onMovieSelect?.(movie)}
-                showRemoveButtons={showRemoveButtons}
-                showTitle={title === "Сейчас смотрят" ? false : showTitle}
-                onRemoveFromFavorites={
-                  onRemoveFromFavorites
-                    ? () => onRemoveFromFavorites(movie.id)
-                    : undefined
-                }
-                onRemoveFromWatched={
-                  onRemoveFromWatched
-                    ? () => onRemoveFromWatched(movie.id)
-                    : undefined
-                }
-              />
-            </Box>
-          </SwiperSlide>
-        ))}
-      </Swiper>
+      <Box sx={{ position: "relative" }}>
+        <Swiper {...getSliderConfig()}>
+          {validMovies.map((movie) => (
+            <SwiperSlide key={movie.id}>
+              <Box sx={{ px: 1 }}>
+                <MovieCard
+                  movie={movie}
+                  onClick={() => onMovieSelect?.(movie)}
+                  showRemoveButtons={showRemoveButtons}
+                  showTitle={title === "Сейчас смотрят" ? false : showTitle}
+                  onRemoveFromFavorites={
+                    onRemoveFromFavorites
+                      ? () => onRemoveFromFavorites(movie.id)
+                      : undefined
+                  }
+                  onRemoveFromWatched={
+                    onRemoveFromWatched
+                      ? () => onRemoveFromWatched(movie.id)
+                      : undefined
+                  }
+                />
+              </Box>
+            </SwiperSlide>
+          ))}
+        </Swiper>
+
+        {!isEnd && (
+          <Box
+            sx={{
+              position: "absolute",
+              top: 0,
+              right: 0,
+              width: "120px",
+              height: "100%",
+              background: `linear-gradient(
+                90deg, 
+                rgba(20,20,20,0) 0%,
+                rgba(20,20,22,0.4) 35%,
+                rgba(21,21,24,0.7) 55%,
+                rgba(22,22,26,0.9) 75%,
+                rgba(23,23,28,1) 100%
+              )`,
+              pointerEvents: "none",
+              zIndex: 2,
+              transition: "opacity 0.3s ease-in-out",
+              opacity: 0.95,
+            }}
+          />
+        )}
+      </Box>
     </Box>
   );
 };
