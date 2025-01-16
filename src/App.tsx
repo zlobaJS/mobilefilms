@@ -235,6 +235,7 @@ function MobileNavigation() {
           display: { xs: "block", sm: "none" },
           paddingTop: "20px",
           backgroundColor: "transparent",
+          pb: "env(safe-area-inset-bottom)",
         }}
       >
         <BottomNavigation
@@ -247,7 +248,6 @@ function MobileNavigation() {
             backdropFilter: "blur(10px)",
             position: "relative",
             zIndex: 2,
-            transform: "translateY(calc(-1 * env(safe-area-inset-bottom)))",
             "& .MuiBottomNavigationAction-root": {
               minWidth: "auto",
               padding: 0,
@@ -661,7 +661,7 @@ function AppRoutes({ movies, isLoading }: { movies: any; isLoading: boolean }) {
           overflowX: "hidden",
           overflowY: "auto",
           height: "100dvh",
-          transform: "translateY(env(safe-area-inset-bottom))",
+          pb: 0,
           WebkitOverflowScrolling: "touch",
           scrollBehavior: "smooth",
           "&::-webkit-scrollbar": {

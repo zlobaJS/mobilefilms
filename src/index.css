@@ -196,12 +196,7 @@ body {
 
 /* Добавляем поддержку для iPhone home indicator area */
 @supports (padding-bottom: env(safe-area-inset-bottom)) {
-  .MuiBox-root {
-    transform: translateY(env(safe-area-inset-bottom));
-  }
-
   .bottom-navigation-container {
-    transform: translateY(calc(-1 * env(safe-area-inset-bottom)));
     &::after {
       content: "";
       position: absolute;
