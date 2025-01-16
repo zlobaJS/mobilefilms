@@ -8,7 +8,6 @@ import {
 import { Swiper, SwiperSlide } from "swiper/react";
 import { MovieCard, MovieCardSkeleton } from "./MovieCard";
 import { useNavigate } from "react-router-dom";
-import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import "swiper/css";
 import "swiper/swiper-bundle.css";
 import { useMemo } from "react";
@@ -45,7 +44,7 @@ export const MovieSlider = ({
   loading = false,
   categoryId,
   onMovieSelect,
-  showAllText = "Еще",
+  showAllText = "ЕЩЕ",
   showAllRoute,
   showTitle = true,
   showRemoveButtons = false,
@@ -121,13 +120,12 @@ export const MovieSlider = ({
             sx={{
               fontWeight: "bold",
               color: "white",
-              fontSize: { xs: "1.1rem", sm: "1.25rem" },
+              fontSize: "1rem",
             }}
           >
             {title}
           </Typography>
           <Button
-            endIcon={<ArrowForwardIosIcon />}
             disabled
             sx={{
               color: "rgba(255,255,255,0.3)",
@@ -201,18 +199,38 @@ export const MovieSlider = ({
           sx={{
             fontWeight: "bold",
             color: "white",
-            fontSize: { xs: "1.1rem", sm: "1.25rem" },
+            fontSize: "1rem",
           }}
         >
           {title}
         </Typography>
         <Button
-          endIcon={<ArrowForwardIosIcon />}
           onClick={handleMoreClick}
           sx={{
             color: "grey.400",
+            position: "relative",
+            padding: "0",
+            minWidth: "auto",
+            textTransform: "none",
+            fontSize: "0.85rem",
+            letterSpacing: "0.2px",
+            fontWeight: 400,
+            "&::after": {
+              content: '""',
+              position: "absolute",
+              bottom: -1,
+              left: 0,
+              width: "100%",
+              height: "1px",
+              borderBottom: "1px solid rgba(255,255,255,0.3)",
+              transition: "all 0.2s ease",
+            },
             "&:hover": {
               color: "white",
+              background: "transparent",
+              "&::after": {
+                borderColor: "rgba(255,255,255,0.8)",
+              },
             },
           }}
         >
