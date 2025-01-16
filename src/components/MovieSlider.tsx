@@ -76,7 +76,7 @@ export const MovieSlider = ({
   );
 
   const getSlidesPerView = () => {
-    if (isMobile) return 2.2;
+    if (isMobile) return 2.8;
     if (isTablet) return 4.2;
     return 6.2;
   };
@@ -84,7 +84,7 @@ export const MovieSlider = ({
   const getSliderConfig = () => {
     return {
       slidesPerView: getSlidesPerView(),
-      spaceBetween: 16,
+      spaceBetween: 8,
       freeMode: true,
       modules: [FreeMode],
     };
@@ -139,7 +139,7 @@ export const MovieSlider = ({
         <Swiper
           modules={[FreeMode]}
           freeMode={true}
-          spaceBetween={isMobile ? 0 : 12}
+          spaceBetween={isMobile ? 0 : 8}
           slidesPerView={getSlidesPerView()}
           style={{ padding: "0 16px" }}
         >
@@ -157,7 +157,7 @@ export const MovieSlider = ({
                 <Box
                   sx={{
                     aspectRatio: isMobile ? "2/3" : "1/1.5",
-                    width: isMobile ? "95%" : "100%",
+                    width: isMobile ? "85%" : "100%",
                     marginBottom: 1,
                   }}
                 >

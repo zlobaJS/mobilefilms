@@ -4,6 +4,8 @@ import {
   Typography,
   Skeleton,
   IconButton,
+  useTheme,
+  useMediaQuery,
 } from "@mui/material";
 import { useState } from "react";
 import { imageUrl } from "../api/tmdb";
@@ -91,6 +93,8 @@ export const MovieCard = ({
 }: MovieCardProps) => {
   const navigate = useNavigate();
   const [imageLoaded, setImageLoaded] = useState(false);
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   const handleOpenDetails = (e: React.MouseEvent) => {
     if ((e.target as HTMLElement).closest(".remove-button")) {
@@ -166,7 +170,7 @@ export const MovieCard = ({
         sx={{
           position: "relative",
           width: "100%",
-          paddingTop: "150%",
+          paddingTop: isMobile ? "140%" : "150%",
           backgroundColor: "transparent",
           borderRadius: "12px",
           overflow: "hidden",
