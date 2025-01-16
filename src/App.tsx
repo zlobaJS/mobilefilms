@@ -232,18 +232,13 @@ function MobileNavigation() {
           width: "100%",
           zIndex: 1300,
           display: { xs: "block", sm: "none" },
-          background:
-            "linear-gradient(to top, transparent 0%, transparent 100%)",
           paddingTop: "20px",
-          paddingBottom: "env(safe-area-inset-bottom)",
           "&::after": {
             content: '""',
             position: "absolute",
             bottom: 0,
             left: 0,
             right: 0,
-            height: "env(safe-area-inset-bottom)",
-            background: "transparent",
             zIndex: -1,
           },
         }}
@@ -256,6 +251,7 @@ function MobileNavigation() {
             height: "56px",
             background:
               "linear-gradient(to top, rgba(20, 20, 20, 1) 0%, rgba(20, 20, 20, 0.8) 100%)",
+            marginBottom: "env(safe-area-inset-bottom)",
             "& .MuiBottomNavigationAction-root": {
               minWidth: "auto",
               padding: 0,
