@@ -253,7 +253,8 @@ function MobileNavigation() {
             bgcolor: "transparent",
             height: "56px",
             background: "rgba(20, 20, 20, 0.8)",
-            transform: "translateY(calc(-1 * var(--sab)))",
+            position: "relative",
+            zIndex: 2,
             backdropFilter: "blur(10px)",
             "& .MuiBottomNavigationAction-root": {
               minWidth: "auto",
@@ -668,6 +669,7 @@ function AppRoutes({ movies, isLoading }: { movies: any; isLoading: boolean }) {
           overflowX: "hidden",
           overflowY: "auto",
           height: "100dvh",
+          marginBottom: "calc(-1 * env(safe-area-inset-bottom))",
           WebkitOverflowScrolling: "touch",
           scrollBehavior: "smooth",
           "&::-webkit-scrollbar": {
