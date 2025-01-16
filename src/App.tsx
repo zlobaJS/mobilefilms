@@ -724,6 +724,14 @@ function AppRoutes({ movies, isLoading }: { movies: any; isLoading: boolean }) {
                       showTitle={true}
                     />
                     <MovieSlider
+                      title="Самые оцениваемые"
+                      movies={movies.mostRated}
+                      loading={isLoading}
+                      categoryId="most-rated"
+                      onMovieSelect={handleMovieSelect}
+                      showTitle={true}
+                    />
+                    <MovieSlider
                       title="Сегодня в тренде"
                       movies={movies.trendingToday}
                       loading={isLoading}
@@ -1030,6 +1038,7 @@ function App() {
     backdrop: Movie[];
     fantasy: Movie[];
     ruMovies: Movie[];
+    mostRated: Movie[];
   }>({
     watchingToday: [],
     trendingToday: [],
@@ -1046,6 +1055,7 @@ function App() {
     backdrop: [],
     fantasy: [],
     ruMovies: [],
+    mostRated: [],
   });
   const startTimeRef = useRef(Date.now());
   const contentRef = useRef<HTMLDivElement>(null);
@@ -1069,6 +1079,7 @@ function App() {
           warData,
           fantasyData,
           ruMoviesData,
+          mostRatedData,
         ] = await Promise.all([
           getMovies.popular(),
           getMovies.nowPlaying(),
@@ -1085,6 +1096,7 @@ function App() {
           getMovies.byGenre(GENRES.WAR),
           getMovies.byGenre(GENRES.FANTASY),
           getMovies.byCountry("RU"),
+          getMovies.mostRated(),
         ]);
 
         const backdropMovies = backdropData.results.slice(0, 5);
@@ -1105,6 +1117,7 @@ function App() {
           backdrop: backdropMovies,
           fantasy: fantasyData.results,
           ruMovies: ruMoviesData.results,
+          mostRated: mostRatedData.results,
         });
 
         setContentLoaded(true);

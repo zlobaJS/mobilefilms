@@ -144,6 +144,17 @@ export const getMovies = {
     return data;
   },
 
+  mostRated: async (page = 1) => {
+    return await fetchTMDB("/discover/movie", {
+      page: page.toString(),
+      sort_by: "vote_count.desc",
+      "vote_count.gte": "1000",
+      include_image_language: "ru,en,null",
+      region: "RU",
+      language: "ru-RU",
+    });
+  },
+
   byCategory: async (category: string, page = 1, sortBy?: string) => {
     switch (category) {
       case "now-playing":
@@ -174,6 +185,8 @@ export const getMovies = {
         return await getMovies.byGenre(GENRES.WAR, page);
       case "ru-movies":
         return await getMovies.byCountry("RU", page, sortBy);
+      case "most-rated":
+        return await getMovies.mostRated(page);
       default:
         return await getMovies.popular(page);
     }
