@@ -243,7 +243,6 @@ function MobileNavigation() {
           sx={{
             bgcolor: "transparent",
             height: "56px",
-            paddingBottom: "env(safe-area-inset-bottom)",
             "& .MuiBottomNavigationAction-root": {
               minWidth: "auto",
               padding: 0,
