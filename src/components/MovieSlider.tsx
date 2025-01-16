@@ -11,8 +11,9 @@ import { useNavigate } from "react-router-dom";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import "swiper/css";
 import "swiper/css/navigation";
+import "swiper/css/effect-coverflow";
 import { useMemo } from "react";
-import { FreeMode } from "swiper/modules";
+import { FreeMode, EffectCoverflow } from "swiper/modules";
 
 interface Movie {
   id: number;
@@ -79,6 +80,32 @@ export const MovieSlider = ({
     if (isMobile) return 2.2;
     if (isTablet) return 4.2;
     return 6.2;
+  };
+
+  const getSliderConfig = () => {
+    if (title === "Сейчас смотрят") {
+      return {
+        effect: "coverflow",
+        grabCursor: true,
+        centeredSlides: true,
+        slidesPerView: isMobile ? 2.2 : 1.8,
+        coverflowEffect: {
+          rotate: isMobile ? 35 : 0,
+          stretch: isMobile ? 0 : 0,
+          depth: isMobile ? 100 : 150,
+          modifier: isMobile ? 1 : 1.5,
+          slideShadows: false,
+        },
+        modules: [EffectCoverflow],
+        spaceBetween: isMobile ? -30 : 0,
+      };
+    }
+
+    return {
+      slidesPerView: getSlidesPerView(),
+      spaceBetween: 16,
+      freeMode: true,
+    };
   };
 
   if (loading) {
@@ -173,6 +200,27 @@ export const MovieSlider = ({
             xs: "-116px",
             sm: 0,
           },
+          "& .swiper-slide": {
+            transition: "transform 0.3s",
+            ...(isMobile && {
+              opacity: 0.5,
+              transform: "scale(0.75)",
+              transformOrigin: "center",
+              perspective: "1000px",
+            }),
+          },
+          "& .swiper-slide-active": {
+            transform: isMobile ? "scale(0.9)" : "scale(1.05)",
+            zIndex: 2,
+            opacity: 1,
+            rotate: "0deg",
+          },
+          "& .swiper-slide-prev": {
+            transformOrigin: "right center",
+          },
+          "& .swiper-slide-next": {
+            transformOrigin: "left center",
+          },
         }),
       }}
     >
@@ -210,52 +258,25 @@ export const MovieSlider = ({
           {showAllText}
         </Button>
       </Box>
-      <Swiper
-        modules={[FreeMode]}
-        freeMode={true}
-        spaceBetween={isMobile ? 0 : 12}
-        slidesPerView={getSlidesPerView()}
-        style={{ padding: "0 16px" }}
-      >
+      <Swiper {...getSliderConfig()}>
         {validMovies.map((movie) => (
-          <SwiperSlide key={movie.id} style={{ height: "auto" }}>
+          <SwiperSlide key={movie.id}>
             <Box
               sx={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                height: "100%",
-                width: "100%",
+                px: 1,
+                ...(title === "Сейчас смотрят" && {
+                  transform: "scale(0.9)",
+                  transition: "transform 0.3s",
+                }),
               }}
             >
-              <Box
-                sx={{
-                  aspectRatio: isMobile ? "2/3" : "1/1.5",
-                  width: isMobile ? "95%" : "100%",
-                  marginBottom: 1,
-                }}
-              >
-                <MovieCard
-                  movie={movie}
-                  onClick={() => {
-                    if (onMovieSelect) {
-                      onMovieSelect(movie.id);
-                    }
-                  }}
-                  showTitle={showTitle}
-                  showRemoveButtons={showRemoveButtons}
-                  onRemoveFromFavorites={
-                    onRemoveFromFavorites
-                      ? () => onRemoveFromFavorites(movie.id)
-                      : undefined
-                  }
-                  onRemoveFromWatched={
-                    onRemoveFromWatched
-                      ? () => onRemoveFromWatched(movie.id)
-                      : undefined
-                  }
-                />
-              </Box>
+              <MovieCard
+                movie={movie}
+                onSelect={onMovieSelect}
+                showRemoveButton={showRemoveButtons}
+                onRemoveFromFavorites={onRemoveFromFavorites}
+                onRemoveFromWatched={onRemoveFromWatched}
+              />
             </Box>
           </SwiperSlide>
         ))}
