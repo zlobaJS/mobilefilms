@@ -224,6 +224,7 @@ function MobileNavigation() {
         </Box>
       )}
       <Box
+        className="bottom-navigation-container"
         sx={{
           position: "fixed",
           bottom: 0,
@@ -234,16 +235,6 @@ function MobileNavigation() {
           display: { xs: "block", sm: "none" },
           paddingTop: "20px",
           backgroundColor: "transparent",
-          "&::after": {
-            content: '""',
-            position: "absolute",
-            bottom: 0,
-            left: 0,
-            right: 0,
-            zIndex: -1,
-            height: "env(safe-area-inset-bottom)",
-            backgroundColor: "transparent",
-          },
         }}
       >
         <BottomNavigation
@@ -253,9 +244,9 @@ function MobileNavigation() {
             bgcolor: "transparent",
             height: "56px",
             background: "rgba(20, 20, 20, 0.8)",
+            backdropFilter: "blur(10px)",
             position: "relative",
             zIndex: 2,
-            backdropFilter: "blur(10px)",
             "& .MuiBottomNavigationAction-root": {
               minWidth: "auto",
               padding: 0,

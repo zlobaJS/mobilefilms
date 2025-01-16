@@ -194,6 +194,27 @@ body {
   }
 }
 
+/* Добавляем поддержку для iPhone home indicator area */
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+  .MuiBox-root {
+    margin-bottom: calc(-1 * env(safe-area-inset-bottom));
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  .bottom-navigation-container {
+    &::after {
+      content: "";
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: env(safe-area-inset-bottom);
+      background: transparent;
+      z-index: -1;
+    }
+  }
+}
+
 /* Для контента, который должен быть поверх status bar */
 .content-above-status-bar {
   margin-top: calc(-1 * var(--sat));
