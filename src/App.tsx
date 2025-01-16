@@ -724,10 +724,10 @@ function AppRoutes({ movies, isLoading }: { movies: any; isLoading: boolean }) {
                       showTitle={true}
                     />
                     <MovieSlider
-                      title="Самые оцениваемые"
-                      movies={movies.mostRated}
+                      title="Топ оценок 2024"
+                      movies={movies.mostRated2024}
                       loading={isLoading}
-                      categoryId="most-rated"
+                      categoryId="most-rated-2024"
                       onMovieSelect={handleMovieSelect}
                       showTitle={true}
                     />
@@ -1022,24 +1022,7 @@ function AppRoutes({ movies, isLoading }: { movies: any; isLoading: boolean }) {
 function App() {
   const [isLoading, setIsLoading] = useState(true);
   const [contentLoaded, setContentLoaded] = useState(false);
-  const [movies, setMovies] = useState<{
-    watchingToday: Movie[];
-    trendingToday: Movie[];
-    trendingWeek: Movie[];
-    popular: Movie[];
-    horror: Movie[];
-    action: Movie[];
-    comedy: Movie[];
-    scifi: Movie[];
-    thriller: Movie[];
-    western: Movie[];
-    drama: Movie[];
-    war: Movie[];
-    backdrop: Movie[];
-    fantasy: Movie[];
-    ruMovies: Movie[];
-    mostRated: Movie[];
-  }>({
+  const [movies, setMovies] = useState({
     watchingToday: [],
     trendingToday: [],
     trendingWeek: [],
@@ -1056,6 +1039,7 @@ function App() {
     fantasy: [],
     ruMovies: [],
     mostRated: [],
+    mostRated2024: [],
   });
   const startTimeRef = useRef(Date.now());
   const contentRef = useRef<HTMLDivElement>(null);
@@ -1080,6 +1064,7 @@ function App() {
           fantasyData,
           ruMoviesData,
           mostRatedData,
+          mostRated2024Data,
         ] = await Promise.all([
           getMovies.popular(),
           getMovies.nowPlaying(),
@@ -1097,6 +1082,7 @@ function App() {
           getMovies.byGenre(GENRES.FANTASY),
           getMovies.byCountry("RU"),
           getMovies.mostRated(),
+          getMovies.mostRated2024(),
         ]);
 
         const backdropMovies = backdropData.results.slice(0, 5);
@@ -1118,6 +1104,7 @@ function App() {
           fantasy: fantasyData.results,
           ruMovies: ruMoviesData.results,
           mostRated: mostRatedData.results,
+          mostRated2024: mostRated2024Data.results,
         });
 
         setContentLoaded(true);

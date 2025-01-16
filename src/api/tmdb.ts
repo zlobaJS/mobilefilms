@@ -155,6 +155,29 @@ export const getMovies = {
     });
   },
 
+  mostRated2024: async (page = 1) => {
+    return await fetchTMDB("/discover/movie", {
+      page: page.toString(),
+      sort_by: "vote_count.desc",
+      "vote_count.gte": "100",
+      primary_release_year: "2024",
+      include_image_language: "ru,en,null",
+      region: "RU",
+      language: "ru-RU",
+    });
+  },
+
+  popular2024: async (page = 1) => {
+    return await fetchTMDB("/discover/movie", {
+      page: page.toString(),
+      sort_by: "popularity.desc",
+      primary_release_year: "2024",
+      include_image_language: "ru,en,null",
+      region: "RU",
+      language: "ru-RU",
+    });
+  },
+
   byCategory: async (category: string, page = 1, sortBy?: string) => {
     switch (category) {
       case "now-playing":
@@ -187,6 +210,10 @@ export const getMovies = {
         return await getMovies.byCountry("RU", page, sortBy);
       case "most-rated":
         return await getMovies.mostRated(page);
+      case "most-rated-2024":
+        return await getMovies.mostRated2024(page);
+      case "popular-2024":
+        return await getMovies.popular2024(page);
       default:
         return await getMovies.popular(page);
     }
