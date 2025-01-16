@@ -1343,63 +1343,71 @@ export const MovieDetails = ({
                       </Typography>
                     )}
 
-                    {/* Возрастной рейтинг */}
-                    {certification && (
-                      <Chip
-                        label={AGE_RATINGS[certification] || certification}
-                        sx={{
-                          backgroundColor: "transparent",
-                          color: "#888",
-                          fontSize: "0.9rem",
-                          height: "20px",
-                          minWidth: "34px",
-                          border: "1px solid rgba(255, 255, 255, 0.2)",
-                          borderRadius: "4px",
-                          "& .MuiChip-label": {
-                            padding: "0 6px",
-                            fontWeight: "500",
-                            lineHeight: 1,
-                          },
-                          "&:hover": {
-                            backgroundColor: "transparent",
-                          },
-                        }}
-                      />
-                    )}
-                  </Box>
-
-                  {voteRank && (
                     <Box
                       sx={{
                         display: "flex",
                         alignItems: "center",
                         gap: 1,
-                        mt: 1,
                       }}
                     >
-                      <Typography
-                        sx={{
-                          color: "#888",
-                          fontSize: "0.9rem",
-                          display: "flex",
-                          alignItems: "center",
-                        }}
-                      >
-                        Место в топе по количеству оценок:{" "}
-                        <Box
-                          component="span"
+                      {certification && (
+                        <Chip
+                          label={AGE_RATINGS[certification] || certification}
                           sx={{
-                            color: "#00e676",
-                            fontWeight: "bold",
-                            ml: 1,
+                            backgroundColor: "transparent",
+                            color: "#888",
+                            fontSize: "0.9rem",
+                            height: "20px",
+                            minWidth: "34px",
+                            border: "1px solid rgba(255, 255, 255, 0.2)",
+                            borderRadius: "4px",
+                            "& .MuiChip-label": {
+                              padding: "0 6px",
+                              fontWeight: "500",
+                              lineHeight: 1,
+                            },
+                            "&:hover": {
+                              backgroundColor: "transparent",
+                            },
+                          }}
+                        />
+                      )}
+                      {voteRank !== null && voteRank <= 5000 && (
+                        <Typography
+                          sx={{
+                            color: "#888",
+                            fontSize: "0.9rem",
+                            display: "flex",
+                            alignItems: "center",
+                            "&::before": {
+                              content: '"•"',
+                              marginRight: "8px",
+                            },
                           }}
                         >
-                          #{voteRank}
-                        </Box>
-                      </Typography>
+                          {voteRank <= 1000 && (
+                            <Box
+                              component="img"
+                              src="https://yastatic.net/s3/kinopoisk-frontend/hd-www/release/_next/static/media/lightning-3x.8986661f.png"
+                              alt="top"
+                              sx={{
+                                width: "16px",
+                                height: "16px",
+                                marginRight: "4px",
+                                opacity: 0.8,
+                              }}
+                            />
+                          )}
+                          {(voteRank === 0 ? 1 : voteRank).toLocaleString(
+                            "ru-RU"
+                          )}{" "}
+                          место
+                        </Typography>
+                      )}
                     </Box>
-                  )}
+                  </Box>
 
+                  {/* Кнопки управления */}
                   <Box
                     sx={{
                       display: "flex",
@@ -1435,12 +1443,7 @@ export const MovieDetails = ({
                       <PlayArrowIcon sx={{ fontSize: 24 }} />
                     </Button>
 
-                    <Box
-                      sx={{
-                        display: "flex",
-                        gap: 1,
-                      }}
-                    >
+                    <Box sx={{ display: "flex", gap: 1 }}>
                       <IconButton
                         onClick={handleFavoriteClick}
                         sx={{
