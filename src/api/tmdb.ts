@@ -493,3 +493,26 @@ export const getMoviesByStudio = async (studioName: string, page = 1) => {
     return { results: [] };
   }
 };
+
+// Добавляем новую функцию для получения позиции фильма в рейтинге по количеству оценок
+export const getMovieRankByVoteCount = async (movieId: number) => {
+  try {
+    // Получаем фильм для определения количества голосов
+    const movieDetails = await getMovieDetails(movieId);
+    if (!movieDetails?.vote_count) return null;
+
+    // Получаем количество фильмов с большим количеством голосов
+    const data = await fetchTMDB("/discover/movie", {
+      sort_by: "vote_count.desc",
+      "vote_count.gte": movieDetails.vote_count.toString(),
+      page: "1",
+    });
+
+    // Вычисляем позицию
+    const totalResults = data.total_results;
+    return totalResults;
+  } catch (error) {
+    console.error("Error getting movie rank:", error);
+    return null;
+  }
+};

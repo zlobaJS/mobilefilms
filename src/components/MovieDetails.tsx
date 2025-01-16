@@ -33,6 +33,7 @@ import {
   getMovieVideos,
   getMovieReleaseInfo,
   AGE_RATINGS,
+  getMovieRankByVoteCount,
 } from "../api/tmdb";
 import { useEffect, useState } from "react";
 import { KinoboxPlayer } from "./KinoboxPlayer";
@@ -186,6 +187,7 @@ export const MovieDetails = ({
   const { addToWatched, removeFromWatched, isWatched } = useWatched();
   const [selectedPerson, setSelectedPerson] = useState<number | null>(null);
   const [isPersonDetailsOpen, setIsPersonDetailsOpen] = useState(false);
+  const [voteRank, setVoteRank] = useState<number | null>(null);
 
   // Добавляем useMediaQuery для определения мобильного разрешения
   const isMobileView = useMediaQuery(theme.breakpoints.down("sm"));
@@ -202,6 +204,7 @@ export const MovieDetails = ({
           recommendedMovies,
           keywordsData,
           releaseInfo,
+          rank,
         ] = await Promise.all([
           getMovieImages(movieData.id),
           getMovieDetails(movieData.id),
@@ -209,6 +212,7 @@ export const MovieDetails = ({
           getMovieRecommendations(movieData.id),
           getMovieKeywords(movieData.id),
           getMovieReleaseInfo(movieData.id),
+          getMovieRankByVoteCount(movieData.id),
         ]);
 
         console.log("Movie ID:", movieData.id);
@@ -282,6 +286,7 @@ export const MovieDetails = ({
         setCertification(releaseInfo);
         setIsLogoLoading(false);
         setIsLoading(false);
+        setVoteRank(rank);
       } catch (error) {
         console.error("Error in fetchData:", error);
         setIsLoading(false);
@@ -1362,6 +1367,38 @@ export const MovieDetails = ({
                       />
                     )}
                   </Box>
+
+                  {voteRank && (
+                    <Box
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 1,
+                        mt: 1,
+                      }}
+                    >
+                      <Typography
+                        sx={{
+                          color: "#888",
+                          fontSize: "0.9rem",
+                          display: "flex",
+                          alignItems: "center",
+                        }}
+                      >
+                        Место в топе по количеству оценок:{" "}
+                        <Box
+                          component="span"
+                          sx={{
+                            color: "#00e676",
+                            fontWeight: "bold",
+                            ml: 1,
+                          }}
+                        >
+                          #{voteRank}
+                        </Box>
+                      </Typography>
+                    </Box>
+                  )}
 
                   <Box
                     sx={{
