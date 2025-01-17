@@ -52,6 +52,7 @@ import { StudioMoviesPage } from "./pages/StudioMoviesPage";
 import { PersonPage } from "./pages/PersonPage";
 import { ChangelogPage } from "./pages/ChangelogPage";
 import { AboutPage } from "./pages/AboutPage";
+import { InstallPWA } from "./components/InstallPWA";
 const darkTheme = createTheme({
   palette: {
     mode: "dark",
@@ -1043,6 +1044,7 @@ function AppRoutes({ movies, isLoading }: { movies: any; isLoading: boolean }) {
         </AnimatePresence>
       </Box>
       <MobileNavigation />
+      <InstallPWA />
     </>
   );
 }
@@ -1172,25 +1174,8 @@ function App() {
             >
               <AppRoutes movies={movies} isLoading={!contentLoaded} />
             </div>
-
             <AnimatePresence mode="wait">
-              {isLoading && (
-                <motion.div
-                  initial={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.5 }}
-                  style={{
-                    position: "fixed",
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
-                    zIndex: 9999,
-                  }}
-                >
-                  <SplashScreen />
-                </motion.div>
-              )}
+              {isLoading && <SplashScreen />}
             </AnimatePresence>
           </ThemeProvider>
         </CastProvider>
