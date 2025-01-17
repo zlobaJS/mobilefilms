@@ -425,8 +425,8 @@ export const getMovieReleaseInfo = async (movieId: number) => {
       }
     }
 
-    // Форматируем данные о релизах
-    const releases = data.results
+    // Форматируем данные о релизах с приоритетом RU и US
+    const allReleases = data.results
       .map((country: any) => {
         if (!country.release_dates?.[0]) return null;
 
@@ -437,11 +437,28 @@ export const getMovieReleaseInfo = async (movieId: number) => {
           certification: country.release_dates[0].certification,
         };
       })
-      .filter(Boolean)
-      .sort(
-        (a: any, b: any) =>
-          new Date(a.date).getTime() - new Date(b.date).getTime()
-      );
+      .filter(Boolean);
+
+    // Сортируем релизы по приоритету стран и дате
+    const releases = allReleases.sort((a: any, b: any) => {
+      // Приоритет стран
+      const getPriority = (country: string) => {
+        if (country === "RU") return 0;
+        if (country === "US") return 1;
+        return 2;
+      };
+
+      const priorityA = getPriority(a.country);
+      const priorityB = getPriority(b.country);
+
+      // Сначала сортируем по приоритету стран
+      if (priorityA !== priorityB) {
+        return priorityA - priorityB;
+      }
+
+      // Затем по дате
+      return new Date(a.date).getTime() - new Date(b.date).getTime();
+    });
 
     return { certification, releases };
   } catch (error) {
