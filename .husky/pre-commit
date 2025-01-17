@@ -1,8 +1,1 @@
-#!/bin/sh
-. "$(dirname "$0")/_/husky.sh"
-
-# Генерируем changelog
-npm run generate-changelog
-
-# Если есть изменения в changelog, добавляем их в коммит
-git add src/pages/ChangelogPage.tsx 
+npm test
