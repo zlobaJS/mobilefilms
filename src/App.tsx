@@ -50,6 +50,8 @@ import { AllWatchedPage } from "./pages/AllWatchedPage";
 import { ProfilePage } from "./pages/ProfilePage";
 import { StudioMoviesPage } from "./pages/StudioMoviesPage";
 import { PersonPage } from "./pages/PersonPage";
+import { ChangelogPage } from "./pages/ChangelogPage";
+import { AboutPage } from "./pages/AboutPage";
 const darkTheme = createTheme({
   palette: {
     mode: "dark",
@@ -154,6 +156,9 @@ function MobileNavigation() {
       case "/about":
         setValue(5);
         break;
+      case "/changelog":
+        setValue(6);
+        break;
       default:
         if (location.pathname.includes("/category")) {
           setValue(2);
@@ -184,6 +189,9 @@ function MobileNavigation() {
         break;
       case 5:
         path = "/about";
+        break;
+      case 6:
+        path = "/changelog";
         break;
     }
 
@@ -912,12 +920,10 @@ function AppRoutes({ movies, isLoading }: { movies: any; isLoading: boolean }) {
                   key={location.pathname}
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
-                  exit={{ opacity: 1 }}
-                  transition={{ duration: 0.1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.2 }}
                 >
-                  <Box sx={{ p: 3 }}>
-                    <Typography variant="h4">О приложении</Typography>
-                  </Box>
+                  <AboutPage />
                 </motion.div>
               }
             />
@@ -1016,6 +1022,20 @@ function AppRoutes({ movies, isLoading }: { movies: any; isLoading: boolean }) {
                   transition={{ duration: 0.2 }}
                 >
                   <PersonPage />
+                </motion.div>
+              }
+            />
+            <Route
+              path="/changelog"
+              element={
+                <motion.div
+                  key={location.pathname}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <ChangelogPage />
                 </motion.div>
               }
             />

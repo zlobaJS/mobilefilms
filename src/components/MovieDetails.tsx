@@ -627,7 +627,7 @@ export const MovieDetails = ({
 
   // Добавьте новый useEffect для контроля времени воспроизведения трейлера
   useEffect(() => {
-    let timer: number;
+    let timer: NodeJS.Timeout;
 
     if (showTrailer && trailerUrl) {
       timer = setTimeout(() => {
