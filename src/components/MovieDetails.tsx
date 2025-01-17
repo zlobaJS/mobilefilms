@@ -692,9 +692,6 @@ export const MovieDetails = ({
     if (rankData) {
       console.log("Rank Data:", {
         rank: rankData.rank,
-        change: rankData.change,
-        lastUpdate: rankData.lastUpdate,
-        timeSinceLastUpdate: rankData.timeSinceLastUpdate,
       });
     }
   }, [rankData]);
@@ -1438,30 +1435,6 @@ export const MovieDetails = ({
                               (rankData?.rank === 0 ? 1 : rankData?.rank) ?? 0
                             ).toLocaleString("ru-RU")}{" "}
                             место
-                            {rankData?.change && (
-                              <Box
-                                sx={{
-                                  display: "flex",
-                                  alignItems: "center",
-                                  marginLeft: "8px",
-                                  color:
-                                    rankData.change > 0 ? "#4CAF50" : "#FF5252",
-                                  fontSize: "0.8rem",
-                                }}
-                              >
-                                {rankData.change > 0 ? "▲" : "▼"}
-                                <Typography
-                                  component="span"
-                                  sx={{
-                                    marginLeft: "2px",
-                                    fontSize: "inherit",
-                                    color: "inherit",
-                                  }}
-                                >
-                                  {Math.abs(rankData.change)}
-                                </Typography>
-                              </Box>
-                            )}
                           </Typography>
                         )}
                     </Box>

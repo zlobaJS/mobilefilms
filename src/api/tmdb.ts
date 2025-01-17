@@ -1,9 +1,5 @@
 export interface RankData {
   rank: number | null;
-  change: number | null;
-  timestamp: number;
-  lastUpdate: string;
-  timeSinceLastUpdate: string;
 }
 
 const tmdbProxy = {
@@ -556,58 +552,9 @@ export const getMoviesByStudio = async (studioName: string, page = 1) => {
   }
 };
 
-// Интерфейс для хранения истории позиций
-interface RankHistory {
-  movieId: number;
-  rank: number;
-  timestamp: number;
-}
-
-// Map для хранения истории позиций
-let rankHistoryMap = new Map<number, RankHistory>();
-
-// 1. Добавить сохранение истории в localStorage
-const saveRankHistory = () => {
-  localStorage.setItem(
-    "rankHistory",
-    JSON.stringify(Array.from(rankHistoryMap.entries()))
-  );
-};
-
-const loadRankHistory = () => {
-  const saved = localStorage.getItem("rankHistory");
-  if (saved) {
-    try {
-      const parsed = JSON.parse(saved) as [number, RankHistory][];
-      // Обновляем существующую Map
-      rankHistoryMap.clear();
-      parsed.forEach(([key, value]) => {
-        rankHistoryMap.set(key, value as RankHistory);
-      });
-    } catch (error) {
-      console.error("Error loading rank history:", error);
-    }
-  }
-};
-
-// 2. Добавить очистку старых записей
-const cleanupOldRanks = () => {
-  const now = Date.now();
-  const MAX_AGE = 24 * 60 * 60 * 1000; // 24 часа
-
-  rankHistoryMap.forEach((value, key) => {
-    if (now - value.timestamp > MAX_AGE) {
-      rankHistoryMap.delete(key);
-    }
-  });
-};
-
 // 3. Модифицировать функцию получения ранга
 export const getMovieRankByVoteCount = async (movieId: number) => {
   try {
-    loadRankHistory();
-    cleanupOldRanks();
-
     const movieDetails = await getMovieDetails(movieId);
     if (!movieDetails?.vote_count) return null;
 
@@ -618,13 +565,24 @@ export const getMovieRankByVoteCount = async (movieId: number) => {
       region: "RU",
       language: "ru-RU",
       include_image_language: "ru,en,null",
+      "vote_count.gte": "100",
     });
 
+    // Проверяем, есть ли фильм на первой странице
+    const firstPagePosition = initialData.results.findIndex(
+      (movie: any) => movie.id === movieId
+    );
+
+    if (firstPagePosition !== -1) {
+      // Если фильм на первой странице, возвращаем его точную позицию
+      return { rank: firstPagePosition + 1 };
+    }
+
+    // Если фильм не на первой странице, используем бинарный поиск
     let currentRank = null;
     const totalPages = Math.min(Math.ceil(5000 / 20), initialData.total_pages);
 
-    // Бинарный поиск нужной страницы
-    let left = 1;
+    let left = 2; // Начинаем со второй страницы
     let right = totalPages;
 
     while (left <= right) {
@@ -636,73 +594,80 @@ export const getMovieRankByVoteCount = async (movieId: number) => {
         region: "RU",
         language: "ru-RU",
         include_image_language: "ru,en,null",
+        "vote_count.gte": "100",
       });
 
+      const position = data.results.findIndex(
+        (movie: any) => movie.id === movieId
+      );
+
+      if (position !== -1) {
+        // Нашли фильм на текущей странице
+        currentRank = (mid - 1) * 20 + position + 1;
+        break;
+      }
+
+      // Определяем, в какую сторону двигаться, сравнивая количество голосов
       const firstMovieVoteCount = data.results[0]?.vote_count || 0;
       const lastMovieVoteCount =
         data.results[data.results.length - 1]?.vote_count || 0;
 
-      if (
-        movieDetails.vote_count >= lastMovieVoteCount &&
-        movieDetails.vote_count <= firstMovieVoteCount
-      ) {
-        // Фильм должен быть на этой странице
-        const position = data.results.findIndex(
+      if (movieDetails.vote_count > firstMovieVoteCount) {
+        // Фильм должен быть на более ранних страницах
+        right = mid - 1;
+      } else if (movieDetails.vote_count < lastMovieVoteCount) {
+        // Фильм должен быть на более поздних страницах
+        left = mid + 1;
+      } else {
+        // Фильм должен быть на текущей странице, но мы его не нашли
+        // Это может быть из-за особенностей сортировки API
+        // Продолжаем поиск в обе стороны
+        const prevPage = await fetchTMDB("/discover/movie", {
+          sort_by: "vote_count.desc",
+          page: (mid - 1).toString(),
+          region: "RU",
+          language: "ru-RU",
+          include_image_language: "ru,en,null",
+          "vote_count.gte": "100",
+        });
+
+        const prevPosition = prevPage.results.findIndex(
           (movie: any) => movie.id === movieId
         );
 
-        if (position !== -1) {
-          currentRank = (mid - 1) * 20 + position + 1;
+        if (prevPosition !== -1) {
+          currentRank = (mid - 2) * 20 + prevPosition + 1;
           break;
         }
-      }
 
-      if (movieDetails.vote_count > firstMovieVoteCount) {
-        right = mid - 1;
-      } else {
-        left = mid + 1;
+        const nextPage = await fetchTMDB("/discover/movie", {
+          sort_by: "vote_count.desc",
+          page: (mid + 1).toString(),
+          region: "RU",
+          language: "ru-RU",
+          include_image_language: "ru,en,null",
+          "vote_count.gte": "100",
+        });
+
+        const nextPosition = nextPage.results.findIndex(
+          (movie: any) => movie.id === movieId
+        );
+
+        if (nextPosition !== -1) {
+          currentRank = mid * 20 + nextPosition + 1;
+          break;
+        }
+
+        // Если все еще не нашли, двигаемся вперед
+        left = mid + 2;
       }
     }
 
-    // Ограничиваем показ только для топ-5000 фильмов
     if (!currentRank || currentRank > 5000) {
       return null;
     }
 
-    // Получаем предыдущую позицию из истории
-    const previousData = rankHistoryMap.get(movieId);
-    const now = Date.now();
-    const UPDATE_INTERVAL = 4 * 60 * 60 * 1000;
-
-    let rankChange = 0;
-
-    if (previousData) {
-      if (now - previousData.timestamp > UPDATE_INTERVAL) {
-        rankChange = previousData.rank - currentRank;
-      }
-    }
-
-    // Сохраняем новую позицию
-    rankHistoryMap.set(movieId, {
-      movieId,
-      rank: currentRank,
-      timestamp: now,
-    });
-
-    saveRankHistory();
-
-    return {
-      rank: currentRank,
-      change: rankChange !== 0 ? rankChange : null,
-      timestamp: now,
-      lastUpdate: previousData?.timestamp
-        ? new Date(previousData.timestamp).toLocaleString()
-        : "never",
-      timeSinceLastUpdate: previousData
-        ? Math.floor((now - previousData.timestamp) / (1000 * 60 * 60)) +
-          " hours"
-        : "never",
-    };
+    return { rank: currentRank };
   } catch (error) {
     console.error("Error getting movie rank:", error);
     return null;
