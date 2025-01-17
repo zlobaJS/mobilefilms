@@ -23,7 +23,6 @@ import HomeIcon from "@mui/icons-material/Home";
 import SearchIcon from "@mui/icons-material/Search";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import SettingsIcon from "@mui/icons-material/Settings";
-import InfoIcon from "@mui/icons-material/Info";
 import PersonIcon from "@mui/icons-material/Person";
 import { MovieSlider } from "./components/MovieSlider";
 import { BackdropSlider } from "./components/BackdropSlider";
@@ -51,7 +50,6 @@ import { ProfilePage } from "./pages/ProfilePage";
 import { StudioMoviesPage } from "./pages/StudioMoviesPage";
 import { PersonPage } from "./pages/PersonPage";
 import { ChangelogPage } from "./pages/ChangelogPage";
-import { AboutPage } from "./pages/AboutPage";
 import { InstallPWA } from "./components/InstallPWA";
 const darkTheme = createTheme({
   palette: {
@@ -154,9 +152,6 @@ function MobileNavigation() {
       case "/settings":
         setValue(4);
         break;
-      case "/about":
-        setValue(5);
-        break;
       case "/changelog":
         setValue(6);
         break;
@@ -187,9 +182,6 @@ function MobileNavigation() {
         break;
       case 4:
         path = "/settings";
-        break;
-      case 5:
-        path = "/about";
         break;
       case 6:
         path = "/changelog";
@@ -324,15 +316,6 @@ function MobileNavigation() {
           />
           <BottomNavigationAction
             icon={<SettingsIcon />}
-            sx={{
-              "&.Mui-selected .MuiSvgIcon-root": {
-                transform: "scale(1.1)",
-                transition: "transform 0.2s",
-              },
-            }}
-          />
-          <BottomNavigationAction
-            icon={<InfoIcon />}
             sx={{
               "&.Mui-selected .MuiSvgIcon-root": {
                 transform: "scale(1.1)",
@@ -911,20 +894,6 @@ function AppRoutes({ movies, isLoading }: { movies: any; isLoading: boolean }) {
                   transition={{ duration: 0.1 }}
                 >
                   <SettingsPage />
-                </motion.div>
-              }
-            />
-            <Route
-              path="/about"
-              element={
-                <motion.div
-                  key={location.pathname}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  <AboutPage />
                 </motion.div>
               }
             />
