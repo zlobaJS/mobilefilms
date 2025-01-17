@@ -113,29 +113,6 @@ export const BackdropSlider = ({ movies }: BackdropSliderProps) => {
     }
   }, [randomMovies]);
 
-  const formatRuntime = (minutes: number) => {
-    const hours = Math.floor(minutes / 60);
-    const mins = minutes % 60;
-    return `${hours}ч ${mins}м`;
-  };
-
-  const countryTranslations: { [key: string]: string } = {
-    "United States of America": "США",
-    "United Kingdom": "Великобритания",
-    Russia: "Россия",
-    France: "Франция",
-    Germany: "Германия",
-    Italy: "Италия",
-    Spain: "Испания",
-    China: "Китай",
-    Japan: "Япония",
-    "South Korea": "Южная Корея",
-  };
-
-  const getCountryName = (englishName: string) => {
-    return countryTranslations[englishName] || englishName;
-  };
-
   const MovieInfo = ({
     movie,
     isMobile = false,
@@ -378,9 +355,10 @@ export const BackdropSlider = ({ movies }: BackdropSliderProps) => {
                 height: "70%",
                 background: `linear-gradient(
                   0deg,
-                  rgba(14,18,28,1) 0%,
-                  rgba(14,18,28,0.92) 30%,
-                  rgba(16,20,32,0.85) 50%,
+                  rgba(20,20,20,1) 0%,
+                  rgba(20,20,20,1) 20%,
+                  rgba(20,20,20,0.98) 35%,
+                  rgba(20,20,20,0.7) 60%,
                   rgba(20,20,20,0) 100%
                 )`,
                 zIndex: 1,
@@ -395,14 +373,13 @@ export const BackdropSlider = ({ movies }: BackdropSliderProps) => {
                 position: "absolute",
                 left: 0,
                 top: 0,
-                width: "70%",
+                width: "40%",
                 height: "100%",
                 background: `linear-gradient(
                   90deg,
-                  rgba(10,15,25,1) 0%,
-                  rgba(10,15,25,0.98) 20%,
-                  rgba(12,18,28,0.95) 40%,
-                  rgba(14,20,32,0.8) 60%,
+                  rgba(20,20,20,0.4) 0%,
+                  rgba(20,20,20,0.3) 30%,
+                  rgba(20,20,20,0.1) 70%,
                   rgba(20,20,20,0) 100%
                 )`,
                 zIndex: 1,
@@ -416,14 +393,13 @@ export const BackdropSlider = ({ movies }: BackdropSliderProps) => {
                 position: "absolute",
                 right: 0,
                 top: 0,
-                width: "40%",
+                width: "25%",
                 height: "100%",
                 background: `linear-gradient(
                   270deg,
-                  rgba(10,15,25,1) 0%,
-                  rgba(10,15,25,0.98) 20%,
-                  rgba(12,18,28,0.95) 40%,
-                  rgba(14,20,32,0.8) 60%,
+                  rgba(20,20,20,0.4) 0%,
+                  rgba(20,20,20,0.3) 30%,
+                  rgba(20,20,20,0.1) 70%,
                   rgba(20,20,20,0) 100%
                 )`,
                 zIndex: 1,
@@ -442,9 +418,9 @@ export const BackdropSlider = ({ movies }: BackdropSliderProps) => {
                 height: "100%",
                 background: `linear-gradient(
                   90deg,
-                  rgba(10,15,25,0.98) 0%,
-                  rgba(12,18,28,0.9) 40%,
-                  rgba(14,20,32,0.7) 70%,
+                  rgba(20,20,20,0.4) 0%,
+                  rgba(20,20,20,0.3) 40%,
+                  rgba(20,20,20,0.1) 70%,
                   rgba(20,20,20,0) 100%
                 )`,
                 zIndex: 1,
@@ -462,9 +438,9 @@ export const BackdropSlider = ({ movies }: BackdropSliderProps) => {
                 height: "100%",
                 background: `linear-gradient(
                   270deg,
-                  rgba(10,15,25,0.98) 0%,
-                  rgba(12,18,28,0.9) 40%,
-                  rgba(14,20,32,0.7) 70%,
+                  rgba(20,20,20,0.4) 0%,
+                  rgba(20,20,20,0.3) 40%,
+                  rgba(20,20,20,0.1) 70%,
                   rgba(20,20,20,0) 100%
                 )`,
                 zIndex: 1,
