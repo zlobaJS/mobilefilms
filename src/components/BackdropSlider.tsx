@@ -185,54 +185,6 @@ export const BackdropSlider = ({ movies }: BackdropSliderProps) => {
           </Typography>
         )}
 
-        <Box
-          sx={{
-            display: "flex",
-            gap: 2,
-            alignItems: "center",
-            justifyContent: isMobile ? "center" : "flex-start",
-            flexWrap: "wrap",
-          }}
-        >
-          <Typography
-            sx={{
-              color: "#00e676",
-              fontWeight: "bold",
-            }}
-          >
-            {Math.round(movie.vote_average * 10)}%
-          </Typography>
-          <Typography sx={{ color: "rgba(255,255,255,0.7)" }}>
-            {new Date(movie.release_date).getFullYear()}
-          </Typography>
-          {movie.production_countries &&
-            movie.production_countries.length > 0 && (
-              <Typography sx={{ color: "rgba(255,255,255,0.7)" }}>
-                {getCountryName(movie.production_countries[0].name)}
-              </Typography>
-            )}
-          {movie.runtime && !isMobile && (
-            <Typography sx={{ color: "rgba(255,255,255,0.7)" }}>
-              {formatRuntime(movie.runtime)}
-            </Typography>
-          )}
-          {movie.release_quality && (
-            <Typography
-              sx={{
-                color: "#000000",
-                textTransform: "uppercase",
-                fontWeight: "bold",
-                backgroundColor: "rgba(255,255,255,0.7)",
-                padding: "2px 8px",
-                borderRadius: "4px",
-                fontSize: "0.8rem",
-              }}
-            >
-              {movie.release_quality}
-            </Typography>
-          )}
-        </Box>
-
         {!isMobile && (
           <Typography
             sx={{
@@ -585,54 +537,6 @@ export const BackdropSlider = ({ movies }: BackdropSliderProps) => {
                   {movie.title}
                 </Typography>
               )}
-
-              <Box
-                sx={{
-                  display: "flex",
-                  gap: 2,
-                  alignItems: "center",
-                  justifyContent: "center",
-                  flexWrap: "wrap",
-                }}
-              >
-                <Typography
-                  sx={{
-                    color: "#00e676",
-                    fontWeight: "bold",
-                  }}
-                >
-                  {Math.round(movie.vote_average * 10)}%
-                </Typography>
-                <Typography sx={{ color: "rgba(255,255,255,0.7)" }}>
-                  {new Date(movie.release_date).getFullYear()}
-                </Typography>
-                {movie.production_countries &&
-                  movie.production_countries.length > 0 && (
-                    <Typography sx={{ color: "rgba(255,255,255,0.7)" }}>
-                      {getCountryName(movie.production_countries[0].name)}
-                    </Typography>
-                  )}
-                {movie.runtime && (
-                  <Typography sx={{ color: "rgba(255,255,255,0.7)" }}>
-                    {formatRuntime(movie.runtime)}
-                  </Typography>
-                )}
-                {movie.release_quality && (
-                  <Typography
-                    sx={{
-                      color: "#000000",
-                      textTransform: "uppercase",
-                      fontWeight: "bold",
-                      backgroundColor: "rgba(255,255,255,0.7)",
-                      padding: "2px 8px",
-                      borderRadius: "4px",
-                      fontSize: "0.8rem",
-                    }}
-                  >
-                    {movie.release_quality}
-                  </Typography>
-                )}
-              </Box>
             </Box>
           </SwiperSlide>
         ))}
