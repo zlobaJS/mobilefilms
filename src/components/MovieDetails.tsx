@@ -34,6 +34,7 @@ import {
   getMovieReleaseInfo,
   AGE_RATINGS,
   getMovieRankByVoteCount,
+  RankData,
 } from "../api/tmdb";
 import { useEffect, useState } from "react";
 import { KinoboxPlayer } from "./KinoboxPlayer";
@@ -140,12 +141,6 @@ const formatReleaseDate = (dateString: string) => {
     year: "numeric",
   });
 };
-
-// Добавим интерфейс для ранга
-interface RankData {
-  rank: number | null;
-  change: number | null;
-}
 
 export const MovieDetails = ({
   movie: initialMovie,
@@ -682,6 +677,17 @@ export const MovieDetails = ({
       navigate(`/movie/${movieId}`);
     }
   };
+
+  useEffect(() => {
+    if (rankData) {
+      console.log("Rank Data:", {
+        rank: rankData.rank,
+        change: rankData.change,
+        lastUpdate: rankData.lastUpdate,
+        timeSinceLastUpdate: rankData.timeSinceLastUpdate,
+      });
+    }
+  }, [rankData]);
 
   if (!currentMovie && !movieId) return null;
 

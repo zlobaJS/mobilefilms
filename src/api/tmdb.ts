@@ -1,3 +1,11 @@
+export interface RankData {
+  rank: number | null;
+  change: number | null;
+  timestamp: number;
+  lastUpdate: string;
+  timeSinceLastUpdate: string;
+}
+
 const tmdbProxy = {
   name: "TMDB Proxy",
   version: "1.0.3",
@@ -521,45 +529,119 @@ export const getMoviesByStudio = async (studioName: string, page = 1) => {
   }
 };
 
-// Добавляем интерфейс для хранения позиций
+// Интерфейс для хранения истории позиций
 interface RankHistory {
   movieId: number;
   rank: number;
   timestamp: number;
 }
 
-// Создаем Map для хранения истории позиций
-const rankHistoryMap = new Map<number, RankHistory>();
+// Map для хранения истории позиций
+let rankHistoryMap = new Map<number, RankHistory>();
 
+// 1. Добавить сохранение истории в localStorage
+const saveRankHistory = () => {
+  localStorage.setItem(
+    "rankHistory",
+    JSON.stringify(Array.from(rankHistoryMap.entries()))
+  );
+};
+
+const loadRankHistory = () => {
+  const saved = localStorage.getItem("rankHistory");
+  if (saved) {
+    try {
+      const parsed = JSON.parse(saved) as [number, RankHistory][];
+      // Обновляем существующую Map
+      rankHistoryMap.clear();
+      parsed.forEach(([key, value]) => {
+        rankHistoryMap.set(key, value as RankHistory);
+      });
+    } catch (error) {
+      console.error("Error loading rank history:", error);
+    }
+  }
+};
+
+// 2. Добавить очистку старых записей
+const cleanupOldRanks = () => {
+  const now = Date.now();
+  const MAX_AGE = 24 * 60 * 60 * 1000; // 24 часа
+
+  rankHistoryMap.forEach((value, key) => {
+    if (now - value.timestamp > MAX_AGE) {
+      rankHistoryMap.delete(key);
+    }
+  });
+};
+
+// 3. Модифицировать функцию получения ранга
 export const getMovieRankByVoteCount = async (movieId: number) => {
   try {
+    loadRankHistory();
+    cleanupOldRanks();
+
     const movieDetails = await getMovieDetails(movieId);
     if (!movieDetails?.vote_count) return null;
 
+    // Добавляем случайный параметр для избежания кэширования
     const data = await fetchTMDB("/discover/movie", {
       sort_by: "vote_count.desc",
       "vote_count.gte": movieDetails.vote_count.toString(),
       page: "1",
+      // Добавляем timestamp для избежания кэширования
+      _t: Date.now().toString(),
     });
 
     const currentRank = data.total_results <= 5000 ? data.total_results : null;
 
-    // Получаем предыдущую позицию
+    // Получаем предыдущую позицию из истории
     const previousData = rankHistoryMap.get(movieId);
-    const rankChange = previousData ? previousData.rank - currentRank : 0;
 
-    // Сохраняем текущую позицию
-    if (currentRank !== null) {
+    // Проверяем, прошло ли достаточно времени для обновления
+    const now = Date.now();
+    const UPDATE_INTERVAL = 4 * 60 * 60 * 1000; // 4 часа
+
+    let rankChange = 0;
+
+    if (previousData) {
+      // Обновляем изменение только если прошло достаточно времени
+      if (now - previousData.timestamp > UPDATE_INTERVAL) {
+        rankChange = previousData.rank - (currentRank || 0);
+      } else {
+        // Если времени прошло мало, используем старое изменение
+        rankChange = 0;
+      }
+    }
+
+    // Сохраняем текущую позицию только если она изменилась или прошло достаточно времени
+    if (
+      currentRank !== null &&
+      (!previousData ||
+        currentRank !== previousData.rank ||
+        now - previousData.timestamp > UPDATE_INTERVAL)
+    ) {
       rankHistoryMap.set(movieId, {
         movieId,
         rank: currentRank,
-        timestamp: Date.now(),
+        timestamp: now,
       });
+
+      saveRankHistory();
     }
 
+    // Добавляем в ответ больше информации для отладки
     return {
       rank: currentRank,
       change: rankChange !== 0 ? rankChange : null,
+      timestamp: now,
+      lastUpdate: previousData?.timestamp
+        ? new Date(previousData.timestamp).toLocaleString()
+        : "never",
+      timeSinceLastUpdate: previousData
+        ? Math.floor((now - previousData.timestamp) / (1000 * 60 * 60)) +
+          " hours"
+        : "never",
     };
   } catch (error) {
     console.error("Error getting movie rank:", error);
