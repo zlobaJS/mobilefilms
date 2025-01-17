@@ -681,7 +681,7 @@ function AppRoutes({ movies, isLoading }: { movies: any; isLoading: boolean }) {
                       minHeight: "100dvh",
                       backgroundColor: "#141414",
                       paddingTop: {
-                        xs: "calc(100vw * 1.2 + env(safe-area-inset-top) - 44px)",
+                        xs: "calc(100vw * 1.2 + env(safe-area-inset-top) - 94px)",
                         sm: "60vh",
                       },
                       position: "relative",
