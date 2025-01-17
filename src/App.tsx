@@ -724,6 +724,14 @@ function AppRoutes({ movies, isLoading }: { movies: any; isLoading: boolean }) {
                       showTitle={true}
                     />
                     <MovieSlider
+                      title="Самые высокооцененные"
+                      movies={movies.mostRated}
+                      loading={isLoading}
+                      categoryId="most-rated"
+                      onMovieSelect={handleMovieSelect}
+                      showTitle={true}
+                    />
+                    <MovieSlider
                       title="Топ оценок 2024"
                       movies={movies.mostRated2024}
                       loading={isLoading}
