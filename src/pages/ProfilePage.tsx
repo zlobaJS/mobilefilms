@@ -1,4 +1,12 @@
-import { Box, Container, Typography, Paper, Avatar, Grid } from "@mui/material";
+import {
+  Box,
+  Container,
+  Typography,
+  Paper,
+  Avatar,
+  Grid,
+  Button,
+} from "@mui/material";
 import { motion } from "framer-motion";
 import { FavoritesSlider } from "../components/FavoritesSlider";
 import { WatchedSlider } from "../components/WatchedSlider";
@@ -17,6 +25,8 @@ import { useFavoritePersons } from "../hooks/useFavoritePersons";
 import PersonIcon from "@mui/icons-material/Person";
 import { useNavigate } from "react-router-dom";
 import { Movie } from "../types/movie";
+import { useAuth } from "../hooks/useAuth";
+import GoogleIcon from "@mui/icons-material/Google";
 
 // Добавляем объект с переводами стран (можно вынести в отдельный файл)
 const countryTranslations: { [key: string]: string } = {
@@ -104,6 +114,7 @@ export const ProfilePage = () => {
   const { favorites, removeFromFavorites } = useFavorites();
   const { watchedMovies, removeFromWatched } = useWatched();
   const { favoritePersons, removeFromFavoritePersons } = useFavoritePersons();
+  const { user, signInWithGoogle, logout } = useAuth();
 
   // Обновляем обработчик для диалога
   const handleMovieSelectDialog = useCallback((movie: Movie | number) => {
@@ -380,24 +391,111 @@ export const ProfilePage = () => {
                 flexDirection: "column",
                 alignItems: "center",
                 gap: 2,
+                py: 2,
               }}
             >
-              <Avatar
-                sx={{
-                  width: 120,
-                  height: 120,
-                  bgcolor: "#0686ee",
-                  fontSize: "3rem",
-                }}
-              >
-                U
-              </Avatar>
-              <Typography
-                variant="h5"
-                sx={{ color: "white", fontWeight: "bold" }}
-              >
-                Пользователь
-              </Typography>
+              {user ? (
+                <>
+                  <Avatar
+                    src={user.photoURL || undefined}
+                    sx={{
+                      width: 96,
+                      height: 96,
+                      border: "4px solid rgba(255, 255, 255, 0.1)",
+                      backgroundColor: "#0686ee",
+                      fontSize: "2.5rem",
+                      transition: "all 0.3s ease",
+                      "&:hover": {
+                        transform: "scale(1.05)",
+                        borderColor: "rgba(255, 255, 255, 0.2)",
+                      },
+                    }}
+                  >
+                    {user.photoURL ? null : user.displayName?.[0] || "U"}
+                  </Avatar>
+                  <Typography
+                    variant="h5"
+                    sx={{
+                      color: "white",
+                      fontWeight: 500,
+                      fontSize: "1.5rem",
+                      textAlign: "center",
+                      marginTop: 1,
+                    }}
+                  >
+                    {user.displayName || "Пользователь"}
+                  </Typography>
+                  <Button
+                    variant="outlined"
+                    onClick={logout}
+                    sx={{
+                      color: "#0686ee",
+                      borderColor: "#0686ee",
+                      textTransform: "none",
+                      fontSize: "0.95rem",
+                      px: 3,
+                      py: 0.8,
+                      mt: 1,
+                      "&:hover": {
+                        borderColor: "#0686ee",
+                        backgroundColor: "rgba(6, 134, 238, 0.1)",
+                      },
+                    }}
+                  >
+                    Выйти
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Avatar
+                    sx={{
+                      width: 96,
+                      height: 96,
+                      border: "4px solid rgba(255, 255, 255, 0.1)",
+                      backgroundColor: "#0686ee",
+                      fontSize: "2.5rem",
+                      transition: "all 0.3s ease",
+                      "&:hover": {
+                        transform: "scale(1.05)",
+                        borderColor: "rgba(255, 255, 255, 0.2)",
+                      },
+                    }}
+                  >
+                    U
+                  </Avatar>
+                  <Typography
+                    variant="h5"
+                    sx={{
+                      color: "white",
+                      fontWeight: 500,
+                      fontSize: "1.5rem",
+                      textAlign: "center",
+                      marginTop: 1,
+                      marginBottom: 2,
+                    }}
+                  >
+                    Войдите в аккаунт
+                  </Typography>
+                  <Button
+                    variant="contained"
+                    startIcon={<GoogleIcon />}
+                    onClick={signInWithGoogle}
+                    sx={{
+                      backgroundColor: "#0686ee",
+                      color: "white",
+                      textTransform: "none",
+                      fontSize: "0.95rem",
+                      px: 3,
+                      py: 0.8,
+                      "&:hover": {
+                        backgroundColor: "#0571cc",
+                      },
+                    }}
+                  >
+                    Войти через Google
+                  </Button>
+                </>
+              )}
             </Box>
           </Paper>
 

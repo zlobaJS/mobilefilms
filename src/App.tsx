@@ -18,6 +18,7 @@ import {
   Paper,
   IconButton,
   Skeleton,
+  Avatar,
 } from "@mui/material";
 import HomeIcon from "@mui/icons-material/Home";
 import SearchIcon from "@mui/icons-material/Search";
@@ -51,6 +52,8 @@ import { StudioMoviesPage } from "./pages/StudioMoviesPage";
 import { PersonPage } from "./pages/PersonPage";
 import { ChangelogPage } from "./pages/ChangelogPage";
 import { InstallPWA } from "./components/InstallPWA";
+import { useAuth } from "./hooks/useAuth";
+import { AuthProvider } from "./contexts/AuthContext";
 const darkTheme = createTheme({
   palette: {
     mode: "dark",
@@ -134,6 +137,7 @@ function MobileNavigation() {
   const location = useLocation();
   const [value, setValue] = useState(2);
   const [isLoading, setIsLoading] = useState(false);
+  const { user } = useAuth();
 
   useEffect(() => {
     switch (location.pathname) {
@@ -306,11 +310,32 @@ function MobileNavigation() {
             }}
           />
           <BottomNavigationAction
-            icon={<PersonIcon />}
+            icon={
+              user ? (
+                <Avatar
+                  src={user.photoURL || undefined}
+                  sx={{
+                    width: 24,
+                    height: 24,
+                    fontSize: "1rem",
+                  }}
+                >
+                  {user.photoURL ? null : user.displayName?.[0] || "U"}
+                </Avatar>
+              ) : (
+                <PersonIcon />
+              )
+            }
             sx={{
               "&.Mui-selected .MuiSvgIcon-root": {
                 transform: "scale(1.1)",
                 transition: "transform 0.2s",
+              },
+              "& .MuiAvatar-root": {
+                transition: "transform 0.2s",
+              },
+              "&.Mui-selected .MuiAvatar-root": {
+                transform: "scale(1.1)",
               },
             }}
           />
@@ -1127,29 +1152,31 @@ function App() {
   }, []);
 
   return (
-    <StrictMode>
-      <BrowserRouter>
-        <CastProvider>
-          <ThemeProvider theme={darkTheme}>
-            <CssBaseline />
-            <div
-              ref={contentRef}
-              style={{
-                visibility: isLoading ? "hidden" : "visible",
-                position: isLoading ? "fixed" : "relative",
-                width: "100%",
-                height: "100%",
-              }}
-            >
-              <AppRoutes movies={movies} isLoading={!contentLoaded} />
-            </div>
-            <AnimatePresence mode="wait">
-              {isLoading && <SplashScreen />}
-            </AnimatePresence>
-          </ThemeProvider>
-        </CastProvider>
-      </BrowserRouter>
-    </StrictMode>
+    <AuthProvider>
+      <StrictMode>
+        <BrowserRouter>
+          <CastProvider>
+            <ThemeProvider theme={darkTheme}>
+              <CssBaseline />
+              <div
+                ref={contentRef}
+                style={{
+                  visibility: isLoading ? "hidden" : "visible",
+                  position: isLoading ? "fixed" : "relative",
+                  width: "100%",
+                  height: "100%",
+                }}
+              >
+                <AppRoutes movies={movies} isLoading={!contentLoaded} />
+              </div>
+              <AnimatePresence mode="wait">
+                {isLoading && <SplashScreen />}
+              </AnimatePresence>
+            </ThemeProvider>
+          </CastProvider>
+        </BrowserRouter>
+      </StrictMode>
+    </AuthProvider>
   );
 }
 
