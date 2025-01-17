@@ -190,6 +190,13 @@ export const MovieDetails = ({
   const [selectedPerson, setSelectedPerson] = useState<number | null>(null);
   const [isPersonDetailsOpen, setIsPersonDetailsOpen] = useState(false);
   const [rankData, setRankData] = useState<RankData | null>(null);
+  const [releaseData, setReleaseData] = useState<{
+    certification: string | null;
+    releases: any[];
+  }>({
+    certification: null,
+    releases: [],
+  });
 
   // Добавляем useMediaQuery для определения мобильного разрешения
   const isMobileView = useMediaQuery(theme.breakpoints.down("sm"));
@@ -286,7 +293,8 @@ export const MovieDetails = ({
 
         setRecommendations(recommendedMovies || []);
         setKeywords(keywordsData);
-        setCertification(releaseInfo);
+        setCertification(releaseInfo.certification);
+        setReleaseData(releaseInfo);
         setIsLogoLoading(false);
         setIsLoading(false);
         setRankData(rank);
@@ -690,6 +698,18 @@ export const MovieDetails = ({
       });
     }
   }, [rankData]);
+
+  // Добавляем функцию для получения типа релиза
+  const getReleaseType = (type: number) => {
+    const types: { [key: number]: string } = {
+      1: "Премьера",
+      2: "Театральный релиз",
+      3: "Цифровой релиз",
+      4: "Физический релиз",
+      5: "ТВ релиз",
+    };
+    return types[type] || "Релиз";
+  };
 
   if (!currentMovie && !movieId) return null;
 
@@ -1603,7 +1623,100 @@ export const MovieDetails = ({
                     )}
                   </Typography>
 
-                  {/* Студии - перемещаем сюда */}
+                  {/* Даты релиза в виде слайдера */}
+                  {releaseData.releases.length > 0 && (
+                    <Box sx={{ mb: 4 }}>
+                      <Typography
+                        variant="h6"
+                        sx={{
+                          color: "#6b6868",
+                          fontSize: "0.9rem",
+                          fontWeight: 500,
+                          mb: 2,
+                          textAlign: "left",
+                        }}
+                      >
+                        Даты релиза
+                      </Typography>
+                      <Box sx={{ position: "relative" }}>
+                        <Swiper
+                          modules={[FreeMode]}
+                          slidesPerView="auto"
+                          spaceBetween={8}
+                          freeMode
+                          style={{ padding: "4px" }}
+                        >
+                          {releaseData.releases.map((release, index) => {
+                            const Flag =
+                              (Flags as any)[release.country] || null;
+                            return (
+                              <SwiperSlide
+                                key={index}
+                                style={{
+                                  width: "auto",
+                                  marginRight: "4px",
+                                }}
+                              >
+                                <Box
+                                  sx={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                    gap: 1.5,
+                                    backgroundColor: "rgba(255,255,255,0.05)",
+                                    borderRadius: "8px",
+                                    padding: "12px",
+                                    minWidth: { xs: "200px", sm: "250px" },
+                                  }}
+                                >
+                                  {Flag && (
+                                    <Flag
+                                      title={release.country}
+                                      style={{
+                                        width: "24px",
+                                        height: "18px",
+                                        borderRadius: "2px",
+                                      }}
+                                    />
+                                  )}
+                                  <Box>
+                                    <Typography
+                                      sx={{
+                                        fontSize: "0.9rem",
+                                        color: "white",
+                                        fontWeight: 500,
+                                      }}
+                                    >
+                                      {translateCountry(release.country)}
+                                    </Typography>
+                                    <Typography
+                                      sx={{
+                                        fontSize: "0.8rem",
+                                        color: "#888",
+                                      }}
+                                    >
+                                      {new Date(
+                                        release.date
+                                      ).toLocaleDateString("ru-RU", {
+                                        day: "numeric",
+                                        month: "long",
+                                        year: "numeric",
+                                      })}
+                                      {" • "}
+                                      {getReleaseType(release.type)}
+                                      {release.certification &&
+                                        ` • ${release.certification}`}
+                                    </Typography>
+                                  </Box>
+                                </Box>
+                              </SwiperSlide>
+                            );
+                          })}
+                        </Swiper>
+                      </Box>
+                    </Box>
+                  )}
+
+                  {/* Студии - идут после дат релиза */}
                   {details?.production_companies &&
                     details.production_companies.length > 0 && (
                       <Box sx={{ mb: 4 }}>

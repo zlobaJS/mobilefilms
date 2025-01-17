@@ -408,35 +408,45 @@ export const getMovieVideos = async (movieId: number) => {
 export const getMovieReleaseInfo = async (movieId: number) => {
   try {
     const data = await fetchTMDB(`/movie/${movieId}/release_dates`, {});
-    console.log("Raw release dates data:", data); // Для отладки
 
     if (!data.results) {
-      return null;
+      return { certification: null, releases: [] };
     }
 
-    // Ищем рейтинг сначала для России
+    // Получаем сертификацию как раньше
+    let certification = null;
     const ruRelease = data.results.find((r: any) => r.iso_3166_1 === "RU");
     if (ruRelease?.release_dates?.[0]?.certification) {
-      return ruRelease.release_dates[0].certification;
-    }
-
-    // Если нет российского, ищем США
-    const usRelease = data.results.find((r: any) => r.iso_3166_1 === "US");
-    if (usRelease?.release_dates?.[0]?.certification) {
-      return usRelease.release_dates[0].certification;
-    }
-
-    // Если нет ни российского, ни американского - берем первый доступный
-    for (const country of data.results) {
-      if (country.release_dates?.[0]?.certification) {
-        return country.release_dates[0].certification;
+      certification = ruRelease.release_dates[0].certification;
+    } else {
+      const usRelease = data.results.find((r: any) => r.iso_3166_1 === "US");
+      if (usRelease?.release_dates?.[0]?.certification) {
+        certification = usRelease.release_dates[0].certification;
       }
     }
 
-    return null;
+    // Форматируем данные о релизах
+    const releases = data.results
+      .map((country: any) => {
+        if (!country.release_dates?.[0]) return null;
+
+        return {
+          country: country.iso_3166_1,
+          type: country.release_dates[0].type,
+          date: country.release_dates[0].release_date,
+          certification: country.release_dates[0].certification,
+        };
+      })
+      .filter(Boolean)
+      .sort(
+        (a: any, b: any) =>
+          new Date(a.date).getTime() - new Date(b.date).getTime()
+      );
+
+    return { certification, releases };
   } catch (error) {
     console.error("Error fetching movie release info:", error);
-    return null;
+    return { certification: null, releases: [] };
   }
 };
 
