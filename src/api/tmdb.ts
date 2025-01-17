@@ -584,53 +584,86 @@ export const getMovieRankByVoteCount = async (movieId: number) => {
     const movieDetails = await getMovieDetails(movieId);
     if (!movieDetails?.vote_count) return null;
 
-    // Добавляем случайный параметр для избежания кэширования
-    const data = await fetchTMDB("/discover/movie", {
+    // Получаем первую страницу для определения общего количества фильмов
+    const initialData = await fetchTMDB("/discover/movie", {
       sort_by: "vote_count.desc",
-      "vote_count.gte": movieDetails.vote_count.toString(),
       page: "1",
-      // Добавляем timestamp для избежания кэширования
-      _t: Date.now().toString(),
+      region: "RU",
+      language: "ru-RU",
+      include_image_language: "ru,en,null",
     });
 
-    const currentRank = data.total_results <= 5000 ? data.total_results : null;
+    let currentRank = null;
+    const totalPages = Math.min(Math.ceil(5000 / 20), initialData.total_pages);
+
+    // Бинарный поиск нужной страницы
+    let left = 1;
+    let right = totalPages;
+
+    while (left <= right) {
+      const mid = Math.floor((left + right) / 2);
+
+      const data = await fetchTMDB("/discover/movie", {
+        sort_by: "vote_count.desc",
+        page: mid.toString(),
+        region: "RU",
+        language: "ru-RU",
+        include_image_language: "ru,en,null",
+      });
+
+      const firstMovieVoteCount = data.results[0]?.vote_count || 0;
+      const lastMovieVoteCount =
+        data.results[data.results.length - 1]?.vote_count || 0;
+
+      if (
+        movieDetails.vote_count >= lastMovieVoteCount &&
+        movieDetails.vote_count <= firstMovieVoteCount
+      ) {
+        // Фильм должен быть на этой странице
+        const position = data.results.findIndex(
+          (movie: any) => movie.id === movieId
+        );
+
+        if (position !== -1) {
+          currentRank = (mid - 1) * 20 + position + 1;
+          break;
+        }
+      }
+
+      if (movieDetails.vote_count > firstMovieVoteCount) {
+        right = mid - 1;
+      } else {
+        left = mid + 1;
+      }
+    }
+
+    // Ограничиваем показ только для топ-5000 фильмов
+    if (!currentRank || currentRank > 5000) {
+      return null;
+    }
 
     // Получаем предыдущую позицию из истории
     const previousData = rankHistoryMap.get(movieId);
-
-    // Проверяем, прошло ли достаточно времени для обновления
     const now = Date.now();
-    const UPDATE_INTERVAL = 4 * 60 * 60 * 1000; // 4 часа
+    const UPDATE_INTERVAL = 4 * 60 * 60 * 1000;
 
     let rankChange = 0;
 
     if (previousData) {
-      // Обновляем изменение только если прошло достаточно времени
       if (now - previousData.timestamp > UPDATE_INTERVAL) {
-        rankChange = previousData.rank - (currentRank || 0);
-      } else {
-        // Если времени прошло мало, используем старое изменение
-        rankChange = 0;
+        rankChange = previousData.rank - currentRank;
       }
     }
 
-    // Сохраняем текущую позицию только если она изменилась или прошло достаточно времени
-    if (
-      currentRank !== null &&
-      (!previousData ||
-        currentRank !== previousData.rank ||
-        now - previousData.timestamp > UPDATE_INTERVAL)
-    ) {
-      rankHistoryMap.set(movieId, {
-        movieId,
-        rank: currentRank,
-        timestamp: now,
-      });
+    // Сохраняем новую позицию
+    rankHistoryMap.set(movieId, {
+      movieId,
+      rank: currentRank,
+      timestamp: now,
+    });
 
-      saveRankHistory();
-    }
+    saveRankHistory();
 
-    // Добавляем в ответ больше информации для отладки
     return {
       rank: currentRank,
       change: rankChange !== 0 ? rankChange : null,
