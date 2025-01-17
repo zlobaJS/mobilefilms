@@ -1603,154 +1603,133 @@ export const MovieDetails = ({
                     )}
                   </Typography>
 
-                  {/* Секция с актерами */}
-                  {cast.length > 0 && isVisible && (
-                    <Box sx={{ mb: 4 }}>
-                      <Typography
-                        variant="h6"
-                        sx={{
-                          color: "#6b6868",
-                          fontSize: "0.9rem",
-                          fontWeight: 500,
-                          mb: 2,
-                          textAlign: "left",
-                        }}
-                      >
-                        В главных ролях
-                      </Typography>
-                      <Box sx={{ position: "relative" }}>
-                        <Swiper
-                          modules={[FreeMode]}
-                          slidesPerView="auto"
-                          spaceBetween={4}
-                          freeMode
-                          style={{
-                            padding: "4px",
-                            width: "100%",
+                  {/* Студии - перемещаем сюда */}
+                  {details?.production_companies &&
+                    details.production_companies.length > 0 && (
+                      <Box sx={{ mb: 4 }}>
+                        <Typography
+                          variant="h6"
+                          sx={{
+                            color: "#6b6868",
+                            fontSize: "0.9rem",
+                            fontWeight: 500,
+                            mb: 2,
+                            textAlign: "left",
                           }}
                         >
-                          {cast
-                            .filter(
-                              (person: CrewMember) =>
-                                person.isActor &&
-                                person.department === "Acting" &&
-                                !person.isCreator
-                            )
-                            .map((actor) => (
+                          Студии
+                        </Typography>
+                        <Box sx={{ position: "relative" }}>
+                          <Swiper
+                            modules={[FreeMode]}
+                            slidesPerView="auto"
+                            spaceBetween={8}
+                            freeMode
+                            style={{ padding: "4px" }}
+                          >
+                            {details.production_companies.map((studio: any) => (
                               <SwiperSlide
-                                key={actor.id}
+                                key={studio.id}
                                 style={{
                                   width: "auto",
                                   marginRight: "4px",
                                   cursor: "pointer",
                                 }}
-                                onClick={() => handlePersonClick(actor.id)}
+                                onClick={() =>
+                                  navigate(
+                                    `/studio/${encodeURIComponent(studio.name)}`
+                                  )
+                                }
                               >
                                 <Box
                                   sx={{
-                                    aspectRatio: "2/3",
-                                    width: {
-                                      xs: "65px",
-                                      sm: "126px",
-                                    },
+                                    display: "flex",
+                                    alignItems: "center",
+                                    gap: 2,
+                                    backgroundColor: "rgba(255,255,255,0.05)",
                                     borderRadius: "8px",
-                                    overflow: "hidden",
-                                    position: "relative",
-                                    mb: 1,
-                                    transition: "transform 0.2s",
+                                    padding: "12px",
+                                    transition: "background-color 0.2s",
                                     "&:hover": {
-                                      transform: "scale(1.05)",
+                                      backgroundColor: "rgba(255,255,255,0.1)",
                                     },
+                                    minWidth: { xs: "200px", sm: "250px" },
                                   }}
                                 >
-                                  {actor.profile_path ? (
+                                  {studio.logo_path ? (
                                     <Box
                                       component="img"
-                                      loading="lazy"
-                                      src={imageUrl(actor.profile_path, "w342")}
-                                      alt={actor.name}
+                                      src={imageUrl(studio.logo_path, "w92")}
+                                      alt={studio.name}
                                       sx={{
-                                        position: "absolute",
-                                        top: 0,
-                                        left: 0,
-                                        width: "100%",
-                                        height: "100%",
-                                        objectFit: "cover",
-                                        imageRendering: [
-                                          "crisp-edges",
-                                          "-webkit-optimize-contrast",
-                                        ],
-                                        backfaceVisibility: "hidden",
+                                        width: "40px",
+                                        height: "40px",
+                                        objectFit: "contain",
+                                        filter: "brightness(0) invert(1)",
+                                        flexShrink: 0,
                                       }}
                                     />
                                   ) : (
                                     <Box
                                       sx={{
-                                        position: "absolute",
-                                        top: 0,
-                                        left: 0,
-                                        width: "100%",
-                                        height: "100%",
+                                        width: "40px",
+                                        height: "40px",
                                         display: "flex",
                                         alignItems: "center",
                                         justifyContent: "center",
-                                        color: "#666",
+                                        backgroundColor:
+                                          "rgba(255,255,255,0.1)",
+                                        borderRadius: "4px",
+                                        flexShrink: 0,
                                       }}
                                     >
-                                      No photo
+                                      <Typography
+                                        sx={{
+                                          color: "rgba(255,255,255,0.5)",
+                                          fontSize: "1.2rem",
+                                          fontWeight: 500,
+                                        }}
+                                      >
+                                        {studio.name.charAt(0)}
+                                      </Typography>
                                     </Box>
                                   )}
-                                </Box>
-                                <Box
-                                  sx={{
-                                    width: {
-                                      xs: "65px",
-                                      sm: "126px",
-                                    },
-                                  }}
-                                >
-                                  <Typography
-                                    sx={{
-                                      color: "white",
-                                      fontSize: {
-                                        xs: "0.8rem",
-                                        sm: "0.9rem",
-                                      },
-                                      fontWeight: 500,
-                                      mb: 0.5,
-                                      overflow: "hidden",
-                                      textOverflow: "ellipsis",
-                                      whiteSpace: "nowrap",
-                                      width: "100%",
-                                    }}
-                                  >
-                                    {actor.name}
-                                  </Typography>
-                                  <Typography
-                                    sx={{
-                                      color: "#888",
-                                      fontSize: {
-                                        xs: "0.75rem",
-                                        sm: "0.8rem",
-                                      },
-                                      overflow: "hidden",
-                                      textOverflow: "ellipsis",
-                                      whiteSpace: "nowrap",
-                                      width: "100%",
-                                    }}
-                                  >
-                                    {actor.character}
-                                  </Typography>
+                                  <Box sx={{ minWidth: 0 }}>
+                                    <Typography
+                                      sx={{
+                                        color: "white",
+                                        fontSize: "0.9rem",
+                                        fontWeight: 500,
+                                        whiteSpace: "nowrap",
+                                        overflow: "hidden",
+                                        textOverflow: "ellipsis",
+                                      }}
+                                      title={studio.name}
+                                    >
+                                      {studio.name}
+                                    </Typography>
+                                    {studio.origin_country && (
+                                      <Typography
+                                        sx={{
+                                          color: "rgba(255,255,255,0.5)",
+                                          fontSize: "0.8rem",
+                                        }}
+                                      >
+                                        {studio.origin_country}
+                                      </Typography>
+                                    )}
+                                  </Box>
                                 </Box>
                               </SwiperSlide>
                             ))}
-                        </Swiper>
+                          </Swiper>
+                        </Box>
                       </Box>
-                    </Box>
-                  )}
+                    )}
 
-                  {/* Создатели */}
-                  {cast.length > 0 && isVisible && (
+                  {/* Создатели - оставляем после студий */}
+                  {cast.filter((person: CrewMember) => person.isCreator)
+                    .length > 0 && (
                     <Box sx={{ mb: 4 }}>
                       <Typography
                         variant="h6"
@@ -1922,6 +1901,156 @@ export const MovieDetails = ({
 
                                       return roles.join(", ");
                                     })()}
+                                  </Typography>
+                                </Box>
+                              </SwiperSlide>
+                            ))}
+                        </Swiper>
+                      </Box>
+                    </Box>
+                  )}
+
+                  {/* В главных ролях */}
+                  {cast.filter((person: any) => !person.isCreator).length >
+                    0 && (
+                    <Box sx={{ mb: 4 }}>
+                      <Typography
+                        variant="h6"
+                        sx={{
+                          color: "#6b6868",
+                          fontSize: "0.9rem",
+                          fontWeight: 500,
+                          mb: 2,
+                          textAlign: "left",
+                        }}
+                      >
+                        В главных ролях
+                      </Typography>
+                      <Box sx={{ position: "relative" }}>
+                        <Swiper
+                          modules={[FreeMode]}
+                          slidesPerView="auto"
+                          spaceBetween={4}
+                          freeMode
+                          style={{ padding: "4px", width: "100%" }}
+                        >
+                          {cast
+                            .filter((person: any) => !person.isCreator)
+                            .map((person) => (
+                              <SwiperSlide
+                                key={person.id}
+                                style={{
+                                  width: "auto",
+                                  marginRight: "4px",
+                                  cursor: "pointer",
+                                }}
+                                onClick={() => handlePersonClick(person.id)}
+                              >
+                                <Box
+                                  sx={{
+                                    width: { xs: "120px", sm: "160px" },
+                                    position: "relative",
+                                  }}
+                                >
+                                  <Box
+                                    sx={{
+                                      paddingTop: "150%",
+                                      position: "relative",
+                                      borderRadius: "8px",
+                                      overflow: "hidden",
+                                      backgroundColor: "rgba(255,255,255,0.05)",
+                                      mb: 1,
+                                    }}
+                                  >
+                                    {person.profile_path ? (
+                                      <Box
+                                        component="img"
+                                        loading="lazy"
+                                        src={imageUrl(
+                                          person.profile_path,
+                                          "w342"
+                                        )}
+                                        alt={person.name}
+                                        sx={{
+                                          position: "absolute",
+                                          top: 0,
+                                          left: 0,
+                                          width: "100%",
+                                          height: "100%",
+                                          objectFit: "cover",
+                                          imageRendering: [
+                                            "crisp-edges",
+                                            "-webkit-optimize-contrast",
+                                          ],
+                                          backfaceVisibility: "hidden",
+                                        }}
+                                      />
+                                    ) : (
+                                      <Box
+                                        sx={{
+                                          position: "absolute",
+                                          top: 0,
+                                          left: 0,
+                                          width: "100%",
+                                          height: "100%",
+                                          display: "flex",
+                                          flexDirection: "column",
+                                          alignItems: "center",
+                                          justifyContent: "center",
+                                          backgroundColor:
+                                            "rgba(255,255,255,0.05)",
+                                          borderRadius: "8px",
+                                          gap: 1,
+                                        }}
+                                      >
+                                        <PersonIcon
+                                          sx={{
+                                            fontSize: { xs: 24, sm: 32 },
+                                            color: "rgba(255,255,255,0.3)",
+                                          }}
+                                        />
+                                        <Typography
+                                          variant="caption"
+                                          sx={{
+                                            color: "rgba(255,255,255,0.5)",
+                                            fontSize: {
+                                              xs: "0.6rem",
+                                              sm: "0.7rem",
+                                            },
+                                            textAlign: "center",
+                                            px: 1,
+                                          }}
+                                        >
+                                          Нет фото
+                                        </Typography>
+                                      </Box>
+                                    )}
+                                  </Box>
+                                  <Typography
+                                    sx={{
+                                      color: "white",
+                                      fontSize: { xs: "0.8rem", sm: "0.9rem" },
+                                      fontWeight: 500,
+                                      mb: 0.5,
+                                      overflow: "hidden",
+                                      textOverflow: "ellipsis",
+                                      whiteSpace: "nowrap",
+                                      width: "100%",
+                                    }}
+                                  >
+                                    {person.name}
+                                  </Typography>
+                                  <Typography
+                                    sx={{
+                                      color: "#888",
+                                      fontSize: { xs: "0.75rem", sm: "0.8rem" },
+                                      overflow: "hidden",
+                                      textOverflow: "ellipsis",
+                                      whiteSpace: "nowrap",
+                                      width: "100%",
+                                    }}
+                                  >
+                                    {person.character}
                                   </Typography>
                                 </Box>
                               </SwiperSlide>
