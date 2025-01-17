@@ -22,6 +22,7 @@ import BookmarkBorderIcon from "@mui/icons-material/BookmarkBorder";
 import BookmarkIcon from "@mui/icons-material/Bookmark";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
+import PersonIcon from "@mui/icons-material/Person";
 import {
   imageUrl,
   getMovieImages,
@@ -254,7 +255,8 @@ export const MovieDetails = ({
               (person: CrewMember) =>
                 person.job === "Director" ||
                 person.job === "Screenplay" ||
-                person.job === "Writer"
+                person.job === "Writer" ||
+                person.job === "Producer"
             )
             // Группируем по id человека
             .reduce((acc: CrewMember[], person: CrewMember) => {
@@ -1834,12 +1836,35 @@ export const MovieDetails = ({
                                         width: "100%",
                                         height: "100%",
                                         display: "flex",
+                                        flexDirection: "column",
                                         alignItems: "center",
                                         justifyContent: "center",
-                                        color: "#666",
+                                        backgroundColor:
+                                          "rgba(255,255,255,0.05)",
+                                        borderRadius: "8px",
+                                        gap: 1,
                                       }}
                                     >
-                                      No photo
+                                      <PersonIcon
+                                        sx={{
+                                          fontSize: { xs: 24, sm: 32 },
+                                          color: "rgba(255,255,255,0.3)",
+                                        }}
+                                      />
+                                      <Typography
+                                        variant="caption"
+                                        sx={{
+                                          color: "rgba(255,255,255,0.5)",
+                                          fontSize: {
+                                            xs: "0.6rem",
+                                            sm: "0.7rem",
+                                          },
+                                          textAlign: "center",
+                                          px: 1,
+                                        }}
+                                      >
+                                        Нет фото
+                                      </Typography>
                                     </Box>
                                   )}
                                 </Box>
@@ -1887,14 +1912,15 @@ export const MovieDetails = ({
                                       const isWriter =
                                         person.jobs?.includes("Screenplay") ||
                                         person.jobs?.includes("Writer");
+                                      const isProducer =
+                                        person.jobs?.includes("Producer");
 
-                                      if (isDirector && isWriter) {
-                                        return "Режиссер, сценарист";
-                                      } else if (isDirector) {
-                                        return "Режиссер";
-                                      } else {
-                                        return "Сценарист";
-                                      }
+                                      const roles = [];
+                                      if (isDirector) roles.push("Режиссер");
+                                      if (isWriter) roles.push("Сценарист");
+                                      if (isProducer) roles.push("Продюсер");
+
+                                      return roles.join(", ");
                                     })()}
                                   </Typography>
                                 </Box>
