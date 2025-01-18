@@ -741,6 +741,15 @@ function AppRoutes({ movies, isLoading }: { movies: any; isLoading: boolean }) {
                       showTitle={true}
                     />
                     <MovieSlider
+                      title="Популярное"
+                      movies={movies.popular}
+                      loading={isLoading}
+                      categoryId="popular"
+                      onMovieSelect={handleMovieSelect}
+                      showTitle={false}
+                      useBackdrop={true}
+                    />
+                    <MovieSlider
                       title="Самые высокооцененные"
                       movies={movies.mostRated}
                       loading={isLoading}
@@ -771,15 +780,6 @@ function AppRoutes({ movies, isLoading }: { movies: any; isLoading: boolean }) {
                       categoryId="trending-week"
                       onMovieSelect={handleMovieSelect}
                       showTitle={true}
-                    />
-                    <MovieSlider
-                      title="Популярное"
-                      movies={movies.popular}
-                      loading={isLoading}
-                      categoryId="popular"
-                      onMovieSelect={handleMovieSelect}
-                      showTitle={true}
-                      useBackdrop={true}
                     />
                     <MovieSlider
                       title="Ужасы"
