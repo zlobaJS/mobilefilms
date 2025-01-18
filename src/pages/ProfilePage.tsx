@@ -425,21 +425,28 @@ export const ProfilePage = () => {
               mb: 3,
               backgroundColor: "rgba(255, 255, 255, 0.05)",
               borderRadius: 2,
-              position: "relative", // Добавляем для кнопки шаринга
+              position: "relative",
             }}
           >
-            {/* Добавляем кнопку шаринга */}
-            <IconButton
-              onClick={handleShareProfile}
-              sx={{
-                position: "absolute",
-                right: 16,
-                top: 16,
-                color: "white",
-              }}
-            >
-              <ShareIcon />
-            </IconButton>
+            {/* Кнопка шаринга только для авторизованных пользователей */}
+            {profileUser && (
+              <IconButton
+                onClick={handleShareProfile}
+                sx={{
+                  position: "absolute",
+                  right: 16,
+                  top: 16,
+                  color: "white",
+                  opacity: 0.7,
+                  "&:hover": {
+                    opacity: 1,
+                    backgroundColor: "rgba(255, 255, 255, 0.1)",
+                  },
+                }}
+              >
+                <ShareIcon />
+              </IconButton>
+            )}
 
             <Box
               sx={{
@@ -451,22 +458,43 @@ export const ProfilePage = () => {
               }}
             >
               {loading ? (
-                <CircularProgress />
+                <CircularProgress sx={{ color: "#0686ee" }} />
               ) : !user || (!userId && !profileUser) ? (
-                // Показываем форму входа для неавторизованных
+                // Улучшенная форма входа для неавторизованных
                 <>
                   <Avatar
                     sx={{
                       width: 96,
                       height: 96,
-                      backgroundColor: "#0686ee",
+                      backgroundColor: "rgba(6, 134, 238, 0.1)",
+                      border: "2px solid rgba(6, 134, 238, 0.3)",
                       fontSize: "2.5rem",
+                      color: "#0686ee",
                     }}
                   >
                     U
                   </Avatar>
-                  <Typography variant="h5" sx={{ color: "white", mb: 2 }}>
-                    Войдите в аккаунт для просмотра профилей
+                  <Typography
+                    variant="h5"
+                    sx={{
+                      color: "white",
+                      mb: 1,
+                      textAlign: "center",
+                      fontSize: { xs: "1.25rem", sm: "1.5rem" },
+                    }}
+                  >
+                    Войдите в аккаунт
+                  </Typography>
+                  <Typography
+                    sx={{
+                      color: "rgba(255, 255, 255, 0.7)",
+                      mb: 2,
+                      textAlign: "center",
+                      fontSize: { xs: "0.875rem", sm: "1rem" },
+                      maxWidth: "80%",
+                    }}
+                  >
+                    Чтобы сохранять фильмы и отслеживать просмотры
                   </Typography>
                   <Button
                     variant="contained"
@@ -478,32 +506,47 @@ export const ProfilePage = () => {
                       textTransform: "none",
                       fontSize: "0.95rem",
                       px: 3,
-                      py: 0.8,
+                      py: 1,
+                      borderRadius: 2,
                       "&:hover": {
                         backgroundColor: "#0571cc",
                       },
+                      transition: "all 0.2s ease",
                     }}
                   >
                     Войти через Google
                   </Button>
                 </>
               ) : profileUser ? (
-                // Показываем данные профиля
+                // Улучшенный профиль пользователя
                 <>
                   <Avatar
                     src={profileUser?.photoURL || undefined}
                     sx={{
                       width: 96,
                       height: 96,
-                      border: "4px solid rgba(255, 255, 255, 0.1)",
-                      backgroundColor: "#0686ee",
+                      border: "4px solid rgba(6, 134, 238, 0.3)",
+                      backgroundColor: "rgba(6, 134, 238, 0.1)",
                       fontSize: "2.5rem",
+                      color: "#0686ee",
+                      transition: "all 0.3s ease",
+                      "&:hover": {
+                        borderColor: "rgba(6, 134, 238, 0.5)",
+                      },
                     }}
                   >
                     {!profileUser?.photoURL &&
                       (profileUser?.displayName?.[0] || "U")}
                   </Avatar>
-                  <Typography variant="h5" sx={{ color: "white", mb: 1 }}>
+                  <Typography
+                    variant="h5"
+                    sx={{
+                      color: "white",
+                      mb: 1,
+                      textAlign: "center",
+                      fontSize: { xs: "1.25rem", sm: "1.5rem" },
+                    }}
+                  >
                     {profileUser?.displayName || "Пользователь"}
                   </Typography>
                   {isOwnProfile && (
@@ -517,21 +560,22 @@ export const ProfilePage = () => {
                         fontSize: "0.95rem",
                         px: 3,
                         py: 0.8,
+                        borderRadius: 2,
                         "&:hover": {
                           borderColor: "#0686ee",
                           backgroundColor: "rgba(6, 134, 238, 0.1)",
                         },
+                        transition: "all 0.2s ease",
                       }}
                     >
                       Выйти
                     </Button>
                   )}
-                  <Button onClick={handleShareProfile}>
-                    Поделиться профилем
-                  </Button>
                 </>
               ) : (
-                <Typography>Профиль не найден</Typography>
+                <Typography sx={{ color: "rgba(255, 255, 255, 0.7)" }}>
+                  Профиль не найден
+                </Typography>
               )}
             </Box>
           </Paper>

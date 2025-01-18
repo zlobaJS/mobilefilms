@@ -391,10 +391,29 @@ export const searchMovies = async (query: string, page = 1) => {
 
 export const getMovieVideos = async (movieId: number) => {
   try {
-    const data = await fetchTMDB(`/movie/${movieId}/videos`, {
-      language: "ru-RU,en-US",
+    // Сначала получаем русские видео
+    const ruData = await fetchTMDB(`/movie/${movieId}/videos`, {
+      language: "ru-RU",
     });
-    return data.results || [];
+
+    // Получаем английские видео
+    const enData = await fetchTMDB(`/movie/${movieId}/videos`, {
+      language: "en-US",
+    });
+
+    // Фильтруем трейлеры
+    const ruTrailers = (ruData.results || []).filter(
+      (video: any) =>
+        video.type === "Trailer" && video.site === "YouTube" && !video.official
+    );
+
+    const enTrailers = (enData.results || []).filter(
+      (video: any) =>
+        video.type === "Trailer" && video.site === "YouTube" && video.official
+    );
+
+    // Возвращаем русские трейлеры, если они есть, иначе английские
+    return ruTrailers.length > 0 ? ruTrailers : enTrailers;
   } catch (error) {
     console.error("Error fetching movie videos:", error);
     return [];
