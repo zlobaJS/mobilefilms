@@ -993,6 +993,20 @@ function AppRoutes({ movies, isLoading }: { movies: any; isLoading: boolean }) {
               }
             />
             <Route
+              path="/profile/:userId"
+              element={
+                <motion.div
+                  key={location.pathname}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <ProfilePage />
+                </motion.div>
+              }
+            />
+            <Route
               path="/studio/:studioName"
               element={
                 <motion.div

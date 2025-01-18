@@ -6,6 +6,9 @@ import {
   Avatar,
   Grid,
   Button,
+  CircularProgress,
+  Snackbar,
+  IconButton,
 } from "@mui/material";
 import { motion } from "framer-motion";
 import { FavoritesSlider } from "../components/FavoritesSlider";
@@ -23,10 +26,12 @@ import { StudiosSlider } from "../components/StudiosSlider";
 import { FavoritePersonsSlider } from "../components/FavoritePersonsSlider";
 import { useFavoritePersons } from "../hooks/useFavoritePersons";
 import PersonIcon from "@mui/icons-material/Person";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { Movie } from "../types/movie";
 import { useAuth } from "../hooks/useAuth";
 import GoogleIcon from "@mui/icons-material/Google";
+import ShareIcon from "@mui/icons-material/Share";
+import { useUserData } from "../hooks/useUserData";
 
 // Добавляем объект с переводами стран (можно вынести в отдельный файл)
 const countryTranslations: { [key: string]: string } = {
@@ -88,7 +93,39 @@ interface ProductionCompany {
 }
 
 export const ProfilePage = () => {
+  const { userId } = useParams(); // Получаем userId из URL
   const navigate = useNavigate();
+  const { user, signInWithGoogle, logout } = useAuth();
+  const { userData: profileUser, loading } = useUserData(userId);
+  const [isSnackbarOpen, setIsSnackbarOpen] = useState(false);
+
+  // Определяем, является ли это профилем текущего пользователя
+  const isOwnProfile = !userId || (user && userId === user.uid);
+
+  // Функция для шаринга профиля
+  const handleShareProfile = async () => {
+    if (!profileUser) return;
+
+    const shareUrl = `${window.location.origin}/profile/${profileUser.uid}`;
+
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: `Профиль ${profileUser.displayName || "пользователя"}`,
+          text: "Посмотри профиль на MovieApp",
+          url: shareUrl,
+        });
+      } catch (error) {
+        if (error instanceof Error && error.name !== "AbortError") {
+          console.error("Ошибка шаринга:", error);
+        }
+      }
+    } else {
+      navigator.clipboard.writeText(shareUrl);
+      setIsSnackbarOpen(true);
+    }
+  };
+
   // Состояния для MovieDetails
   const [selectedMovie, setSelectedMovie] = useState<any>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -114,7 +151,6 @@ export const ProfilePage = () => {
   const { favorites, removeFromFavorites } = useFavorites();
   const { watchedMovies, removeFromWatched } = useWatched();
   const { favoritePersons, removeFromFavoritePersons } = useFavoritePersons();
-  const { user, signInWithGoogle, logout } = useAuth();
 
   // Обновляем обработчик для диалога
   const handleMovieSelectDialog = useCallback((movie: Movie | number) => {
@@ -356,6 +392,12 @@ export const ProfilePage = () => {
     [navigate]
   );
 
+  useEffect(() => {
+    if (!user && userId) {
+      navigate("/profile");
+    }
+  }, [user, userId, navigate]);
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -383,8 +425,22 @@ export const ProfilePage = () => {
               mb: 3,
               backgroundColor: "rgba(255, 255, 255, 0.05)",
               borderRadius: 2,
+              position: "relative", // Добавляем для кнопки шаринга
             }}
           >
+            {/* Добавляем кнопку шаринга */}
+            <IconButton
+              onClick={handleShareProfile}
+              sx={{
+                position: "absolute",
+                right: 16,
+                top: 16,
+                color: "white",
+              }}
+            >
+              <ShareIcon />
+            </IconButton>
+
             <Box
               sx={{
                 display: "flex",
@@ -394,87 +450,23 @@ export const ProfilePage = () => {
                 py: 2,
               }}
             >
-              {user ? (
-                <>
-                  <Avatar
-                    src={user.photoURL || undefined}
-                    sx={{
-                      width: 96,
-                      height: 96,
-                      border: "4px solid rgba(255, 255, 255, 0.1)",
-                      backgroundColor: "#0686ee",
-                      fontSize: "2.5rem",
-                      transition: "all 0.3s ease",
-                      "&:hover": {
-                        transform: "scale(1.05)",
-                        borderColor: "rgba(255, 255, 255, 0.2)",
-                      },
-                    }}
-                  >
-                    {user.photoURL ? null : user.displayName?.[0] || "U"}
-                  </Avatar>
-                  <Typography
-                    variant="h5"
-                    sx={{
-                      color: "white",
-                      fontWeight: 500,
-                      fontSize: "1.5rem",
-                      textAlign: "center",
-                      marginTop: 1,
-                    }}
-                  >
-                    {user.displayName || "Пользователь"}
-                  </Typography>
-                  <Button
-                    variant="outlined"
-                    onClick={logout}
-                    sx={{
-                      color: "#0686ee",
-                      borderColor: "#0686ee",
-                      textTransform: "none",
-                      fontSize: "0.95rem",
-                      px: 3,
-                      py: 0.8,
-                      mt: 1,
-                      "&:hover": {
-                        borderColor: "#0686ee",
-                        backgroundColor: "rgba(6, 134, 238, 0.1)",
-                      },
-                    }}
-                  >
-                    Выйти
-                  </Button>
-                </>
-              ) : (
+              {loading ? (
+                <CircularProgress />
+              ) : !user || (!userId && !profileUser) ? (
+                // Показываем форму входа для неавторизованных
                 <>
                   <Avatar
                     sx={{
                       width: 96,
                       height: 96,
-                      border: "4px solid rgba(255, 255, 255, 0.1)",
                       backgroundColor: "#0686ee",
                       fontSize: "2.5rem",
-                      transition: "all 0.3s ease",
-                      "&:hover": {
-                        transform: "scale(1.05)",
-                        borderColor: "rgba(255, 255, 255, 0.2)",
-                      },
                     }}
                   >
                     U
                   </Avatar>
-                  <Typography
-                    variant="h5"
-                    sx={{
-                      color: "white",
-                      fontWeight: 500,
-                      fontSize: "1.5rem",
-                      textAlign: "center",
-                      marginTop: 1,
-                      marginBottom: 2,
-                    }}
-                  >
-                    Войдите в аккаунт
+                  <Typography variant="h5" sx={{ color: "white", mb: 2 }}>
+                    Войдите в аккаунт для просмотра профилей
                   </Typography>
                   <Button
                     variant="contained"
@@ -495,6 +487,51 @@ export const ProfilePage = () => {
                     Войти через Google
                   </Button>
                 </>
+              ) : profileUser ? (
+                // Показываем данные профиля
+                <>
+                  <Avatar
+                    src={profileUser?.photoURL || undefined}
+                    sx={{
+                      width: 96,
+                      height: 96,
+                      border: "4px solid rgba(255, 255, 255, 0.1)",
+                      backgroundColor: "#0686ee",
+                      fontSize: "2.5rem",
+                    }}
+                  >
+                    {!profileUser?.photoURL &&
+                      (profileUser?.displayName?.[0] || "U")}
+                  </Avatar>
+                  <Typography variant="h5" sx={{ color: "white", mb: 1 }}>
+                    {profileUser?.displayName || "Пользователь"}
+                  </Typography>
+                  {isOwnProfile && (
+                    <Button
+                      variant="outlined"
+                      onClick={logout}
+                      sx={{
+                        color: "#0686ee",
+                        borderColor: "#0686ee",
+                        textTransform: "none",
+                        fontSize: "0.95rem",
+                        px: 3,
+                        py: 0.8,
+                        "&:hover": {
+                          borderColor: "#0686ee",
+                          backgroundColor: "rgba(6, 134, 238, 0.1)",
+                        },
+                      }}
+                    >
+                      Выйти
+                    </Button>
+                  )}
+                  <Button onClick={handleShareProfile}>
+                    Поделиться профилем
+                  </Button>
+                </>
+              ) : (
+                <Typography>Профиль не найден</Typography>
               )}
             </Box>
           </Paper>
@@ -821,6 +858,14 @@ export const ProfilePage = () => {
             updateTrigger={updateTrigger}
             onPersonSelect={handlePersonSelect}
             onMovieSelect={handleMovieSelect}
+          />
+
+          {/* Добавляем Snackbar в конец компонента */}
+          <Snackbar
+            open={isSnackbarOpen}
+            autoHideDuration={3000}
+            onClose={() => setIsSnackbarOpen(false)}
+            message="Ссылка на профиль скопирована"
           />
         </Container>
       </Box>
