@@ -92,7 +92,7 @@ export const MovieSlider = ({
   const getSliderConfig = () => {
     return {
       slidesPerView: getSlidesPerView(),
-      spaceBetween: 8,
+      spaceBetween: useBackdrop ? 2 : 8,
       freeMode: true,
       modules: [FreeMode],
       onReachEnd: () => setIsEnd(true),
@@ -255,7 +255,7 @@ export const MovieSlider = ({
         <Swiper {...getSliderConfig()}>
           {validMovies.map((movie) => (
             <SwiperSlide key={movie.id}>
-              <Box sx={{ px: 1 }}>
+              <Box sx={{ px: useBackdrop ? 0.5 : 1 }}>
                 <MovieCard
                   movie={movie}
                   onClick={() => onMovieSelect?.(movie)}

@@ -173,9 +173,11 @@ export const MovieCard = ({
         sx={{
           position: "relative",
           width: "100%",
-          paddingTop: useBackdrop ? "56.25%" : isMobile ? "140%" : "150%",
+          paddingTop: useBackdrop ? "48%" : isMobile ? "140%" : "150%",
+          maxWidth: useBackdrop ? "92%" : "100%",
+          margin: useBackdrop ? "0 auto" : "0",
           backgroundColor: "transparent",
-          borderRadius: "12px",
+          borderRadius: useBackdrop ? "16px" : "12px",
           overflow: "hidden",
         }}
       >
@@ -190,7 +192,7 @@ export const MovieCard = ({
                   right: 0,
                   bottom: 0,
                   bgcolor: "rgba(255,255,255,0.05)",
-                  borderRadius: "12px",
+                  borderRadius: useBackdrop ? "16px" : "12px",
                 }}
               >
                 <MovieCardSkeleton />
@@ -212,7 +214,7 @@ export const MovieCard = ({
                 width: "100%",
                 height: "100%",
                 objectFit: "cover",
-                borderRadius: "12px",
+                borderRadius: useBackdrop ? "16px" : "12px",
                 opacity: imageLoaded ? 1 : 0,
                 transition: "opacity 0.3s ease",
               }}
