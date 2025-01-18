@@ -23,6 +23,7 @@ interface Movie {
   vote_average: number;
   release_date: string;
   release_quality?: string;
+  logo_path?: string;
 }
 
 interface MovieCardProps {
@@ -32,6 +33,7 @@ interface MovieCardProps {
   showRemoveButtons?: boolean;
   onRemoveFromFavorites?: () => void;
   onRemoveFromWatched?: () => void;
+  useBackdrop?: boolean;
 }
 
 export const MovieCardSkeleton = () => {
@@ -90,6 +92,7 @@ export const MovieCard = ({
   showRemoveButtons = false,
   onRemoveFromFavorites,
   onRemoveFromWatched,
+  useBackdrop = false,
 }: MovieCardProps) => {
   const navigate = useNavigate();
   const [imageLoaded, setImageLoaded] = useState(false);
@@ -170,13 +173,13 @@ export const MovieCard = ({
         sx={{
           position: "relative",
           width: "100%",
-          paddingTop: isMobile ? "140%" : "150%",
+          paddingTop: useBackdrop ? "56.25%" : isMobile ? "140%" : "150%",
           backgroundColor: "transparent",
           borderRadius: "12px",
           overflow: "hidden",
         }}
       >
-        {movie.poster_path ? (
+        {(useBackdrop ? movie.backdrop_path : movie.poster_path) ? (
           <>
             {!imageLoaded && (
               <Box
@@ -195,7 +198,10 @@ export const MovieCard = ({
             )}
             <CardMedia
               component="img"
-              image={imageUrl(movie.poster_path, "w342")}
+              image={imageUrl(
+                useBackdrop ? movie.backdrop_path : movie.poster_path,
+                useBackdrop ? "w780" : "w342"
+              )}
               alt={movie.title}
               onLoad={() => setImageLoaded(true)}
               sx={{
@@ -211,6 +217,33 @@ export const MovieCard = ({
                 transition: "opacity 0.3s ease",
               }}
             />
+            {useBackdrop && movie.logo_path && (
+              <Box
+                sx={{
+                  position: "absolute",
+                  top: "50%",
+                  left: "50%",
+                  transform: "translate(-50%, -50%)",
+                  width: "60%",
+                  height: "auto",
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <img
+                  src={imageUrl(movie.logo_path, "w300")}
+                  alt={`${movie.title} logo`}
+                  style={{
+                    width: "100%",
+                    height: "auto",
+                    objectFit: "contain",
+                    filter:
+                      "drop-shadow(0 0 2px rgba(0,0,0,0.9)) drop-shadow(0 0 8px rgba(0,0,0,0.7))",
+                  }}
+                />
+              </Box>
+            )}
           </>
         ) : (
           <Box

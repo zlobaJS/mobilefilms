@@ -124,12 +124,41 @@ export const getMovies = {
   },
 
   popular: async (page = 1) => {
-    return await fetchTMDB("/movie/popular", {
+    // Получаем базовые данные о популярных фильмах
+    const data = await fetchTMDB("/movie/popular", {
       page: page.toString(),
       include_image_language: "ru,en,null",
       region: "RU",
       language: "ru-RU",
     });
+
+    // Получаем изображения (включая лого) для каждого фильма
+    if (data.results && data.results.length > 0) {
+      const moviesWithLogos = await Promise.all(
+        data.results.map(async (movie: any) => {
+          try {
+            const images = await getMovieImages(movie.id);
+            // Если есть лого, добавляем его к данным фильма
+            if (images.logos && images.logos.length > 0) {
+              return {
+                ...movie,
+                logo_path: images.logos[0].file_path,
+              };
+            }
+            return movie;
+          } catch (error) {
+            return movie;
+          }
+        })
+      );
+
+      return {
+        ...data,
+        results: moviesWithLogos,
+      };
+    }
+
+    return data;
   },
 
   byGenre: async (genreId: number, page = 1) => {

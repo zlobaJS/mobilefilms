@@ -779,6 +779,7 @@ function AppRoutes({ movies, isLoading }: { movies: any; isLoading: boolean }) {
                       categoryId="popular"
                       onMovieSelect={handleMovieSelect}
                       showTitle={true}
+                      useBackdrop={true}
                     />
                     <MovieSlider
                       title="Ужасы"

@@ -37,6 +37,7 @@ interface MovieSliderProps {
   showRemoveButtons?: boolean;
   onRemoveFromFavorites?: (movieId: number) => void;
   onRemoveFromWatched?: (movieId: number) => void;
+  useBackdrop?: boolean;
 }
 
 export const MovieSlider = ({
@@ -51,6 +52,7 @@ export const MovieSlider = ({
   showRemoveButtons = false,
   onRemoveFromFavorites,
   onRemoveFromWatched,
+  useBackdrop = false,
 }: MovieSliderProps) => {
   const theme = useTheme();
   const navigate = useNavigate();
@@ -77,6 +79,11 @@ export const MovieSlider = ({
   );
 
   const getSlidesPerView = () => {
+    if (useBackdrop) {
+      if (isMobile) return 1.2;
+      if (isTablet) return 2.2;
+      return 3.2;
+    }
     if (isMobile) return 2.8;
     if (isTablet) return 4.2;
     return 6.2;
@@ -264,6 +271,7 @@ export const MovieSlider = ({
                       ? () => onRemoveFromWatched(movie.id)
                       : undefined
                   }
+                  useBackdrop={useBackdrop}
                 />
               </Box>
             </SwiperSlide>
