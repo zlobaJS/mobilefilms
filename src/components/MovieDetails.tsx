@@ -59,6 +59,8 @@ import {
   PolarAngleAxis,
   ResponsiveContainer,
 } from "recharts";
+// Добавим новый импорт
+import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 
 declare module "@mui/material/styles" {
   interface BreakpointOverrides {
@@ -207,6 +209,8 @@ export const MovieDetails = ({
   });
   // Добавляем новое состояние для контроля тултипа на мобильных устройствах
   const [showVoteTooltip, setShowVoteTooltip] = useState(false);
+  // Добавим состояние для модального окна с деталями
+  const [showMetricsDetails, setShowMetricsDetails] = useState(false);
 
   // Добавляем useMediaQuery для определения мобильного разрешения
   const isMobileView = useMediaQuery(theme.breakpoints.down("sm"));
@@ -2651,20 +2655,39 @@ export const MovieDetails = ({
                     </Box>
                   )}
 
-                  {/* Добавьте компонент диаграммы после описания */}
+                  {/* Обновляем секцию с заголовком и диаграммой */}
                   <Box sx={{ mt: 3, mb: 3 }}>
-                    <Typography
-                      variant="h6"
+                    <Box
                       sx={{
-                        color: "#6b6868",
-                        fontSize: "0.9rem",
-                        fontWeight: 500,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
                         mb: 2,
-                        textAlign: "left",
                       }}
                     >
-                      Метрики фильма
-                    </Typography>
+                      <Typography
+                        variant="h6"
+                        sx={{
+                          color: "#6b6868",
+                          fontSize: "0.9rem",
+                          fontWeight: 500,
+                          textAlign: "left",
+                        }}
+                      >
+                        Метрики фильма
+                      </Typography>
+                      <IconButton
+                        onClick={() => setShowMetricsDetails(true)}
+                        sx={{
+                          color: "rgba(255, 255, 255, 0.4)",
+                          "&:hover": {
+                            color: "rgba(255, 255, 255, 0.7)",
+                          },
+                        }}
+                      >
+                        <InfoOutlinedIcon sx={{ fontSize: "1.2rem" }} />
+                      </IconButton>
+                    </Box>
                     <Box
                       sx={{
                         width: "100%",
@@ -2698,162 +2721,150 @@ export const MovieDetails = ({
                           />
                         </RadarChart>
                       </ResponsiveContainer>
+                    </Box>
+                  </Box>
+
+                  {/* Модальное окно с деталями метрик */}
+                  <Dialog
+                    open={showMetricsDetails}
+                    onClose={() => setShowMetricsDetails(false)}
+                    TransitionComponent={Fade}
+                    TransitionProps={{
+                      timeout: 300,
+                    }}
+                    PaperProps={{
+                      sx: {
+                        backgroundColor: "#1a1a1a",
+                        borderRadius: "12px",
+                        maxWidth: "600px",
+                        width: "90%",
+                        m: 2,
+                      },
+                    }}
+                  >
+                    <Box sx={{ p: 3 }}>
                       <Box
                         sx={{
                           display: "flex",
-                          justifyContent: "space-around",
-                          mt: 2,
-                          color: "rgba(255, 255, 255, 0.6)",
-                          fontSize: "0.8rem",
-                          flexWrap: "wrap",
+                          justifyContent: "space-between",
+                          alignItems: "center",
+                          mb: 2,
+                        }}
+                      >
+                        <Typography variant="h6" sx={{ color: "white" }}>
+                          Детали метрик
+                        </Typography>
+                        <IconButton
+                          onClick={() => setShowMetricsDetails(false)}
+                          sx={{ color: "rgba(255, 255, 255, 0.5)" }}
+                        >
+                          <CloseIcon />
+                        </IconButton>
+                      </Box>
+                      <Box
+                        sx={{
+                          display: "flex",
+                          flexDirection: "column",
                           gap: 2,
                         }}
                       >
-                        <Box>
-                          <Typography
-                            variant="caption"
-                            sx={{ color: "rgba(255, 255, 255, 0.4)" }}
-                          >
-                            Рейтинг:
-                          </Typography>
-                          <Typography variant="body2">
-                            {details?.vote_average?.toFixed(1)} из 10
-                          </Typography>
-                        </Box>
-                        <Box>
-                          <Typography
-                            variant="caption"
-                            sx={{ color: "rgba(255, 255, 255, 0.4)" }}
-                          >
-                            Длительность:
-                          </Typography>
-                          <Typography variant="body2">
-                            {details?.runtime} мин
-                          </Typography>
-                        </Box>
-                        <Box>
-                          <Typography
-                            variant="caption"
-                            sx={{ color: "rgba(255, 255, 255, 0.4)" }}
-                          >
-                            Голоса:
-                          </Typography>
-                          <Typography variant="body2">
-                            {details?.vote_count?.toLocaleString()}
-                          </Typography>
-                        </Box>
-                        <Box>
-                          <Typography
-                            variant="caption"
-                            sx={{ color: "rgba(255, 255, 255, 0.4)" }}
-                          >
-                            Бюджет:
-                          </Typography>
-                          <Typography variant="body2">
-                            {details?.budget
+                        {[
+                          {
+                            label: "Рейтинг",
+                            value: `${details?.vote_average?.toFixed(1)} из 10`,
+                            description:
+                              "Средняя оценка фильма по мнению пользователей",
+                          },
+                          {
+                            label: "Длительность",
+                            value: `${details?.runtime} мин`,
+                            description: "Продолжительность фильма",
+                          },
+                          {
+                            label: "Популярность",
+                            value: `${details?.vote_count?.toLocaleString()} голосов (${
+                              Math.round(
+                                (details?.vote_count /
+                                  Math.max(
+                                    (new Date().getTime() -
+                                      new Date(
+                                        details?.release_date
+                                      ).getTime()) /
+                                      (1000 * 60 * 60 * 24),
+                                    1
+                                  )) *
+                                  10
+                              ) / 10
+                            } в день)`,
+                            description:
+                              "Количество голосов и средняя активность голосования",
+                          },
+                          {
+                            label: "Бюджет",
+                            value: details?.budget
                               ? `$${(details.budget / 1000000).toFixed(1)}M`
-                              : "—"}
-                          </Typography>
-                        </Box>
-                        <Box>
-                          <Typography
-                            variant="caption"
-                            sx={{ color: "rgba(255, 255, 255, 0.4)" }}
-                          >
-                            Популярность:
-                          </Typography>
-                          <Typography variant="body2">
-                            {details?.vote_count ? (
-                              <>
-                                {details.vote_count.toLocaleString()} голосов
-                                <Typography
-                                  component="span"
-                                  sx={{
-                                    fontSize: "0.75rem",
-                                    color: "rgba(255, 255, 255, 0.4)",
-                                    ml: 0.5,
-                                  }}
-                                >
-                                  (
-                                  {Math.round(
-                                    (details.vote_count /
-                                      Math.max(
-                                        (new Date().getTime() -
-                                          new Date(
-                                            details.release_date
-                                          ).getTime()) /
-                                          (1000 * 60 * 60 * 24),
-                                        1
-                                      )) *
-                                      10
-                                  ) / 10}{" "}
-                                  в день)
-                                </Typography>
-                              </>
-                            ) : (
-                              "—"
-                            )}
-                          </Typography>
-                        </Box>
-                        <Box>
-                          <Typography
-                            variant="caption"
-                            sx={{ color: "rgba(255, 255, 255, 0.4)" }}
-                          >
-                            Доход:
-                          </Typography>
-                          <Typography variant="body2">
-                            {details?.revenue
+                              : "—",
+                            description: "Бюджет производства фильма",
+                          },
+                          {
+                            label: "Доход",
+                            value: details?.revenue
                               ? `$${(details.revenue / 1000000000).toFixed(1)}B`
-                              : "—"}
-                          </Typography>
-                        </Box>
-                        <Box>
-                          <Typography
-                            variant="caption"
-                            sx={{ color: "rgba(255, 255, 255, 0.4)" }}
-                          >
-                            Окупаемость:
-                          </Typography>
-                          <Typography variant="body2">
-                            {details?.budget && details?.revenue
-                              ? `${(
-                                  ((details.revenue - details.budget) /
-                                    details.budget) *
-                                  100
-                                ).toFixed(0)}%`
-                              : "—"}
-                          </Typography>
-                        </Box>
-                        <Box>
-                          <Typography
-                            variant="caption"
-                            sx={{ color: "rgba(255, 255, 255, 0.4)" }}
-                          >
-                            Охват:
-                          </Typography>
-                          <Typography variant="body2">
-                            {details?.production_countries
-                              ? `${(
-                                  details.production_countries.length / 20
-                                ).toFixed(1)} из 20 стран`
-                              : "—"}
-                          </Typography>
-                        </Box>
-                        <Box>
-                          <Typography
-                            variant="caption"
-                            sx={{ color: "rgba(255, 255, 255, 0.4)" }}
-                          >
-                            Тренд:
-                          </Typography>
-                          <Typography variant="body2">
-                            {details?.popularity?.toFixed(1)} из 170
-                          </Typography>
-                        </Box>
+                              : "—",
+                            description: "Общие кассовые сборы фильма",
+                          },
+                          {
+                            label: "Окупаемость",
+                            value:
+                              details?.budget && details?.revenue
+                                ? `${(
+                                    ((details.revenue - details.budget) /
+                                      details.budget) *
+                                    100
+                                  ).toFixed(0)}%`
+                                : "—",
+                            description:
+                              "Процент возврата инвестиций относительно бюджета",
+                          },
+                          {
+                            label: "Тренд",
+                            value: `${details?.popularity?.toFixed(1)} из 170`,
+                            description:
+                              "Текущий показатель популярности на TMDB",
+                          },
+                        ].map((metric) => (
+                          <Box key={metric.label}>
+                            <Box
+                              sx={{
+                                display: "flex",
+                                justifyContent: "space-between",
+                                mb: 0.5,
+                              }}
+                            >
+                              <Typography
+                                sx={{ color: "rgba(255, 255, 255, 0.7)" }}
+                              >
+                                {metric.label}
+                              </Typography>
+                              <Typography
+                                sx={{ color: "#0686ee", fontWeight: 500 }}
+                              >
+                                {metric.value}
+                              </Typography>
+                            </Box>
+                            <Typography
+                              sx={{
+                                color: "rgba(255, 255, 255, 0.5)",
+                                fontSize: "0.85rem",
+                              }}
+                            >
+                              {metric.description}
+                            </Typography>
+                          </Box>
+                        ))}
                       </Box>
                     </Box>
-                  </Box>
+                  </Dialog>
                 </Box>
               </Box>
             </Box>
