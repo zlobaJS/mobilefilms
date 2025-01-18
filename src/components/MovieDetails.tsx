@@ -1720,6 +1720,97 @@ export const MovieDetails = ({
                     )}
                   </Typography>
 
+                  {/* Добавляем кнопку "Подробнее" если текст длинный */}
+                  {details?.overview && details.overview.length > 200 && (
+                    <Button
+                      onClick={() =>
+                        setIsExpandedDescription(!isExpandedDescription)
+                      }
+                      sx={{
+                        color: "#0686ee",
+                        textTransform: "none",
+                        p: 0,
+                        minWidth: "auto",
+                        fontSize: { xs: "0.9rem", sm: "1rem" },
+                        "&:hover": {
+                          backgroundColor: "transparent",
+                          textDecoration: "underline",
+                        },
+                      }}
+                    >
+                      {isExpandedDescription ? "Свернуть" : "Подробнее"}
+                    </Button>
+                  )}
+
+                  {/* Секция с метриками фильма */}
+                  <Box sx={{ mt: 3, mb: 3 }}>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        mb: 2,
+                      }}
+                    >
+                      <Typography
+                        variant="h6"
+                        sx={{
+                          color: "#6b6868",
+                          fontSize: "0.9rem",
+                          fontWeight: 500,
+                          textAlign: "left",
+                        }}
+                      >
+                        Метрики фильма
+                      </Typography>
+                      <IconButton
+                        onClick={() => setShowMetricsDetails(true)}
+                        sx={{
+                          color: "rgba(255, 255, 255, 0.4)",
+                          "&:hover": {
+                            color: "rgba(255, 255, 255, 0.7)",
+                          },
+                        }}
+                      >
+                        <InfoOutlinedIcon sx={{ fontSize: "1.2rem" }} />
+                      </IconButton>
+                    </Box>
+                    <Box
+                      sx={{
+                        width: "100%",
+                        height: 300,
+                        backgroundColor: "rgba(255, 255, 255, 0.03)",
+                        borderRadius: "12px",
+                        p: 2,
+                      }}
+                    >
+                      <ResponsiveContainer width="100%" height="100%">
+                        <RadarChart
+                          cx="50%"
+                          cy="50%"
+                          outerRadius="80%"
+                          data={calculateMetrics(details)}
+                        >
+                          <PolarGrid stroke="rgba(255, 255, 255, 0.1)" />
+                          <PolarAngleAxis
+                            dataKey="metric"
+                            tick={{
+                              fill: "rgba(255, 255, 255, 0.6)",
+                              fontSize: 12,
+                            }}
+                          />
+                          <Radar
+                            name="Метрики"
+                            dataKey="value"
+                            stroke="#0686ee"
+                            fill="#0686ee"
+                            fillOpacity={0.3}
+                          />
+                        </RadarChart>
+                      </ResponsiveContainer>
+                    </Box>
+                  </Box>
+
                   {/* Даты релиза в виде слайдера */}
                   {releaseData.releases.length > 0 && (
                     <Box sx={{ mb: 4 }}>
@@ -2655,75 +2746,6 @@ export const MovieDetails = ({
                     </Box>
                   )}
 
-                  {/* Обновляем секцию с заголовком и диаграммой */}
-                  <Box sx={{ mt: 3, mb: 3 }}>
-                    <Box
-                      sx={{
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "space-between",
-                        mb: 2,
-                      }}
-                    >
-                      <Typography
-                        variant="h6"
-                        sx={{
-                          color: "#6b6868",
-                          fontSize: "0.9rem",
-                          fontWeight: 500,
-                          textAlign: "left",
-                        }}
-                      >
-                        Метрики фильма
-                      </Typography>
-                      <IconButton
-                        onClick={() => setShowMetricsDetails(true)}
-                        sx={{
-                          color: "rgba(255, 255, 255, 0.4)",
-                          "&:hover": {
-                            color: "rgba(255, 255, 255, 0.7)",
-                          },
-                        }}
-                      >
-                        <InfoOutlinedIcon sx={{ fontSize: "1.2rem" }} />
-                      </IconButton>
-                    </Box>
-                    <Box
-                      sx={{
-                        width: "100%",
-                        height: 300,
-                        backgroundColor: "rgba(255, 255, 255, 0.03)",
-                        borderRadius: "12px",
-                        p: 2,
-                      }}
-                    >
-                      <ResponsiveContainer width="100%" height="100%">
-                        <RadarChart
-                          cx="50%"
-                          cy="50%"
-                          outerRadius="80%"
-                          data={calculateMetrics(details)}
-                        >
-                          <PolarGrid stroke="rgba(255, 255, 255, 0.1)" />
-                          <PolarAngleAxis
-                            dataKey="metric"
-                            tick={{
-                              fill: "rgba(255, 255, 255, 0.6)",
-                              fontSize: 12,
-                            }}
-                          />
-                          <Radar
-                            name="Метрики"
-                            dataKey="value"
-                            stroke="#0686ee"
-                            fill="#0686ee"
-                            fillOpacity={0.3}
-                          />
-                        </RadarChart>
-                      </ResponsiveContainer>
-                    </Box>
-                  </Box>
-
                   {/* Модальное окно с деталями метрик */}
                   <Dialog
                     open={showMetricsDetails}
@@ -2765,101 +2787,144 @@ export const MovieDetails = ({
                         sx={{
                           display: "flex",
                           flexDirection: "column",
-                          gap: 2,
+                          gap: 3,
                         }}
                       >
                         {[
                           {
-                            label: "Рейтинг",
-                            value: `${details?.vote_average?.toFixed(1)} из 10`,
-                            description:
-                              "Средняя оценка фильма по мнению пользователей",
+                            section: "Оценки",
+                            metrics: [
+                              {
+                                label: "Рейтинг",
+                                value: `${details?.vote_average?.toFixed(
+                                  1
+                                )} из 10`,
+                                description:
+                                  "Средняя оценка фильма по мнению пользователей",
+                              },
+                              {
+                                label: "Популярность",
+                                value: `${details?.vote_count?.toLocaleString()} голосов (${
+                                  Math.round(
+                                    (details?.vote_count /
+                                      Math.max(
+                                        (new Date().getTime() -
+                                          new Date(
+                                            details?.release_date
+                                          ).getTime()) /
+                                          (1000 * 60 * 60 * 24),
+                                        1
+                                      )) *
+                                      10
+                                  ) / 10
+                                } в день)`,
+                                description:
+                                  "Количество голосов и средняя активность голосования",
+                              },
+                              {
+                                label: "Тренд",
+                                value: `${details?.popularity?.toFixed(
+                                  1
+                                )} из 170`,
+                                description:
+                                  "Текущий показатель популярности на TMDB",
+                              },
+                            ],
                           },
                           {
-                            label: "Длительность",
-                            value: `${details?.runtime} мин`,
-                            description: "Продолжительность фильма",
+                            section: "Характеристики",
+                            metrics: [
+                              {
+                                label: "Длительность",
+                                value: `${details?.runtime} мин`,
+                                description: "Продолжительность фильма",
+                              },
+                            ],
                           },
                           {
-                            label: "Популярность",
-                            value: `${details?.vote_count?.toLocaleString()} голосов (${
-                              Math.round(
-                                (details?.vote_count /
-                                  Math.max(
-                                    (new Date().getTime() -
-                                      new Date(
-                                        details?.release_date
-                                      ).getTime()) /
-                                      (1000 * 60 * 60 * 24),
-                                    1
-                                  )) *
-                                  10
-                              ) / 10
-                            } в день)`,
-                            description:
-                              "Количество голосов и средняя активность голосования",
+                            section: "Финансы",
+                            metrics: [
+                              {
+                                label: "Бюджет",
+                                value: details?.budget
+                                  ? `$${(details.budget / 1000000).toFixed(1)}M`
+                                  : "—",
+                                description: "Бюджет производства фильма",
+                              },
+                              {
+                                label: "Доход",
+                                value: details?.revenue
+                                  ? `$${(details.revenue / 1000000000).toFixed(
+                                      1
+                                    )}B`
+                                  : "—",
+                                description: "Общие кассовые сборы фильма",
+                              },
+                              {
+                                label: "Окупаемость",
+                                value:
+                                  details?.budget && details?.revenue
+                                    ? `${(
+                                        ((details.revenue - details.budget) /
+                                          details.budget) *
+                                        100
+                                      ).toFixed(0)}%`
+                                    : "—",
+                                description:
+                                  "Процент возврата инвестиций относительно бюджета",
+                              },
+                            ],
                           },
-                          {
-                            label: "Бюджет",
-                            value: details?.budget
-                              ? `$${(details.budget / 1000000).toFixed(1)}M`
-                              : "—",
-                            description: "Бюджет производства фильма",
-                          },
-                          {
-                            label: "Доход",
-                            value: details?.revenue
-                              ? `$${(details.revenue / 1000000000).toFixed(1)}B`
-                              : "—",
-                            description: "Общие кассовые сборы фильма",
-                          },
-                          {
-                            label: "Окупаемость",
-                            value:
-                              details?.budget && details?.revenue
-                                ? `${(
-                                    ((details.revenue - details.budget) /
-                                      details.budget) *
-                                    100
-                                  ).toFixed(0)}%`
-                                : "—",
-                            description:
-                              "Процент возврата инвестиций относительно бюджета",
-                          },
-                          {
-                            label: "Тренд",
-                            value: `${details?.popularity?.toFixed(1)} из 170`,
-                            description:
-                              "Текущий показатель популярности на TMDB",
-                          },
-                        ].map((metric) => (
-                          <Box key={metric.label}>
+                        ].map((section) => (
+                          <Box key={section.section}>
+                            <Typography
+                              sx={{
+                                color: "rgba(255, 255, 255, 0.9)",
+                                fontSize: "1rem",
+                                fontWeight: 500,
+                                mb: 2,
+                              }}
+                            >
+                              {section.section}
+                            </Typography>
                             <Box
                               sx={{
                                 display: "flex",
-                                justifyContent: "space-between",
-                                mb: 0.5,
+                                flexDirection: "column",
+                                gap: 2,
                               }}
                             >
-                              <Typography
-                                sx={{ color: "rgba(255, 255, 255, 0.7)" }}
-                              >
-                                {metric.label}
-                              </Typography>
-                              <Typography
-                                sx={{ color: "#0686ee", fontWeight: 500 }}
-                              >
-                                {metric.value}
-                              </Typography>
+                              {section.metrics.map((metric) => (
+                                <Box key={metric.label}>
+                                  <Box
+                                    sx={{
+                                      display: "flex",
+                                      justifyContent: "space-between",
+                                      mb: 0.5,
+                                    }}
+                                  >
+                                    <Typography
+                                      sx={{ color: "rgba(255, 255, 255, 0.7)" }}
+                                    >
+                                      {metric.label}
+                                    </Typography>
+                                    <Typography
+                                      sx={{ color: "#0686ee", fontWeight: 500 }}
+                                    >
+                                      {metric.value}
+                                    </Typography>
+                                  </Box>
+                                  <Typography
+                                    sx={{
+                                      color: "rgba(255, 255, 255, 0.5)",
+                                      fontSize: "0.85rem",
+                                    }}
+                                  >
+                                    {metric.description}
+                                  </Typography>
+                                </Box>
+                              ))}
                             </Box>
-                            <Typography
-                              sx={{
-                                color: "rgba(255, 255, 255, 0.5)",
-                                fontSize: "0.85rem",
-                              }}
-                            >
-                              {metric.description}
-                            </Typography>
                           </Box>
                         ))}
                       </Box>
