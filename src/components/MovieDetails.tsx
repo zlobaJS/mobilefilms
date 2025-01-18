@@ -197,6 +197,8 @@ export const MovieDetails = ({
     certification: null,
     releases: [],
   });
+  // Добавляем новое состояние для контроля тултипа на мобильных устройствах
+  const [showVoteTooltip, setShowVoteTooltip] = useState(false);
 
   // Добавляем useMediaQuery для определения мобильного разрешения
   const isMobileView = useMediaQuery(theme.breakpoints.down("sm"));
@@ -719,7 +721,7 @@ export const MovieDetails = ({
     return hours > 0 ? `${hours}ч ${mins}м` : `${mins}м`;
   };
 
-  // Функция для форматирования количества голосов
+  // Обновляем функцию форматирования количества голосов
   const formatVoteCount = (count: number) => {
     if (!count) return "-";
     if (count >= 1000) {
@@ -1209,12 +1211,51 @@ export const MovieDetails = ({
                                 >
                                   •
                                 </Typography>
-                                <Typography
-                                  sx={{ color: "#888", fontSize: "1rem" }}
-                                >
-                                  {formatVoteCount(currentMovie.vote_count)}{" "}
-                                  оценок
-                                </Typography>
+                                {currentMovie.vote_count >= 1000 ? (
+                                  <Tooltip
+                                    open={
+                                      isMobileView ? showVoteTooltip : undefined
+                                    }
+                                    onClose={() => setShowVoteTooltip(false)}
+                                    title={`${currentMovie.vote_count.toLocaleString(
+                                      "ru-RU"
+                                    )} оценок`}
+                                    arrow
+                                    placement="top"
+                                    enterDelay={200}
+                                    leaveDelay={200}
+                                  >
+                                    <Typography
+                                      onClick={() => {
+                                        if (isMobileView) {
+                                          setShowVoteTooltip(!showVoteTooltip);
+                                        }
+                                      }}
+                                      sx={{
+                                        color: "#888",
+                                        fontSize: "1rem",
+                                        borderBottom:
+                                          "1px dotted rgba(255,255,255,0.3)",
+                                        cursor: "help",
+                                        "&:hover": {
+                                          borderBottom:
+                                            "1px dotted rgba(255,255,255,0.5)",
+                                        },
+                                        userSelect: "none", // Предотвращаем выделение текста при тапе
+                                        WebkitTapHighlightColor: "transparent", // Убираем подсветку при тапе на iOS
+                                      }}
+                                    >
+                                      {formatVoteCount(currentMovie.vote_count)}{" "}
+                                      оценок
+                                    </Typography>
+                                  </Tooltip>
+                                ) : (
+                                  <Typography
+                                    sx={{ color: "#888", fontSize: "1rem" }}
+                                  >
+                                    {currentMovie.vote_count} оценок
+                                  </Typography>
+                                )}
                               </>
                             )}
                         </Box>
