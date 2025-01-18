@@ -51,6 +51,14 @@ import { useSelector } from "react-redux";
 import { RootState } from "../store/store";
 import { useWatched } from "../hooks/useWatched";
 import { PersonDetails } from "./PersonDetails";
+// Добавьте импорт для Radar из recharts
+import {
+  Radar,
+  RadarChart,
+  PolarGrid,
+  PolarAngleAxis,
+  ResponsiveContainer,
+} from "recharts";
 
 declare module "@mui/material/styles" {
   interface BreakpointOverrides {
@@ -737,6 +745,77 @@ export const MovieDetails = ({
     if (rating >= 7) return "#57de94";
     if (rating >= 5.6) return "#888";
     return "#FF5252";
+  };
+
+  // Обновляем функцию calculateMetrics
+  const calculateMetrics = (details: any) => {
+    const calculatePopularityScore = (
+      releaseDate: string,
+      voteCount: number
+    ) => {
+      if (!releaseDate || !voteCount) return 0;
+
+      const releaseDateTime = new Date(releaseDate).getTime();
+      const currentTime = new Date().getTime();
+      const daysSinceRelease =
+        (currentTime - releaseDateTime) / (1000 * 60 * 60 * 24);
+
+      // Если фильм вышел менее 30 дней назад
+      if (daysSinceRelease < 30) {
+        // Для новых фильмов используем более мягкую шкалу
+        return Math.min(voteCount / 1000, 1); // 1000 голосов за первый месяц считаем максимумом
+      }
+
+      // Для более старых фильмов считаем среднее количество голосов в день
+      const votesPerDay = voteCount / Math.max(daysSinceRelease, 1);
+
+      // Нормализуем значение. Считаем, что 5 голосов в день - это хороший показатель
+      return Math.min(votesPerDay / 5, 1);
+    };
+
+    const calculateROI = (budget: number, revenue: number) => {
+      if (!budget || !revenue) return 0;
+      const roi = (revenue - budget) / budget;
+      return Math.min(roi / 10, 1);
+    };
+
+    const popularityScore = calculatePopularityScore(
+      details?.release_date,
+      details?.vote_count || 0
+    );
+
+    return [
+      {
+        metric: "Рейтинг",
+        value: (details?.vote_average || 0) / 10,
+        fullMark: 1,
+      },
+      {
+        metric: "Длительность",
+        value: Math.min((details?.runtime || 0) / 180, 1),
+        fullMark: 1,
+      },
+      {
+        metric: "Популярность",
+        value: popularityScore,
+        fullMark: 1,
+      },
+      {
+        metric: "Бюджет",
+        value: Math.min((details?.budget || 0) / 200000000, 1),
+        fullMark: 1,
+      },
+      {
+        metric: "Тренд",
+        value: Math.min((details?.popularity || 0) / 170, 1), // Изменено с 1000 на 170
+        fullMark: 1,
+      },
+      {
+        metric: "Окупаемость",
+        value: calculateROI(details?.budget || 0, details?.revenue || 0),
+        fullMark: 1,
+      },
+    ];
   };
 
   return (
@@ -2571,6 +2650,210 @@ export const MovieDetails = ({
                       </Box>
                     </Box>
                   )}
+
+                  {/* Добавьте компонент диаграммы после описания */}
+                  <Box sx={{ mt: 3, mb: 3 }}>
+                    <Typography
+                      variant="h6"
+                      sx={{
+                        color: "#6b6868",
+                        fontSize: "0.9rem",
+                        fontWeight: 500,
+                        mb: 2,
+                        textAlign: "left",
+                      }}
+                    >
+                      Метрики фильма
+                    </Typography>
+                    <Box
+                      sx={{
+                        width: "100%",
+                        height: 300,
+                        backgroundColor: "rgba(255, 255, 255, 0.03)",
+                        borderRadius: "12px",
+                        p: 2,
+                      }}
+                    >
+                      <ResponsiveContainer width="100%" height="100%">
+                        <RadarChart
+                          cx="50%"
+                          cy="50%"
+                          outerRadius="80%"
+                          data={calculateMetrics(details)}
+                        >
+                          <PolarGrid stroke="rgba(255, 255, 255, 0.1)" />
+                          <PolarAngleAxis
+                            dataKey="metric"
+                            tick={{
+                              fill: "rgba(255, 255, 255, 0.6)",
+                              fontSize: 12,
+                            }}
+                          />
+                          <Radar
+                            name="Метрики"
+                            dataKey="value"
+                            stroke="#0686ee"
+                            fill="#0686ee"
+                            fillOpacity={0.3}
+                          />
+                        </RadarChart>
+                      </ResponsiveContainer>
+                      <Box
+                        sx={{
+                          display: "flex",
+                          justifyContent: "space-around",
+                          mt: 2,
+                          color: "rgba(255, 255, 255, 0.6)",
+                          fontSize: "0.8rem",
+                          flexWrap: "wrap",
+                          gap: 2,
+                        }}
+                      >
+                        <Box>
+                          <Typography
+                            variant="caption"
+                            sx={{ color: "rgba(255, 255, 255, 0.4)" }}
+                          >
+                            Рейтинг:
+                          </Typography>
+                          <Typography variant="body2">
+                            {details?.vote_average?.toFixed(1)} из 10
+                          </Typography>
+                        </Box>
+                        <Box>
+                          <Typography
+                            variant="caption"
+                            sx={{ color: "rgba(255, 255, 255, 0.4)" }}
+                          >
+                            Длительность:
+                          </Typography>
+                          <Typography variant="body2">
+                            {details?.runtime} мин
+                          </Typography>
+                        </Box>
+                        <Box>
+                          <Typography
+                            variant="caption"
+                            sx={{ color: "rgba(255, 255, 255, 0.4)" }}
+                          >
+                            Голоса:
+                          </Typography>
+                          <Typography variant="body2">
+                            {details?.vote_count?.toLocaleString()}
+                          </Typography>
+                        </Box>
+                        <Box>
+                          <Typography
+                            variant="caption"
+                            sx={{ color: "rgba(255, 255, 255, 0.4)" }}
+                          >
+                            Бюджет:
+                          </Typography>
+                          <Typography variant="body2">
+                            {details?.budget
+                              ? `$${(details.budget / 1000000).toFixed(1)}M`
+                              : "—"}
+                          </Typography>
+                        </Box>
+                        <Box>
+                          <Typography
+                            variant="caption"
+                            sx={{ color: "rgba(255, 255, 255, 0.4)" }}
+                          >
+                            Популярность:
+                          </Typography>
+                          <Typography variant="body2">
+                            {details?.vote_count ? (
+                              <>
+                                {details.vote_count.toLocaleString()} голосов
+                                <Typography
+                                  component="span"
+                                  sx={{
+                                    fontSize: "0.75rem",
+                                    color: "rgba(255, 255, 255, 0.4)",
+                                    ml: 0.5,
+                                  }}
+                                >
+                                  (
+                                  {Math.round(
+                                    (details.vote_count /
+                                      Math.max(
+                                        (new Date().getTime() -
+                                          new Date(
+                                            details.release_date
+                                          ).getTime()) /
+                                          (1000 * 60 * 60 * 24),
+                                        1
+                                      )) *
+                                      10
+                                  ) / 10}{" "}
+                                  в день)
+                                </Typography>
+                              </>
+                            ) : (
+                              "—"
+                            )}
+                          </Typography>
+                        </Box>
+                        <Box>
+                          <Typography
+                            variant="caption"
+                            sx={{ color: "rgba(255, 255, 255, 0.4)" }}
+                          >
+                            Доход:
+                          </Typography>
+                          <Typography variant="body2">
+                            {details?.revenue
+                              ? `$${(details.revenue / 1000000000).toFixed(1)}B`
+                              : "—"}
+                          </Typography>
+                        </Box>
+                        <Box>
+                          <Typography
+                            variant="caption"
+                            sx={{ color: "rgba(255, 255, 255, 0.4)" }}
+                          >
+                            Окупаемость:
+                          </Typography>
+                          <Typography variant="body2">
+                            {details?.budget && details?.revenue
+                              ? `${(
+                                  ((details.revenue - details.budget) /
+                                    details.budget) *
+                                  100
+                                ).toFixed(0)}%`
+                              : "—"}
+                          </Typography>
+                        </Box>
+                        <Box>
+                          <Typography
+                            variant="caption"
+                            sx={{ color: "rgba(255, 255, 255, 0.4)" }}
+                          >
+                            Охват:
+                          </Typography>
+                          <Typography variant="body2">
+                            {details?.production_countries
+                              ? `${(
+                                  details.production_countries.length / 20
+                                ).toFixed(1)} из 20 стран`
+                              : "—"}
+                          </Typography>
+                        </Box>
+                        <Box>
+                          <Typography
+                            variant="caption"
+                            sx={{ color: "rgba(255, 255, 255, 0.4)" }}
+                          >
+                            Тренд:
+                          </Typography>
+                          <Typography variant="body2">
+                            {details?.popularity?.toFixed(1)} из 170
+                          </Typography>
+                        </Box>
+                      </Box>
+                    </Box>
+                  </Box>
                 </Box>
               </Box>
             </Box>

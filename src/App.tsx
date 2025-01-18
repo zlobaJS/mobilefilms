@@ -758,7 +758,7 @@ function AppRoutes({ movies, isLoading }: { movies: any; isLoading: boolean }) {
                       showTitle={true}
                     />
                     <MovieSlider
-                      title="Топ оценок 2024"
+                      title="Лучшие фильмы 2024"
                       movies={movies.mostRated2024}
                       loading={isLoading}
                       categoryId="most-rated-2024"
