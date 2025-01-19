@@ -282,22 +282,18 @@ export interface MovieImage {
   iso_639_1?: string | null;
 }
 
-// Модифицируем функцию getMovieImages чтобы она возвращала все backdrops
+// Модифицируем функцию getMovieImages чтобы она возвращала только backdrops без языка
 export const getMovieImages = async (movieId: number) => {
   try {
     const data = await fetchTMDB(`/movie/${movieId}/images`, {
       include_image_language: "ru,en,null",
     });
 
-    // Сортируем backdrops по размеру для лучшего качества
+    // Фильтруем только backdrops без языка
     if (data.backdrops && data.backdrops.length > 0) {
-      data.backdrops = data.backdrops.sort((a: MovieImage, b: MovieImage) => {
-        // Приоритет отдаем изображениям без языка
-        if (!a.iso_639_1 && b.iso_639_1) return -1;
-        if (a.iso_639_1 && !b.iso_639_1) return 1;
-        // Затем сортируем по размеру
-        return b.width * b.height - a.width * a.height;
-      });
+      data.backdrops = data.backdrops
+        .filter((backdrop: MovieImage) => !backdrop.iso_639_1) // Оставляем только backdrops без языка
+        .slice(0, 10); // Ограничиваем количество backdrops до 10
     }
 
     // Существующая логика для logos

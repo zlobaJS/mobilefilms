@@ -330,9 +330,21 @@ export const MovieDetails = ({
         // Добавим логирование для отладки
         console.log("Release Info:", releaseInfo);
 
-        // Используем backdrop из images API вместо movieData.backdrop_path
-        if (movieDetails && images.backdrops?.[0]) {
+        // Используем отфильтрованные backdrops без языка
+        if (movieDetails && images.backdrops?.length > 0) {
           movieDetails.backdrop_path = images.backdrops[0].file_path;
+          setAvailableBackdrops(images.backdrops);
+
+          // Проверяем сохраненный backdrop
+          const savedBackdropPath = getSavedBackdrop(movieData.id);
+          if (savedBackdropPath) {
+            const savedIndex = images.backdrops.findIndex(
+              (backdrop: MovieImage) => backdrop.file_path === savedBackdropPath
+            );
+            if (savedIndex !== -1) {
+              setCurrentBackdropIndex(savedIndex);
+            }
+          }
         }
 
         let logoPath = null;
