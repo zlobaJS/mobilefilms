@@ -64,6 +64,8 @@ import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 // В начале файла добавим импорт
 import WallpaperIcon from "@mui/icons-material/Wallpaper";
 import { MovieImage } from "../api/tmdb";
+// Добавляем импорт контекста авторизации
+import { useAuthContext } from "../contexts/AuthContext";
 
 declare module "@mui/material/styles" {
   interface BreakpointOverrides {
@@ -232,10 +234,37 @@ export const MovieDetails = ({
     []
   );
   const [currentBackdropIndex, setCurrentBackdropIndex] = useState(0);
-  const [showBackdropButton, setShowBackdropButton] = useState(false);
 
   // Добавляем useMediaQuery для определения мобильного разрешения
   const isMobileView = useMediaQuery(theme.breakpoints.down("sm"));
+
+  // Получаем данные о пользователе из контекста
+  const { user } = useAuthContext();
+
+  // Добавляем функцию для сохранения backdrop в localStorage
+  const saveBackdropToLocalStorage = (
+    movieId: number,
+    backdropPath: string
+  ) => {
+    if (user) {
+      // Используем uid пользователя для уникального ключа
+      const key = `userBackdrops_${user.uid}`;
+      const savedBackdrops = JSON.parse(localStorage.getItem(key) || "{}");
+      savedBackdrops[movieId] = backdropPath;
+      localStorage.setItem(key, JSON.stringify(savedBackdrops));
+    }
+  };
+
+  // Добавляем функцию для получения сохраненного backdrop
+  const getSavedBackdrop = (movieId: number): string | null => {
+    if (user) {
+      // Используем uid пользователя для уникального ключа
+      const key = `userBackdrops_${user.uid}`;
+      const savedBackdrops = JSON.parse(localStorage.getItem(key) || "{}");
+      return savedBackdrops[movieId] || null;
+    }
+    return null;
+  };
 
   // Добавляем функцию hasValue на уровне компонента
   const hasValue = (value: any) => {
@@ -1017,18 +1046,44 @@ export const MovieDetails = ({
       if (currentMovie?.id) {
         const images = await getMovieImages(currentMovie.id);
         if (images.backdrops && images.backdrops.length > 0) {
-          setAvailableBackdrops(images.backdrops);
-          setShowBackdropButton(images.backdrops.length > 1);
+          // Ограничиваем количество backdrops до 10
+          const limitedBackdrops = images.backdrops.slice(0, 10);
+          setAvailableBackdrops(limitedBackdrops);
+
+          // Проверяем сохраненный backdrop
+          const savedBackdropPath = getSavedBackdrop(currentMovie.id);
+          if (savedBackdropPath) {
+            const savedIndex = limitedBackdrops.findIndex(
+              (backdrop: MovieImage) => backdrop.file_path === savedBackdropPath
+            );
+            if (savedIndex !== -1) {
+              setCurrentBackdropIndex(savedIndex);
+            }
+          }
         }
       }
     };
     loadBackdrops();
-  }, [currentMovie?.id]);
+  }, [currentMovie?.id, user]);
 
-  // Добавим функцию для смены backdrop
+  // Модифицируем функцию смены backdrop
   const handleChangeBackdrop = () => {
     if (availableBackdrops.length > 1) {
-      setCurrentBackdropIndex((prev) => (prev + 1) % availableBackdrops.length);
+      // Если достигли последнего backdrop, возвращаемся к первому
+      const newIndex =
+        currentBackdropIndex === availableBackdrops.length - 1
+          ? 0
+          : currentBackdropIndex + 1;
+
+      setCurrentBackdropIndex(newIndex);
+
+      // Сохраняем выбранный backdrop
+      if (currentMovie?.id && user) {
+        saveBackdropToLocalStorage(
+          currentMovie.id,
+          availableBackdrops[newIndex].file_path
+        );
+      }
     }
   };
 
@@ -3127,26 +3182,37 @@ export const MovieDetails = ({
           onMovieSelect={handlePersonMovieSelect}
         />
       )}
-      {showBackdropButton && (
-        <IconButton
-          onClick={handleChangeBackdrop}
-          sx={{
-            position: "fixed",
-            top: "env(safe-area-inset-top, 16px)",
-            left: "env(safe-area-inset-left, 16px)",
-            zIndex: 1301,
-            color: "white",
-            bgcolor: "rgba(0,0,0,0.3)",
-            backdropFilter: "blur(4px)",
-            mt: "20px",
-            ml: "20px",
-            "&:hover": {
-              bgcolor: "rgba(0,0,0,0.5)",
-            },
-          }}
+      {availableBackdrops.length > 1 && (
+        <Tooltip
+          title={user ? "" : "Войдите, чтобы менять фон"}
+          placement="right"
         >
-          <WallpaperIcon />
-        </IconButton>
+          <span>
+            <IconButton
+              onClick={handleChangeBackdrop}
+              disabled={!user}
+              sx={{
+                position: "fixed",
+                top: "env(safe-area-inset-top, 16px)",
+                left: "env(safe-area-inset-left, 16px)",
+                zIndex: 1301,
+                color: "white",
+                bgcolor: user ? "rgba(0,0,0,0.3)" : "rgba(0,0,0,0.1)",
+                backdropFilter: "blur(4px)",
+                mt: "20px",
+                ml: "20px",
+                "&:hover": {
+                  bgcolor: user ? "rgba(0,0,0,0.5)" : "rgba(0,0,0,0.1)",
+                },
+                "&.Mui-disabled": {
+                  color: "rgba(255,255,255,0.3)",
+                },
+              }}
+            >
+              <WallpaperIcon />
+            </IconButton>
+          </span>
+        </Tooltip>
       )}
     </Dialog>
   );
