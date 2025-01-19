@@ -40,6 +40,8 @@ import ShareIcon from "@mui/icons-material/Share";
 import { useUserData } from "../hooks/useUserData";
 import { useProfileBackdrop } from "../hooks/useProfileBackdrop";
 import WallpaperIcon from "@mui/icons-material/Wallpaper";
+import { useMovieRecommendations } from "../hooks/useMovieRecommendations";
+import { RecommendationsSlider } from "../components/RecommendationsSlider";
 
 // Добавляем объект с переводами стран (можно вынести в отдельный файл)
 const countryTranslations: { [key: string]: string } = {
@@ -435,6 +437,9 @@ export const ProfilePage = () => {
       console.error("Error setting backdrop:", error);
     }
   };
+
+  const { recommendations, loading: recommendationsLoading } =
+    useMovieRecommendations(favorites, watchedMovies);
 
   return (
     <motion.div
@@ -915,6 +920,25 @@ export const ProfilePage = () => {
               />
             )}
           </Paper>
+
+          {/* Секция рекомендаций */}
+          {user && (favorites.length > 0 || watchedMovies.length > 0) && (
+            <Paper
+              elevation={0}
+              sx={{
+                p: 3,
+                mb: 4,
+                backgroundColor: "rgba(255, 255, 255, 0.05)",
+                borderRadius: 2,
+              }}
+            >
+              <RecommendationsSlider
+                movies={recommendations}
+                loading={recommendationsLoading}
+                onMovieSelect={handleMovieSelectDialog}
+              />
+            </Paper>
+          )}
 
           {/* Слайдеры с фильмами */}
           <Box sx={{ mt: 4 }}>
