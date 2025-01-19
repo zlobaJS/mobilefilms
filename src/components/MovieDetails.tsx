@@ -811,7 +811,7 @@ export const MovieDetails = ({
       },
       {
         metric: "Тренд",
-        value: Math.min((details?.popularity || 0) / 170, 1), // Изменено с 1000 на 170
+        value: Math.min((details?.popularity || 0) / 1000, 1), // Изменено с 170 на 1000
         fullMark: 1,
       },
       {
@@ -1719,28 +1719,6 @@ export const MovieDetails = ({
                       </Button>
                     )}
                   </Typography>
-
-                  {/* Добавляем кнопку "Подробнее" если текст длинный */}
-                  {details?.overview && details.overview.length > 200 && (
-                    <Button
-                      onClick={() =>
-                        setIsExpandedDescription(!isExpandedDescription)
-                      }
-                      sx={{
-                        color: "#0686ee",
-                        textTransform: "none",
-                        p: 0,
-                        minWidth: "auto",
-                        fontSize: { xs: "0.9rem", sm: "1rem" },
-                        "&:hover": {
-                          backgroundColor: "transparent",
-                          textDecoration: "underline",
-                        },
-                      }}
-                    >
-                      {isExpandedDescription ? "Свернуть" : "Подробнее"}
-                    </Button>
-                  )}
 
                   {/* Секция с метриками фильма */}
                   <Box sx={{ mt: 3, mb: 3 }}>
@@ -2825,7 +2803,7 @@ export const MovieDetails = ({
                                 label: "Тренд",
                                 value: `${details?.popularity?.toFixed(
                                   1
-                                )} из 170`,
+                                )} из 1000`, // Изменено с 170 на 1000
                                 description:
                                   "Текущий показатель популярности на TMDB",
                               },

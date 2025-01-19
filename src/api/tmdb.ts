@@ -5,8 +5,8 @@ export interface RankData {
 const tmdbProxy = {
   name: "TMDB Proxy",
   version: "1.0.3",
-  path_image: "https://imagetmdb.com/t/p",
-  path_api: "https://apitmdb.cub.red/3",
+  path_image: "https://tmdbimg.rootu.top/t/p",
+  path_api: "https://tmdbapi.rootu.top/3",
 };
 
 const API_KEY = "25d88f055e7a91d25fd272f3fd287165";
@@ -47,7 +47,7 @@ export const fetchTMDB = async (
   const queryParams = new URLSearchParams({
     api_key: API_KEY,
     language: "ru-RU",
-    region: "RU",
+    // region: "RU",
     ...params,
   });
 
@@ -100,7 +100,7 @@ export const getMovies = {
     return await fetchTMDB("/movie/now_playing", {
       page: page.toString(),
       include_image_language: "ru,en,null",
-      region: "RU",
+      // region: "RU",
       language: "ru-RU",
     });
   },
@@ -109,7 +109,7 @@ export const getMovies = {
     return await fetchTMDB("/trending/movie/day", {
       page: page.toString(),
       include_image_language: "ru,en,null",
-      region: "RU",
+      // region: "RU",
       language: "ru-RU",
     });
   },
@@ -118,7 +118,7 @@ export const getMovies = {
     return await fetchTMDB("/trending/movie/week", {
       page: page.toString(),
       include_image_language: "ru,en,null",
-      region: "RU",
+      // region: "RU",
       language: "ru-RU",
     });
   },
@@ -128,7 +128,7 @@ export const getMovies = {
     const data = await fetchTMDB("/movie/popular", {
       page: page.toString(),
       include_image_language: "ru,en,null",
-      region: "RU",
+      // region: "RU",
       language: "ru-RU",
     });
 
@@ -166,7 +166,7 @@ export const getMovies = {
       with_genres: genreId.toString(),
       page: page.toString(),
       include_image_language: "ru,en,null",
-      region: "RU",
+      // region: "RU",
       language: "ru-RU",
     });
 
@@ -183,7 +183,7 @@ export const getMovies = {
       sort_by: "vote_count.desc",
       "vote_count.gte": "1000",
       include_image_language: "ru,en,null",
-      region: "RU",
+      // region: "RU",
       language: "ru-RU",
     });
   },
@@ -195,7 +195,7 @@ export const getMovies = {
       "vote_count.gte": "100",
       primary_release_year: "2024",
       include_image_language: "ru,en,null",
-      region: "RU",
+      // region: "RU",
       language: "ru-RU",
     });
   },
@@ -206,7 +206,7 @@ export const getMovies = {
       sort_by: "popularity.desc",
       primary_release_year: "2024",
       include_image_language: "ru,en,null",
-      region: "RU",
+      // region: "RU",
       language: "ru-RU",
     });
   },
