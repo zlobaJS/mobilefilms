@@ -106,10 +106,7 @@ export const CategoryPage = ({
         if (effectiveCategoryId) {
           if (categoryType === "keyword") {
             console.log("Fetching keyword movies:", effectiveCategoryId);
-            response = await getMoviesByKeyword(
-              Number(effectiveCategoryId),
-              page
-            );
+            response = await getMoviesByKeyword(Number(effectiveCategoryId));
           } else {
             response = await getMovies.byCategory(
               effectiveCategoryId,

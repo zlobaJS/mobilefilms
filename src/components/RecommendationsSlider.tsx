@@ -1,7 +1,7 @@
-import { Box, Typography, styled } from "@mui/material";
+import { Box, Typography, styled, Skeleton } from "@mui/material";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { EffectCards } from "swiper/modules";
-import { MovieCard, MovieCardSkeleton } from "./MovieCard";
+import { MovieCard } from "./MovieCard";
 import { Movie } from "../types/movie";
 import AutoAwesomeIcon from "@mui/icons-material/AutoAwesome";
 
@@ -23,6 +23,61 @@ const StyledSwiper = styled(Swiper)({
     transform: "scale(0.9)",
   },
 });
+
+const LoadingCard = () => (
+  <Box
+    sx={{
+      width: "100%",
+      height: "100%",
+      position: "relative",
+      borderRadius: "18px",
+      overflow: "hidden",
+      bgcolor: "rgba(255,255,255,0.05)",
+    }}
+  >
+    <Skeleton
+      variant="rectangular"
+      width="100%"
+      height="100%"
+      animation="wave"
+      sx={{
+        bgcolor: "rgba(255,255,255,0.1)",
+        transform: "none",
+      }}
+    />
+    <Box
+      sx={{
+        position: "absolute",
+        bottom: 0,
+        left: 0,
+        right: 0,
+        p: 2,
+        background: "linear-gradient(transparent, rgba(0,0,0,0.8))",
+      }}
+    >
+      <Skeleton
+        variant="text"
+        width="70%"
+        height={24}
+        sx={{ bgcolor: "rgba(255,255,255,0.1)" }}
+      />
+      <Box sx={{ mt: 1, display: "flex", gap: 1 }}>
+        <Skeleton
+          variant="circular"
+          width={32}
+          height={32}
+          sx={{ bgcolor: "rgba(255,255,255,0.1)" }}
+        />
+        <Skeleton
+          variant="circular"
+          width={32}
+          height={32}
+          sx={{ bgcolor: "rgba(255,255,255,0.1)" }}
+        />
+      </Box>
+    </Box>
+  </Box>
+);
 
 interface RecommendationsSliderProps {
   movies: Movie[];
@@ -59,6 +114,43 @@ export const RecommendationsSlider = ({
         >
           Рекомендации для вас
         </Typography>
+        {loading && (
+          <Box
+            sx={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 1,
+              ml: "auto",
+              color: "rgba(255,255,255,0.7)",
+              fontSize: "0.875rem",
+            }}
+          >
+            <Box
+              sx={{
+                width: 6,
+                height: 6,
+                borderRadius: "50%",
+                bgcolor: "#FFD700",
+                animation: "pulse 1.5s infinite",
+                "@keyframes pulse": {
+                  "0%": {
+                    transform: "scale(0.8)",
+                    opacity: 0.5,
+                  },
+                  "50%": {
+                    transform: "scale(1)",
+                    opacity: 1,
+                  },
+                  "100%": {
+                    transform: "scale(0.8)",
+                    opacity: 0.5,
+                  },
+                },
+              }}
+            />
+            Подбираем фильмы...
+          </Box>
+        )}
       </Box>
 
       <Box
@@ -77,7 +169,7 @@ export const RecommendationsSlider = ({
           {loading
             ? Array.from({ length: 3 }).map((_, index) => (
                 <SwiperSlide key={`skeleton-${index}`}>
-                  <MovieCardSkeleton />
+                  <LoadingCard />
                 </SwiperSlide>
               ))
             : Array.from(new Set(movies.map((m) => m.id))).map((movieId) => {

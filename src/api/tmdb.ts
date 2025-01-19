@@ -362,10 +362,14 @@ export const getCollection = async (collectionId: number) => {
 
 export const getMovieRecommendations = async (movieId: number) => {
   try {
-    const data = await fetchTMDB(`/movie/${movieId}/recommendations`, {});
-    return data.results || [];
+    const response = await fetch(
+      `${tmdbProxy.path_api}/movie/${movieId}/recommendations?api_key=${API_KEY}&language=ru`
+    );
+    const data = await response.json();
+    console.log(`Recommendations for movie ${movieId}:`, data);
+    return data.results;
   } catch (error) {
-    console.error("Error fetching recommendations:", error);
+    console.error("Error fetching movie recommendations:", error);
     return [];
   }
 };
@@ -380,12 +384,13 @@ export const getMovieKeywords = async (movieId: number) => {
   }
 };
 
-export const getMoviesByKeyword = async (keywordId: number, page = 1) => {
+export const getMoviesByKeyword = async (keywordId: number) => {
   try {
     const data = await fetchTMDB("/discover/movie", {
       with_keywords: keywordId.toString(),
-      page: page.toString(),
       sort_by: "popularity.desc",
+      include_image_language: "ru,en,null",
+      language: "ru-RU",
     });
     return data;
   } catch (error) {
