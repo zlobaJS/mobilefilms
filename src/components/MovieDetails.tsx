@@ -241,6 +241,32 @@ export const MovieDetails = ({
   // Получаем данные о пользователе из контекста
   const { user } = useAuthContext();
 
+  // Добавим useEffect для загрузки backdrops
+  useEffect(() => {
+    const loadBackdrops = async () => {
+      if (currentMovie?.id) {
+        const images = await getMovieImages(currentMovie.id);
+        if (images.backdrops && images.backdrops.length > 0) {
+          // Ограничиваем количество backdrops до 10
+          const limitedBackdrops = images.backdrops.slice(0, 10);
+          setAvailableBackdrops(limitedBackdrops);
+
+          // Проверяем сохраненный backdrop
+          const savedBackdropPath = getSavedBackdrop(currentMovie.id);
+          if (savedBackdropPath) {
+            const savedIndex = limitedBackdrops.findIndex(
+              (backdrop: MovieImage) => backdrop.file_path === savedBackdropPath
+            );
+            if (savedIndex !== -1) {
+              setCurrentBackdropIndex(savedIndex);
+            }
+          }
+        }
+      }
+    };
+    loadBackdrops();
+  }, [currentMovie?.id, user]);
+
   // Добавляем функцию для сохранения backdrop в localStorage
   const saveBackdropToLocalStorage = (
     movieId: number,
@@ -1051,32 +1077,6 @@ export const MovieDetails = ({
       </Box>
     </Box>
   </Dialog>;
-
-  // Добавим useEffect для загрузки backdrops
-  useEffect(() => {
-    const loadBackdrops = async () => {
-      if (currentMovie?.id) {
-        const images = await getMovieImages(currentMovie.id);
-        if (images.backdrops && images.backdrops.length > 0) {
-          // Ограничиваем количество backdrops до 10
-          const limitedBackdrops = images.backdrops.slice(0, 10);
-          setAvailableBackdrops(limitedBackdrops);
-
-          // Проверяем сохраненный backdrop
-          const savedBackdropPath = getSavedBackdrop(currentMovie.id);
-          if (savedBackdropPath) {
-            const savedIndex = limitedBackdrops.findIndex(
-              (backdrop: MovieImage) => backdrop.file_path === savedBackdropPath
-            );
-            if (savedIndex !== -1) {
-              setCurrentBackdropIndex(savedIndex);
-            }
-          }
-        }
-      }
-    };
-    loadBackdrops();
-  }, [currentMovie?.id, user]);
 
   // Модифицируем функцию смены backdrop
   const handleChangeBackdrop = () => {
