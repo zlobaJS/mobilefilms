@@ -96,7 +96,6 @@ export const CategoryPage = ({
 
   useEffect(() => {
     const fetchMovies = async () => {
-      // Устанавливаем loading только для первой загрузки
       if (page === 1) {
         setLoading(true);
       }
@@ -105,8 +104,21 @@ export const CategoryPage = ({
         let response;
         if (effectiveCategoryId) {
           if (categoryType === "keyword") {
-            console.log("Fetching keyword movies:", effectiveCategoryId);
-            response = await getMoviesByKeyword(Number(effectiveCategoryId));
+            console.log(
+              "Fetching keyword movies:",
+              effectiveCategoryId,
+              "page:",
+              page
+            );
+            const keywordMovies = await getMoviesByKeyword(
+              Number(effectiveCategoryId),
+              page
+            );
+            response = {
+              results: keywordMovies.results || [],
+              total_pages: keywordMovies.total_pages,
+            };
+            setHasMore(page < (keywordMovies.total_pages || 0));
           } else {
             response = await getMovies.byCategory(
               effectiveCategoryId,
@@ -115,20 +127,28 @@ export const CategoryPage = ({
             );
           }
         }
+
         if (response?.results) {
-          if (page === 1) {
-            setMovies(response.results);
-          } else {
-            setMovies((prev) => [...prev, ...response.results]);
-          }
-          setHasMore(response.results.length === 20);
+          setMovies((prevMovies) => {
+            if (page === 1) {
+              return response.results;
+            }
+            // Фильтруем дубликаты внутри функции обновления состояния
+            const newMovies = response.results.filter(
+              (newMovie: Movie) =>
+                !prevMovies.some(
+                  (existingMovie) => existingMovie.id === newMovie.id
+                )
+            );
+            return [...prevMovies, ...newMovies];
+          });
         }
       } catch (error) {
         console.error("Error fetching movies:", error);
         navigate("/");
       } finally {
         setLoading(false);
-        setIsLoadingMore(false); // Сбрасываем флаг загрузки
+        setIsLoadingMore(false);
         if (page === 1) {
           setTimeout(() => setContentVisible(true), 100);
         }

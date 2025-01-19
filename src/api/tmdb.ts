@@ -384,19 +384,15 @@ export const getMovieKeywords = async (movieId: number) => {
   }
 };
 
-export const getMoviesByKeyword = async (keywordId: number) => {
-  try {
-    const data = await fetchTMDB("/discover/movie", {
-      with_keywords: keywordId.toString(),
-      sort_by: "popularity.desc",
-      include_image_language: "ru,en,null",
-      language: "ru-RU",
-    });
-    return data;
-  } catch (error) {
-    console.error("Error fetching movies by keyword:", error);
-    return { results: [] };
-  }
+export const getMoviesByKeyword = async (
+  keywordId: number,
+  page: number = 1
+) => {
+  return await fetchTMDB(`/keyword/${keywordId}/movies`, {
+    page: page.toString(),
+    include_adult: "false",
+    sort_by: "popularity.desc",
+  });
 };
 
 export const searchMovies = async (query: string, page = 1) => {
