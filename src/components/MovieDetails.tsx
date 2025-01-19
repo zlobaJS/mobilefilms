@@ -153,6 +153,19 @@ const formatReleaseDate = (dateString: string) => {
   });
 };
 
+// Добавим интерфейс для метрики
+interface Metric {
+  label: string;
+  value: string;
+  description: string;
+}
+
+// Добавляем интерфейс для секции
+interface MetricSection {
+  section: string;
+  metrics: (Metric | false)[];
+}
+
 export const MovieDetails = ({
   movie: initialMovie,
   movieId,
@@ -214,6 +227,40 @@ export const MovieDetails = ({
 
   // Добавляем useMediaQuery для определения мобильного разрешения
   const isMobileView = useMediaQuery(theme.breakpoints.down("sm"));
+
+  // Добавляем функцию hasValue на уровне компонента
+  const hasValue = (value: any) => {
+    return value !== null && value !== undefined && value !== 0;
+  };
+
+  // Функция для расчета популярности
+  const calculatePopularityScore = (releaseDate: string, voteCount: number) => {
+    if (!releaseDate || !voteCount) return 0;
+
+    const releaseDateTime = new Date(releaseDate).getTime();
+    const currentTime = new Date().getTime();
+    const daysSinceRelease =
+      (currentTime - releaseDateTime) / (1000 * 60 * 60 * 24);
+
+    // Если фильм вышел менее 30 дней назад
+    if (daysSinceRelease < 30) {
+      // Для новых фильмов используем более мягкую шкалу
+      return Math.min(voteCount / 1000, 1); // 1000 голосов за первый месяц считаем максимумом
+    }
+
+    // Для более старых фильмов считаем среднее количество голосов в день
+    const votesPerDay = voteCount / Math.max(daysSinceRelease, 1);
+
+    // Нормализуем значение. Считаем, что 5 голосов в день - это хороший показатель
+    return Math.min(votesPerDay / 5, 1);
+  };
+
+  // Функция для расчета окупаемости
+  const calculateROI = (budget: number, revenue: number) => {
+    if (!budget || !revenue) return 0;
+    const roi = (revenue - budget) / budget;
+    return Math.min(roi / 10, 1);
+  };
 
   // Модифицируем fetchData
   const fetchData = async (movieData: any) => {
@@ -753,74 +800,207 @@ export const MovieDetails = ({
 
   // Обновляем функцию calculateMetrics
   const calculateMetrics = (details: any) => {
-    const calculatePopularityScore = (
-      releaseDate: string,
-      voteCount: number
-    ) => {
-      if (!releaseDate || !voteCount) return 0;
+    // Собираем только метрики с существующими значениями
+    const metrics = [];
 
-      const releaseDateTime = new Date(releaseDate).getTime();
-      const currentTime = new Date().getTime();
-      const daysSinceRelease =
-        (currentTime - releaseDateTime) / (1000 * 60 * 60 * 24);
-
-      // Если фильм вышел менее 30 дней назад
-      if (daysSinceRelease < 30) {
-        // Для новых фильмов используем более мягкую шкалу
-        return Math.min(voteCount / 1000, 1); // 1000 голосов за первый месяц считаем максимумом
-      }
-
-      // Для более старых фильмов считаем среднее количество голосов в день
-      const votesPerDay = voteCount / Math.max(daysSinceRelease, 1);
-
-      // Нормализуем значение. Считаем, что 5 голосов в день - это хороший показатель
-      return Math.min(votesPerDay / 5, 1);
-    };
-
-    const calculateROI = (budget: number, revenue: number) => {
-      if (!budget || !revenue) return 0;
-      const roi = (revenue - budget) / budget;
-      return Math.min(roi / 10, 1);
-    };
-
-    const popularityScore = calculatePopularityScore(
-      details?.release_date,
-      details?.vote_count || 0
-    );
-
-    return [
-      {
+    // Рейтинг
+    if (hasValue(details?.vote_average)) {
+      metrics.push({
         metric: "Рейтинг",
-        value: (details?.vote_average || 0) / 10,
+        value: details.vote_average / 10,
         fullMark: 1,
-      },
-      {
+      });
+    }
+
+    // Длительность
+    if (hasValue(details?.runtime)) {
+      metrics.push({
         metric: "Длительность",
-        value: Math.min((details?.runtime || 0) / 180, 1),
+        value: Math.min(details.runtime / 180, 1),
         fullMark: 1,
-      },
-      {
-        metric: "Популярность",
-        value: popularityScore,
-        fullMark: 1,
-      },
-      {
+      });
+    }
+
+    // Популярность
+    if (hasValue(details?.vote_count) && details?.release_date) {
+      const popularityScore = calculatePopularityScore(
+        details.release_date,
+        details.vote_count
+      );
+      if (popularityScore > 0) {
+        metrics.push({
+          metric: "Популярность",
+          value: popularityScore,
+          fullMark: 1,
+        });
+      }
+    }
+
+    // Бюджет
+    if (hasValue(details?.budget)) {
+      metrics.push({
         metric: "Бюджет",
-        value: Math.min((details?.budget || 0) / 200000000, 1),
+        value: Math.min(details.budget / 200000000, 1),
         fullMark: 1,
-      },
-      {
+      });
+    }
+
+    // Тренд
+    if (hasValue(details?.popularity)) {
+      metrics.push({
         metric: "Тренд",
-        value: Math.min((details?.popularity || 0) / 1000, 1), // Изменено с 170 на 1000
+        value: Math.min(details.popularity / 1000, 1),
         fullMark: 1,
-      },
-      {
-        metric: "Окупаемость",
-        value: calculateROI(details?.budget || 0, details?.revenue || 0),
-        fullMark: 1,
-      },
-    ];
+      });
+    }
+
+    // Окупаемость
+    if (hasValue(details?.budget) && hasValue(details?.revenue)) {
+      const roi = calculateROI(details.budget, details.revenue);
+      if (roi > 0) {
+        metrics.push({
+          metric: "Окупаемость",
+          value: roi,
+          fullMark: 1,
+        });
+      }
+    }
+
+    return metrics;
   };
+
+  // В модальном окне также добавим проверки
+  <Dialog
+    open={showMetricsDetails}
+    onClose={() => setShowMetricsDetails(false)}
+    // ...остальные пропсы...
+  >
+    <Box sx={{ p: 3 }}>
+      {/* ... заголовок ... */}
+      <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
+        {(
+          [
+            {
+              section: "Оценки",
+              metrics: [
+                hasValue(details?.vote_average) && {
+                  label: "Рейтинг",
+                  value: `${details.vote_average.toFixed(1)} из 10`,
+                  description: "Средняя оценка фильма по мнению пользователей",
+                },
+                hasValue(details?.vote_count) && {
+                  label: "Популярность",
+                  value: `${details.vote_count.toLocaleString()} голосов`,
+                  description: "Количество голосов",
+                },
+                hasValue(details?.popularity) && {
+                  label: "Тренд",
+                  value: `${details.popularity.toFixed(1)} из 1000`,
+                  description: "Текущий показатель популярности на TMDB",
+                },
+              ].filter(Boolean),
+            },
+            {
+              section: "Характеристики",
+              metrics: [
+                hasValue(details?.runtime) && {
+                  label: "Длительность",
+                  value: `${details.runtime} мин`,
+                  description: "Продолжительность фильма",
+                },
+              ].filter(Boolean),
+            },
+            {
+              section: "Финансы",
+              metrics: [
+                hasValue(details?.budget) && {
+                  label: "Бюджет",
+                  value: `$${(details.budget / 1000000).toFixed(1)}M`,
+                  description: "Бюджет производства фильма",
+                },
+                hasValue(details?.revenue) && {
+                  label: "Доход",
+                  value: `$${(details.revenue / 1000000000).toFixed(1)}B`,
+                  description: "Общие кассовые сборы фильма",
+                },
+                hasValue(details?.budget) &&
+                  hasValue(details?.revenue) && {
+                    label: "Окупаемость",
+                    value: `${(
+                      ((details.revenue - details.budget) / details.budget) *
+                      100
+                    ).toFixed(0)}%`,
+                    description:
+                      "Процент возврата инвестиций относительно бюджета",
+                  },
+              ].filter(Boolean),
+            },
+          ] as MetricSection[]
+        )
+          .filter((section) => section.metrics.length > 0)
+          .map((section) => (
+            <Box key={section.section}>
+              <Typography
+                sx={{
+                  color: "rgba(255, 255, 255, 0.9)",
+                  fontSize: "1rem",
+                  fontWeight: 500,
+                  mb: 2,
+                }}
+              >
+                {section.section}
+              </Typography>
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 2,
+                }}
+              >
+                {section.metrics.map(
+                  (metric: Metric | false) =>
+                    metric && (
+                      <Box key={metric.label}>
+                        <Box
+                          sx={{
+                            display: "flex",
+                            justifyContent: "space-between",
+                            mb: 0.5,
+                          }}
+                        >
+                          <Typography
+                            sx={{
+                              color: "rgba(255, 255, 255, 0.7)",
+                            }}
+                          >
+                            {metric.label}
+                          </Typography>
+                          <Typography
+                            sx={{
+                              color: "#0686ee",
+                              fontWeight: 500,
+                            }}
+                          >
+                            {metric.value}
+                          </Typography>
+                        </Box>
+                        <Typography
+                          sx={{
+                            color: "rgba(255, 255, 255, 0.5)",
+                            fontSize: "0.85rem",
+                          }}
+                        >
+                          {metric.description}
+                        </Typography>
+                      </Box>
+                    )
+                )}
+              </Box>
+            </Box>
+          ))}
+      </Box>
+    </Box>
+  </Dialog>;
 
   return (
     <Dialog
@@ -2772,139 +2952,131 @@ export const MovieDetails = ({
                           {
                             section: "Оценки",
                             metrics: [
-                              {
+                              hasValue(details?.vote_average) && {
                                 label: "Рейтинг",
-                                value: `${details?.vote_average?.toFixed(
+                                value: `${details.vote_average.toFixed(
                                   1
                                 )} из 10`,
                                 description:
                                   "Средняя оценка фильма по мнению пользователей",
                               },
-                              {
+                              hasValue(details?.vote_count) && {
                                 label: "Популярность",
-                                value: `${details?.vote_count?.toLocaleString()} голосов (${
-                                  Math.round(
-                                    (details?.vote_count /
-                                      Math.max(
-                                        (new Date().getTime() -
-                                          new Date(
-                                            details?.release_date
-                                          ).getTime()) /
-                                          (1000 * 60 * 60 * 24),
-                                        1
-                                      )) *
-                                      10
-                                  ) / 10
-                                } в день)`,
-                                description:
-                                  "Количество голосов и средняя активность голосования",
+                                value: `${details.vote_count.toLocaleString()} голосов`,
+                                description: "Количество голосов",
                               },
-                              {
+                              hasValue(details?.popularity) && {
                                 label: "Тренд",
-                                value: `${details?.popularity?.toFixed(
+                                value: `${details.popularity.toFixed(
                                   1
-                                )} из 1000`, // Изменено с 170 на 1000
+                                )} из 1000`,
                                 description:
                                   "Текущий показатель популярности на TMDB",
                               },
-                            ],
+                            ].filter(Boolean),
                           },
                           {
                             section: "Характеристики",
                             metrics: [
-                              {
+                              hasValue(details?.runtime) && {
                                 label: "Длительность",
-                                value: `${details?.runtime} мин`,
+                                value: `${details.runtime} мин`,
                                 description: "Продолжительность фильма",
                               },
-                            ],
+                            ].filter(Boolean),
                           },
                           {
                             section: "Финансы",
                             metrics: [
-                              {
+                              hasValue(details?.budget) && {
                                 label: "Бюджет",
-                                value: details?.budget
-                                  ? `$${(details.budget / 1000000).toFixed(1)}M`
-                                  : "—",
+                                value: `$${(details.budget / 1000000).toFixed(
+                                  1
+                                )}M`,
                                 description: "Бюджет производства фильма",
                               },
-                              {
+                              hasValue(details?.revenue) && {
                                 label: "Доход",
-                                value: details?.revenue
-                                  ? `$${(details.revenue / 1000000000).toFixed(
-                                      1
-                                    )}B`
-                                  : "—",
+                                value: `$${(
+                                  details.revenue / 1000000000
+                                ).toFixed(1)}B`,
                                 description: "Общие кассовые сборы фильма",
                               },
-                              {
-                                label: "Окупаемость",
-                                value:
-                                  details?.budget && details?.revenue
-                                    ? `${(
-                                        ((details.revenue - details.budget) /
-                                          details.budget) *
-                                        100
-                                      ).toFixed(0)}%`
-                                    : "—",
-                                description:
-                                  "Процент возврата инвестиций относительно бюджета",
-                              },
-                            ],
+                              hasValue(details?.budget) &&
+                                hasValue(details?.revenue) && {
+                                  label: "Окупаемость",
+                                  value: `${(
+                                    ((details.revenue - details.budget) /
+                                      details.budget) *
+                                    100
+                                  ).toFixed(0)}%`,
+                                  description:
+                                    "Процент возврата инвестиций относительно бюджета",
+                                },
+                            ].filter(Boolean),
                           },
-                        ].map((section) => (
-                          <Box key={section.section}>
-                            <Typography
-                              sx={{
-                                color: "rgba(255, 255, 255, 0.9)",
-                                fontSize: "1rem",
-                                fontWeight: 500,
-                                mb: 2,
-                              }}
-                            >
-                              {section.section}
-                            </Typography>
-                            <Box
-                              sx={{
-                                display: "flex",
-                                flexDirection: "column",
-                                gap: 2,
-                              }}
-                            >
-                              {section.metrics.map((metric) => (
-                                <Box key={metric.label}>
-                                  <Box
-                                    sx={{
-                                      display: "flex",
-                                      justifyContent: "space-between",
-                                      mb: 0.5,
-                                    }}
-                                  >
-                                    <Typography
-                                      sx={{ color: "rgba(255, 255, 255, 0.7)" }}
-                                    >
-                                      {metric.label}
-                                    </Typography>
-                                    <Typography
-                                      sx={{ color: "#0686ee", fontWeight: 500 }}
-                                    >
-                                      {metric.value}
-                                    </Typography>
-                                  </Box>
-                                  <Typography
-                                    sx={{
-                                      color: "rgba(255, 255, 255, 0.5)",
-                                      fontSize: "0.85rem",
-                                    }}
-                                  >
-                                    {metric.description}
-                                  </Typography>
-                                </Box>
-                              ))}
+                        ]
+                          .filter((section) => section.metrics.length > 0)
+                          .map((section) => (
+                            <Box key={section.section}>
+                              <Typography
+                                sx={{
+                                  color: "rgba(255, 255, 255, 0.9)",
+                                  fontSize: "1rem",
+                                  fontWeight: 500,
+                                  mb: 2,
+                                }}
+                              >
+                                {section.section}
+                              </Typography>
+                              <Box
+                                sx={{
+                                  display: "flex",
+                                  flexDirection: "column",
+                                  gap: 2,
+                                }}
+                              >
+                                {section.metrics.map(
+                                  (metric: Metric | false) =>
+                                    metric && (
+                                      <Box key={metric.label}>
+                                        <Box
+                                          sx={{
+                                            display: "flex",
+                                            justifyContent: "space-between",
+                                            mb: 0.5,
+                                          }}
+                                        >
+                                          <Typography
+                                            sx={{
+                                              color: "rgba(255, 255, 255, 0.7)",
+                                            }}
+                                          >
+                                            {metric.label}
+                                          </Typography>
+                                          <Typography
+                                            sx={{
+                                              color: "#0686ee",
+                                              fontWeight: 500,
+                                            }}
+                                          >
+                                            {metric.value}
+                                          </Typography>
+                                        </Box>
+                                        <Typography
+                                          sx={{
+                                            color: "rgba(255, 255, 255, 0.5)",
+                                            fontSize: "0.85rem",
+                                          }}
+                                        >
+                                          {metric.description}
+                                        </Typography>
+                                      </Box>
+                                    )
+                                )}
+                              </Box>
                             </Box>
-                          </Box>
-                        ))}
+                          ))}
                       </Box>
                     </Box>
                   </Dialog>
