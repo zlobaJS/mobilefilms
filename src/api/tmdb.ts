@@ -274,28 +274,28 @@ export const getMovies = {
   },
 };
 
+// Добавляем новый интерфейс для изображений
+export interface MovieImage {
+  file_path: string;
+  width: number;
+  height: number;
+  iso_639_1?: string | null;
+}
+
+// Модифицируем функцию getMovieImages чтобы она возвращала все backdrops
 export const getMovieImages = async (movieId: number) => {
   try {
     const data = await fetchTMDB(`/movie/${movieId}/images`, {
       include_image_language: "ru,en,null",
     });
 
-    // Сортировка backdrops по приоритету языка и качеству
+    // Сортируем backdrops по размеру для лучшего качества
     if (data.backdrops && data.backdrops.length > 0) {
-      // Сначала ищем backdrop без языка
-      const noLanguageBackdrop = data.backdrops.find((b: any) => !b.iso_639_1);
-
-      // Если нет без языка, ищем русский backdrop
-      const russianBackdrop = data.backdrops.find(
-        (b: any) => b.iso_639_1 === "ru"
-      );
-
-      // Используем найденный backdrop или первый доступный
-      const bestBackdrop =
-        noLanguageBackdrop || russianBackdrop || data.backdrops[0];
-
-      // Сортируем backdrops по размеру для лучшего качества
-      data.backdrops = [bestBackdrop].sort((a: any, b: any) => {
+      data.backdrops = data.backdrops.sort((a: MovieImage, b: MovieImage) => {
+        // Приоритет отдаем изображениям без языка
+        if (!a.iso_639_1 && b.iso_639_1) return -1;
+        if (a.iso_639_1 && !b.iso_639_1) return 1;
+        // Затем сортируем по размеру
         return b.width * b.height - a.width * a.height;
       });
     }

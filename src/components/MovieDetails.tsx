@@ -61,6 +61,9 @@ import {
 } from "recharts";
 // Добавим новый импорт
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
+// В начале файла добавим импорт
+import WallpaperIcon from "@mui/icons-material/Wallpaper";
+import { MovieImage } from "../api/tmdb";
 
 declare module "@mui/material/styles" {
   interface BreakpointOverrides {
@@ -224,6 +227,12 @@ export const MovieDetails = ({
   const [showVoteTooltip, setShowVoteTooltip] = useState(false);
   // Добавим состояние для модального окна с деталями
   const [showMetricsDetails, setShowMetricsDetails] = useState(false);
+  // Внутри компонента MovieDetails добавим новые состояния
+  const [availableBackdrops, setAvailableBackdrops] = useState<MovieImage[]>(
+    []
+  );
+  const [currentBackdropIndex, setCurrentBackdropIndex] = useState(0);
+  const [showBackdropButton, setShowBackdropButton] = useState(false);
 
   // Добавляем useMediaQuery для определения мобильного разрешения
   const isMobileView = useMediaQuery(theme.breakpoints.down("sm"));
@@ -1002,6 +1011,27 @@ export const MovieDetails = ({
     </Box>
   </Dialog>;
 
+  // Добавим useEffect для загрузки backdrops
+  useEffect(() => {
+    const loadBackdrops = async () => {
+      if (currentMovie?.id) {
+        const images = await getMovieImages(currentMovie.id);
+        if (images.backdrops && images.backdrops.length > 0) {
+          setAvailableBackdrops(images.backdrops);
+          setShowBackdropButton(images.backdrops.length > 1);
+        }
+      }
+    };
+    loadBackdrops();
+  }, [currentMovie?.id]);
+
+  // Добавим функцию для смены backdrop
+  const handleChangeBackdrop = () => {
+    if (availableBackdrops.length > 1) {
+      setCurrentBackdropIndex((prev) => (prev + 1) % availableBackdrops.length);
+    }
+  };
+
   return (
     <Dialog
       open={open}
@@ -1275,7 +1305,8 @@ export const MovieDetails = ({
                   <Box
                     component="img"
                     src={imageUrl(
-                      currentMovie?.backdrop_path ||
+                      availableBackdrops[currentBackdropIndex]?.file_path ||
+                        currentMovie?.backdrop_path ||
                         currentMovie?.poster_path ||
                         "",
                       isMobile ? "w1280" : "original"
@@ -1737,8 +1768,7 @@ export const MovieDetails = ({
                             )}
                             {(
                               (rankData?.rank === 0 ? 1 : rankData?.rank) ?? 0
-                            ).toLocaleString("ru-RU")}{" "}
-                            место
+                            ).toLocaleString("ru-RU")}
                           </Typography>
                         )}
                     </Box>
@@ -3096,6 +3126,27 @@ export const MovieDetails = ({
           }}
           onMovieSelect={handlePersonMovieSelect}
         />
+      )}
+      {showBackdropButton && (
+        <IconButton
+          onClick={handleChangeBackdrop}
+          sx={{
+            position: "fixed",
+            top: "env(safe-area-inset-top, 16px)",
+            left: "env(safe-area-inset-left, 16px)",
+            zIndex: 1301,
+            color: "white",
+            bgcolor: "rgba(0,0,0,0.3)",
+            backdropFilter: "blur(4px)",
+            mt: "20px",
+            ml: "20px",
+            "&:hover": {
+              bgcolor: "rgba(0,0,0,0.5)",
+            },
+          }}
+        >
+          <WallpaperIcon />
+        </IconButton>
       )}
     </Dialog>
   );
