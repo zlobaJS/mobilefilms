@@ -9,6 +9,12 @@ import {
   CircularProgress,
   Snackbar,
   IconButton,
+  Tooltip,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  Card,
+  CardMedia,
 } from "@mui/material";
 import { motion } from "framer-motion";
 import { FavoritesSlider } from "../components/FavoritesSlider";
@@ -18,7 +24,7 @@ import { MovieDetails } from "../components/MovieDetails";
 import { useFavorites } from "../hooks/useFavorites";
 import { useWatched } from "../hooks/useWatched";
 import * as Flags from "country-flag-icons/react/3x2";
-import { getMovieDetails } from "../api/tmdb";
+import { getMovieDetails, imageUrl } from "../api/tmdb";
 import MovieFilterIcon from "@mui/icons-material/MovieFilter";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import VisibilityIcon from "@mui/icons-material/Visibility";
@@ -32,6 +38,8 @@ import { useAuth } from "../hooks/useAuth";
 import GoogleIcon from "@mui/icons-material/Google";
 import ShareIcon from "@mui/icons-material/Share";
 import { useUserData } from "../hooks/useUserData";
+import { useProfileBackdrop } from "../hooks/useProfileBackdrop";
+import WallpaperIcon from "@mui/icons-material/Wallpaper";
 
 // Добавляем объект с переводами стран (можно вынести в отдельный файл)
 const countryTranslations: { [key: string]: string } = {
@@ -398,6 +406,36 @@ export const ProfilePage = () => {
     }
   }, [user, userId, navigate]);
 
+  // Добавляем хук для управления фоном
+  const { backdropPath, setProfileBackdrop } = useProfileBackdrop(
+    userId || user?.uid
+  );
+  const [showBackdropMenu, setShowBackdropMenu] = useState(false);
+  const [availableMovies, setAvailableMovies] = useState<Movie[]>([]);
+
+  // Добавляем эффект для объединения фильмов
+  useEffect(() => {
+    // Объединяем просмотренные и избранные фильмы без дубликатов
+    const allMovies = [
+      ...new Map(
+        [...favorites, ...watchedMovies].map((movie) => [movie.id, movie])
+      ).values(),
+    ];
+    setAvailableMovies(allMovies);
+  }, [favorites, watchedMovies]);
+
+  // Добавляем обработчик установки фона
+  const handleSetBackdrop = async (movie: Movie) => {
+    if (!user) return;
+
+    try {
+      await setProfileBackdrop(movie.id, movie.backdrop_path);
+      setShowBackdropMenu(false);
+    } catch (error) {
+      console.error("Error setting backdrop:", error);
+    }
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -414,9 +452,99 @@ export const ProfilePage = () => {
           paddingBottom: "max(1rem, env(safe-area-inset-bottom))",
           paddingLeft: "env(safe-area-inset-left)",
           paddingRight: "env(safe-area-inset-right)",
+          // Добавляем стили для фона
+          backgroundImage: backdropPath ? `url(${backdropPath})` : "none",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat",
+          "&::before": {
+            content: '""',
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: "rgba(20, 20, 20, 0.85)",
+            zIndex: 0,
+          },
         }}
       >
-        <Container maxWidth="xl">
+        {/* Добавляем кнопку смены фона */}
+        {user && (
+          <Tooltip title="Сменить фон профиля">
+            <IconButton
+              onClick={() => setShowBackdropMenu(true)}
+              sx={{
+                position: "fixed",
+                top: "env(safe-area-inset-top, 16px)",
+                right: "env(safe-area-inset-right, 16px)",
+                zIndex: 2,
+                color: "white",
+                bgcolor: "rgba(0,0,0,0.5)",
+                "&:hover": {
+                  bgcolor: "rgba(0,0,0,0.7)",
+                },
+              }}
+            >
+              <WallpaperIcon />
+            </IconButton>
+          </Tooltip>
+        )}
+
+        {/* Добавляем диалог выбора фона */}
+        <Dialog
+          open={showBackdropMenu}
+          onClose={() => setShowBackdropMenu(false)}
+          maxWidth="md"
+          fullWidth
+        >
+          <DialogTitle sx={{ bgcolor: "#141414", color: "white" }}>
+            Выберите фон профиля
+          </DialogTitle>
+          <DialogContent sx={{ bgcolor: "#141414", p: 2 }}>
+            <Grid container spacing={2}>
+              {availableMovies.map((movie) => (
+                <Grid item xs={12} sm={6} md={4} key={movie.id}>
+                  <Card
+                    sx={{
+                      position: "relative",
+                      cursor: "pointer",
+                      "&:hover": {
+                        transform: "scale(1.02)",
+                        transition: "transform 0.2s",
+                      },
+                    }}
+                    onClick={() => handleSetBackdrop(movie)}
+                  >
+                    <CardMedia
+                      component="img"
+                      height="140"
+                      image={imageUrl(movie.backdrop_path, "w500")}
+                      alt={movie.title}
+                    />
+                    <Box
+                      sx={{
+                        position: "absolute",
+                        bottom: 0,
+                        left: 0,
+                        right: 0,
+                        p: 1,
+                        background:
+                          "linear-gradient(transparent, rgba(0,0,0,0.8))",
+                      }}
+                    >
+                      <Typography variant="body2" sx={{ color: "white" }}>
+                        {movie.title}
+                      </Typography>
+                    </Box>
+                  </Card>
+                </Grid>
+              ))}
+            </Grid>
+          </DialogContent>
+        </Dialog>
+
+        <Container maxWidth="xl" sx={{ position: "relative", zIndex: 1 }}>
           {/* Профиль */}
           <Paper
             elevation={0}
