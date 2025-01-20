@@ -8,6 +8,7 @@ const tmdbProxy = {
   version: "1.0.3",
   path_image: "https://tmdbimg.rootu.top/t/p",
   path_api: "https://apitmdb.cub.red/3",
+  details_api: "https://tmdbapi.rootu.top/3",
 };
 
 const API_KEY = "25d88f055e7a91d25fd272f3fd287165";
@@ -32,7 +33,8 @@ const CACHE_LIFETIME = 0; // было 2 * 60 * 60 * 1000
 
 export const fetchTMDB = async (
   endpoint: string,
-  params: Record<string, string> = {}
+  params: Record<string, string> = {},
+  forceDetailsApi: boolean = false
 ) => {
   const cacheKey = `${endpoint}?${new URLSearchParams(params)}`;
   const now = Date.now();
@@ -48,24 +50,56 @@ export const fetchTMDB = async (
   const queryParams = new URLSearchParams({
     api_key: API_KEY,
     language: "ru-RU",
-    // region: "RU",
     ...params,
   });
 
+  // Определяем, какой API использовать
+  const isDetailsEndpoint =
+    endpoint.includes("/movie/") &&
+    !endpoint.includes("/movie/popular") &&
+    !endpoint.includes("/movie/now_playing");
+  const useDetailsApi = forceDetailsApi || isDetailsEndpoint;
+  const apiPath = useDetailsApi ? tmdbProxy.details_api : tmdbProxy.path_api;
+
   try {
-    const response = await fetch(
-      `${tmdbProxy.path_api}${endpoint}?${queryParams}`
-    );
+    const response = await fetch(`${apiPath}${endpoint}?${queryParams}`);
 
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
 
     const data = await response.json();
-    cache.set(cacheKey, { data, timestamp: now });
-    return data;
+
+    if (data && (!data.results || data.results.length > 0)) {
+      cache.set(cacheKey, { data, timestamp: now });
+      return data;
+    }
+
+    throw new Error("Empty data received");
   } catch (error) {
-    console.error("Error fetching from TMDB:", error);
+    console.warn(`API request failed for ${apiPath}:`, error);
+
+    // Если основной API не сработал, пробуем другой API только для деталей фильма
+    if (isDetailsEndpoint && apiPath !== tmdbProxy.details_api) {
+      try {
+        const backupResponse = await fetch(
+          `${tmdbProxy.details_api}${endpoint}?${queryParams}`
+        );
+
+        if (!backupResponse.ok) {
+          throw new Error(
+            `Backup HTTP error! status: ${backupResponse.status}`
+          );
+        }
+
+        const backupData = await backupResponse.json();
+        cache.set(cacheKey, { data: backupData, timestamp: now });
+        return backupData;
+      } catch (backupError) {
+        console.error("Both APIs failed:", backupError);
+      }
+    }
+
     return { results: [] };
   }
 };
@@ -286,18 +320,20 @@ export interface MovieImage {
 // Модифицируем функцию getMovieImages чтобы она возвращала только backdrops без языка
 export const getMovieImages = async (movieId: number) => {
   try {
-    const data = await fetchTMDB(`/movie/${movieId}/images`, {
-      include_image_language: "ru,en,null",
-    });
+    const data = await fetchTMDB(
+      `/movie/${movieId}/images`,
+      {
+        include_image_language: "ru,en,null",
+      },
+      true
+    );
 
-    // Фильтруем только backdrops без языка
     if (data.backdrops && data.backdrops.length > 0) {
       data.backdrops = data.backdrops
-        .filter((backdrop: MovieImage) => !backdrop.iso_639_1) // Оставляем только backdrops без языка
-        .slice(0, 10); // Ограничиваем количество backdrops до 10
+        .filter((backdrop: MovieImage) => !backdrop.iso_639_1)
+        .slice(0, 10);
     }
 
-    // Существующая логика для logos
     if (data.logos && data.logos.length > 0) {
       const russianLogo = data.logos.find(
         (logo: any) => logo.iso_639_1 === "ru"
@@ -321,7 +357,7 @@ export const getMovieImages = async (movieId: number) => {
 
 export const getMovieDetails = async (movieId: number) => {
   try {
-    const data = await fetchTMDB(`/movie/${movieId}`, {});
+    const data = await fetchTMDB(`/movie/${movieId}`, {}, true);
     return data;
   } catch (error) {
     console.error("Error fetching movie details:", error);
