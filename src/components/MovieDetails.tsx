@@ -244,6 +244,10 @@ export const MovieDetails = ({
   const [currentBackdropIndex, setCurrentBackdropIndex] = useState(0);
   const [isFullyLoaded, setIsFullyLoaded] = useState(false);
   const [backdropLoaded, setBackdropLoaded] = useState(false);
+  // В начале компонента добавим новое состояние для текущего backdrop
+  const [currentBackdropPath, setCurrentBackdropPath] = useState<string | null>(
+    null
+  );
 
   // Добавляем useMediaQuery для определения мобильного разрешения
   const isMobileView = useMediaQuery(theme.breakpoints.down("sm"));
@@ -460,6 +464,7 @@ export const MovieDetails = ({
       setIsLoading(true);
       setIsFullyLoaded(false);
       setBackdropLoaded(false);
+      setCurrentBackdropPath(null); // Сбрасываем текущий backdrop при начале загрузки
 
       try {
         let movieToDisplay = initialMovie;
@@ -471,7 +476,6 @@ export const MovieDetails = ({
         if (movieToDisplay) {
           setCurrentMovie(movieToDisplay);
 
-          // Загружаем все данные параллельно
           const [
             images,
             movieDetails,
@@ -493,31 +497,55 @@ export const MovieDetails = ({
           ]);
 
           // Предзагружаем backdrop изображение
-          const backdropUrl = imageUrl(
-            images.backdrops?.[0]?.file_path || movieToDisplay.backdrop_path,
-            "original"
-          );
-          const img = new Image();
-          img.onload = () => {
-            setBackdropLoaded(true);
-          };
-          img.src = backdropUrl;
-
-          // Обновляем все состояния
           if (images.backdrops?.length > 0) {
-            movieDetails.backdrop_path = images.backdrops[0].file_path;
-            setAvailableBackdrops(images.backdrops);
+            const backdropPath = images.backdrops[0].file_path;
+            setCurrentBackdropPath(backdropPath); // Устанавливаем новый backdrop
+
+            const backdropUrl = imageUrl(backdropPath, "original");
+            const img = new Image();
+            img.onload = () => {
+              setBackdropLoaded(true);
+            };
+            img.onerror = () => {
+              setBackdropLoaded(true);
+            };
+            img.src = backdropUrl;
+          } else {
+            setBackdropLoaded(true);
           }
 
           // Обрабатываем логотип
           let logoPath = null;
           let hasLogoTemp = false;
           if (images.logos && images.logos.length > 0) {
-            logoPath = images.logos[0].file_path;
-            hasLogoTemp = true;
+            const russianLogo = images.logos.find(
+              (logo: any) => logo.iso_639_1 === "ru"
+            );
+            const englishLogo = images.logos.find(
+              (logo: any) => logo.iso_639_1 === "en"
+            );
+            const neutralLogo = images.logos.find(
+              (logo: any) => !logo.iso_639_1
+            );
+
+            const bestLogo =
+              russianLogo || englishLogo || neutralLogo || images.logos[0];
+            if (bestLogo) {
+              logoPath = bestLogo.file_path;
+              hasLogoTemp = true;
+            }
           }
+
+          // Устанавливаем состояния для логотипа
           setLogo(logoPath);
           setHasLogo(hasLogoTemp);
+          setIsLogoLoading(false);
+
+          // Обновляем все состояния
+          if (images.backdrops?.length > 0) {
+            movieDetails.backdrop_path = images.backdrops[0].file_path;
+            setAvailableBackdrops(images.backdrops);
+          }
 
           // Обрабатываем актеров и создателей
           const actors =
@@ -580,6 +608,9 @@ export const MovieDetails = ({
         }
       } catch (error) {
         console.error("Error fetching movie data:", error);
+        setIsLogoLoading(false);
+        setBackdropLoaded(true);
+        setIsFullyLoaded(true);
       } finally {
         setIsLoading(false);
       }
@@ -746,11 +777,11 @@ export const MovieDetails = ({
       setCurrentMovie(initialMovie);
       setIsVisible(false);
       setIsExpandedDescription(false);
-      setRecommendations([]); // Очищаем рекомендации при закрытии
+      setRecommendations([]);
       setIsUpdating(false);
-    } else {
-      // При открытии устанавливаем начальный фильм
-      setCurrentMovie(initialMovie);
+      setCurrentBackdropPath(null); // Очищаем текущий backdrop
+      setBackdropLoaded(false);
+      setIsFullyLoaded(false);
     }
   }, [open, initialMovie]);
 
@@ -1249,6 +1280,9 @@ export const MovieDetails = ({
           bottom: 0,
           padding: 0,
           overflow: "hidden",
+          backgroundImage: currentBackdropPath
+            ? `url(${imageUrl(currentBackdropPath, "original")})`
+            : "none",
           backgroundSize: "cover",
           backgroundPosition: "center",
           backgroundRepeat: "no-repeat",
@@ -1645,6 +1679,7 @@ export const MovieDetails = ({
                               },
                               width: "100%",
                               minHeight: "80px",
+                              mb: 2,
                             }}
                           >
                             <Box
@@ -1653,10 +1688,13 @@ export const MovieDetails = ({
                               alt={currentMovie?.title}
                               sx={{
                                 maxHeight: "80px",
-                                maxWidth: "70%",
+                                maxWidth: { xs: "85%", sm: "70%" },
                                 objectFit: "contain",
-                                mb: 2,
                                 filter: "brightness(1.2)",
+                              }}
+                              onError={(e: any) => {
+                                console.error("Logo loading error:", e);
+                                setHasLogo(false);
                               }}
                             />
                           </Box>

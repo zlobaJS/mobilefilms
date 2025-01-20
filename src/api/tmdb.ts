@@ -1,12 +1,13 @@
 export interface RankData {
   rank: number | null;
 }
+//   path_api: "https://tmdbapi.rootu.top/3",
 
 const tmdbProxy = {
   name: "TMDB Proxy",
   version: "1.0.3",
   path_image: "https://tmdbimg.rootu.top/t/p",
-  path_api: "https://tmdbapi.rootu.top/3",
+  path_api: "https://apitmdb.cub.red/3",
 };
 
 const API_KEY = "25d88f055e7a91d25fd272f3fd287165";
