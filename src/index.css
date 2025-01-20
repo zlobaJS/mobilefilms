@@ -216,3 +216,25 @@ body {
   margin-top: calc(-1 * var(--sat));
   padding-top: var(--sat);
 }
+
+/* Добавьте эти стили для лучшей поддержки iOS */
+.settings-page {
+  overscroll-behavior-y: none;
+  -webkit-overflow-scrolling: touch;
+  touch-action: manipulation;
+}
+
+/* Отключаем выделение текста на iOS */
+* {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* Разрешаем выделение для input и textarea */
+input,
+textarea {
+  -webkit-user-select: text;
+  user-select: text;
+}

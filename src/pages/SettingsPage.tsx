@@ -20,18 +20,40 @@ export const SettingsPage = () => {
     <Box
       sx={{
         bgcolor: "#141414",
-        minHeight: "100dvh",
-        pt: { xs: "calc(env(safe-area-inset-top) + 16px)", sm: 2 },
-        pb: { xs: "calc(56px + env(safe-area-inset-bottom))", sm: 2 },
+        minHeight: "100%",
+        height: "100%",
+        position: "fixed",
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        overflowY: "auto",
+        WebkitOverflowScrolling: "touch",
+        pt: {
+          xs: "calc(env(safe-area-inset-top) + 16px)",
+          sm: 2,
+        },
+        pb: {
+          xs: "calc(56px + env(safe-area-inset-bottom))",
+          sm: 2,
+        },
       }}
     >
-      <Container maxWidth="md">
+      <Container
+        maxWidth="md"
+        sx={{
+          height: "100%",
+          display: "flex",
+          flexDirection: "column",
+        }}
+      >
         <Box
           sx={{
             p: { xs: 2, sm: 3 },
             display: "flex",
             flexDirection: "column",
             gap: 3,
+            flex: 1,
           }}
         >
           <Typography
