@@ -26,7 +26,6 @@ import FavoriteIcon from "@mui/icons-material/Favorite";
 import SettingsIcon from "@mui/icons-material/Settings";
 import PersonIcon from "@mui/icons-material/Person";
 import { MovieSlider } from "./components/MovieSlider";
-import { BackdropSlider } from "./components/BackdropSlider";
 import { getMovies, GENRES, searchMovies } from "./api/tmdb";
 import {
   BrowserRouter,
