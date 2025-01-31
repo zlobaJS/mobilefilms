@@ -529,7 +529,7 @@ function SearchPage() {
         setResults(searchResults);
         setIsLoading(false);
         navigate(`/search?query=${encodeURIComponent(query)}`);
-      }, 1500); // Задержка в 1.5 секунды
+      }, 500); // Задержка в 1.5 секунды
     } else {
       setResults([]);
       navigate("/search");
@@ -706,8 +706,9 @@ function AppRoutes({ movies, isLoading }: { movies: any; isLoading: boolean }) {
                       minHeight: "100dvh",
                       backgroundColor: "#141414",
                       paddingTop: {
-                        xs: "calc(100vw * 1.2 + env(safe-area-inset-top) - 16px)",
-                        sm: "60vh",
+                        xs: "15vh",
+                        // xs: "calc(100vw * 1.2 + env(safe-area-inset-top) - 16px)",
+                        sm: "10vh",
                       },
                       position: "relative",
                       zIndex: 4,
@@ -719,19 +720,15 @@ function AppRoutes({ movies, isLoading }: { movies: any; isLoading: boolean }) {
                         top: 0,
                         left: 0,
                         right: 0,
-                        height: {
-                          xs: "calc(100vw * 1.2 + env(safe-area-inset-top))",
-                          sm: "60vh",
-                        },
+                        // height: {
+                        //   xs: "calc(100vw * 1.2 + env(safe-area-inset-top))",
+                        //   sm: "60vh",
+                        // },
                         pointerEvents: "none",
                         zIndex: 1,
                       },
                     }}
                   >
-                    <BackdropSlider
-                      movies={movies.popular}
-                      onMovieSelect={handleMovieSelect}
-                    />
                     <MovieSlider
                       title="Сейчас смотрят"
                       movies={movies.watchingToday}
