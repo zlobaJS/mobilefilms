@@ -385,6 +385,7 @@ export const GENRES = {
   WESTERN: 37,
   DRAMA: 18,
   WAR: 10752,
+  HISTORY: 36,
 };
 
 export const getCollection = async (collectionId: number) => {

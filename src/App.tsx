@@ -850,6 +850,14 @@ function AppRoutes({ movies, isLoading }: { movies: any; isLoading: boolean }) {
                       showTitle={true}
                     />
                     <MovieSlider
+                      title="Исторические"
+                      movies={movies.historical}
+                      loading={isLoading}
+                      categoryId="historical"
+                      onMovieSelect={handleMovieSelect}
+                      showTitle={true}
+                    />
+                    <MovieSlider
                       title="Российские фильмы"
                       movies={movies.ruMovies}
                       loading={isLoading}
@@ -1075,6 +1083,7 @@ function App() {
     ruMovies: [],
     mostRated: [],
     mostRated2024: [],
+    historical: [],
   });
   const startTimeRef = useRef(Date.now());
   const contentRef = useRef<HTMLDivElement>(null);
@@ -1100,6 +1109,7 @@ function App() {
           ruMoviesData,
           mostRatedData,
           mostRated2024Data,
+          historicalData,
         ] = await Promise.all([
           getMovies.popular(),
           getMovies.nowPlaying(),
@@ -1118,6 +1128,7 @@ function App() {
           getMovies.byCountry("RU"),
           getMovies.mostRated(),
           getMovies.mostRated2024(),
+          getMovies.byGenre(GENRES.HISTORY),
         ]);
 
         const backdropMovies = backdropData.results.slice(0, 5);
@@ -1140,6 +1151,7 @@ function App() {
           ruMovies: ruMoviesData.results,
           mostRated: mostRatedData.results,
           mostRated2024: mostRated2024Data.results,
+          historical: historicalData.results,
         });
 
         setContentLoaded(true);

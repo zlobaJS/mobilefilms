@@ -106,6 +106,10 @@ export const MovieCard = ({
     navigate(`/movie/${movie.id}`);
   };
 
+  const getYear = (date: string) => {
+    return date ? new Date(date).getFullYear() : "";
+  };
+
   return (
     <Box
       onClick={onClick || handleOpenDetails}
@@ -324,23 +328,33 @@ export const MovieCard = ({
       </Box>
 
       {showTitle && (
-        <Typography
-          variant="subtitle1"
-          sx={{
-            color: "white",
-            fontWeight: "bold",
-            fontSize: { xs: "0.875rem", sm: "1rem" },
-            mt: 1,
-            textAlign: "center",
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-            display: "-webkit-box",
-            WebkitLineClamp: 1,
-            WebkitBoxOrient: "vertical",
-          }}
-        >
-          {movie.title}
-        </Typography>
+        <Box sx={{ textAlign: "center", mt: 1 }}>
+          <Typography
+            variant="subtitle1"
+            sx={{
+              color: "white",
+              fontWeight: "bold",
+              fontSize: { xs: "0.875rem", sm: "1rem" },
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              display: "-webkit-box",
+              WebkitLineClamp: 1,
+              WebkitBoxOrient: "vertical",
+            }}
+          >
+            {movie.title}
+          </Typography>
+          <Typography
+            variant="body2"
+            sx={{
+              color: "rgba(255,255,255,0.7)",
+              fontSize: { xs: "0.75rem", sm: "0.875rem" },
+              mt: 0.5,
+            }}
+          >
+            {getYear(movie.release_date)}
+          </Typography>
+        </Box>
       )}
     </Box>
   );

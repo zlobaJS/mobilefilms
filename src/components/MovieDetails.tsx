@@ -1266,7 +1266,7 @@ export const MovieDetails = ({
       }}
       PaperProps={{
         sx: {
-          bgcolor: "#141414",
+          bgcolor: "#141414af",
           height: "100vh",
           width: "100vw",
           margin: 0,
@@ -1371,7 +1371,7 @@ export const MovieDetails = ({
                   gap: 2,
                 }}
               >
-                <CircularProgress size={60} sx={{ color: "white" }} />
+                <CircularProgress size={60} sx={{ color: "blue" }} />
                 <Typography variant="h6" sx={{ color: "white" }}>
                   Загрузка фильма...
                 </Typography>
@@ -1732,6 +1732,7 @@ export const MovieDetails = ({
                           display: "flex",
                           flexWrap: "wrap",
                           gap: "8px",
+                          rowGap: "1px",
                           mb: 2,
                           alignItems: "center",
                           justifyContent: { xs: "center", sm: "flex-start" },
