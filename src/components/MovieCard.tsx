@@ -309,17 +309,20 @@ export const MovieCard = ({
               position: "absolute",
               top: 8,
               left: 8,
-              bgcolor: (() => {
+              background: (() => {
                 const rating = Number(movie.vote_average);
-                if (rating >= 7) return "#4CAF50";
-                if (rating >= 5.6) return "#888";
-                return "#FF5252";
+                if (rating >= 7)
+                  return "linear-gradient(90deg, #00C9FF 0%, #3dbc49 100%)";
+                if (rating >= 5.6)
+                  return "linear-gradient(90deg, #757575 0%, #9E9E9E 100%)";
+                return "linear-gradient(90deg, #FF5252 0%, #FF1744 100%)";
               })(),
               color: "#fff",
               padding: { xs: "2px 6px", sm: "4px 8px" },
               borderRadius: { xs: "6px", sm: "8px" },
               fontSize: { xs: "12px", sm: "14px" },
               fontWeight: "bold",
+              boxShadow: "0 2px 8px rgba(0,0,0,0.2)",
             }}
           >
             {movie.vote_average.toFixed(1)}
