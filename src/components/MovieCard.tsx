@@ -351,7 +351,7 @@ export const MovieCard = ({
             variant="body2"
             sx={{
               color: "rgba(255,255,255,0.7)",
-              fontSize: { xs: "0.75rem", sm: "0.875rem" },
+              fontSize: { xs: "0.85rem", sm: "0.975rem" },
               mt: 0.5,
             }}
           >

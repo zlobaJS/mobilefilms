@@ -53,6 +53,7 @@ import { ChangelogPage } from "./pages/ChangelogPage";
 import { InstallPWA } from "./components/InstallPWA";
 import { useAuth } from "./hooks/useAuth";
 import { AuthProvider } from "./contexts/AuthContext";
+import CloseIcon from "@mui/icons-material/Close";
 const darkTheme = createTheme({
   palette: {
     mode: "dark",
@@ -519,36 +520,51 @@ function SearchPage() {
   const [results, setResults] = useState<Movie[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+  const searchTimeout = useRef<NodeJS.Timeout>();
 
-  const handleSearch = async () => {
-    if (query) {
-      setIsLoading(true);
-      setTimeout(async () => {
-        const searchResults = await searchMovies(query);
-        setResults(searchResults);
-        setIsLoading(false);
-        navigate(`/search?query=${encodeURIComponent(query)}`);
-      }, 500); // Задержка в 1.5 секунды
-    } else {
-      setResults([]);
-      navigate("/search");
-    }
-  };
+  // Обновляем поиск при вводе с debounce
+  const handleSearch = useCallback(
+    async (searchQuery: string) => {
+      if (searchQuery) {
+        setIsLoading(true);
+        try {
+          const searchResults = await searchMovies(searchQuery);
+          setResults(searchResults);
+          navigate(`/search?query=${encodeURIComponent(searchQuery)}`, {
+            replace: true,
+          });
+        } catch (error) {
+          console.error("Search error:", error);
+        } finally {
+          setIsLoading(false);
+        }
+      } else {
+        setResults([]);
+        navigate("/search", { replace: true });
+      }
+    },
+    [navigate]
+  );
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setQuery(value);
-    if (!value) {
-      setResults([]);
-      navigate("/search");
+
+    // Отменяем предыдущий таймаут
+    if (searchTimeout.current) {
+      clearTimeout(searchTimeout.current);
     }
+
+    // Устанавливаем новый таймаут для поиска
+    searchTimeout.current = setTimeout(() => {
+      handleSearch(value);
+    }, 300);
   };
 
-  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      handleSearch();
-    }
+  const handleClearInput = () => {
+    setQuery("");
+    setResults([]);
+    navigate("/search", { replace: true });
   };
 
   const firstMovie: Movie | null = results.length > 0 ? results[0] : null;
@@ -561,29 +577,63 @@ function SearchPage() {
           display: "flex",
           alignItems: "center",
           mb: 2,
-          backgroundColor: "#333",
-          borderRadius: "8px",
-          p: "2px 4px",
-          boxShadow: "0 3px 5px rgba(0,0,0,0.2)",
+          backgroundColor: "rgba(255,255,255,0.1)",
+          borderRadius: "100px",
+          p: "4px 16px",
+          boxShadow: "0 4px 20px rgba(0,0,0,0.15)",
+          backdropFilter: "blur(10px)",
+          transition: "all 0.3s ease",
+          border: "1px solid rgba(255,255,255,0.1)",
+          "&:hover, &:focus-within": {
+            backgroundColor: "rgba(255,255,255,0.15)",
+            boxShadow: "0 4px 24px rgba(0,0,0,0.2)",
+            border: "1px solid rgba(255,255,255,0.2)",
+          },
         }}
+        onSubmit={(e) => e.preventDefault()}
       >
+        <SearchIcon
+          sx={{
+            color: "rgba(255,255,255,0.7)",
+            mr: 1,
+          }}
+        />
         <InputBase
-          sx={{ ml: 1, flex: 1, color: "white" }}
+          sx={{
+            ml: 1,
+            flex: 1,
+            color: "white",
+            "& input": {
+              padding: "8px 0",
+              fontSize: "1rem",
+              "&::placeholder": {
+                color: "rgba(255,255,255,0.5)",
+                opacity: 1,
+              },
+            },
+          }}
           placeholder="Поиск фильмов..."
           value={query}
           onChange={handleInputChange}
-          onKeyPress={handleKeyPress}
           inputProps={{ "aria-label": "поиск фильмов" }}
         />
-        <IconButton
-          type="button"
-          sx={{ p: "10px", color: "white" }}
-          aria-label="search"
-          onClick={handleSearch}
-        >
-          <SearchIcon />
-        </IconButton>
+        {query && (
+          <IconButton
+            sx={{
+              color: "rgba(255,255,255,0.5)",
+              p: "8px",
+              "&:hover": {
+                color: "rgba(255,255,255,0.8)",
+              },
+            }}
+            aria-label="clear search"
+            onClick={handleClearInput}
+          >
+            <CloseIcon />
+          </IconButton>
+        )}
       </Paper>
+
       {isLoading && (
         <Box
           sx={{
@@ -602,7 +652,8 @@ function SearchPage() {
           <CircularProgress sx={{ color: "#0686ee" }} />
         </Box>
       )}
-      {!isLoading && firstMovie && (
+
+      {firstMovie && (
         <Box
           sx={{
             position: "fixed",
@@ -618,21 +669,20 @@ function SearchPage() {
             backgroundPosition: "center",
             backgroundRepeat: "no-repeat",
             zIndex: -1,
-          }}
-        >
-          <Box
-            sx={{
+            "&::after": {
+              content: '""',
               position: "absolute",
               top: 0,
               left: 0,
               right: 0,
               bottom: 0,
-              backgroundColor: "rgba(0, 0, 0, 0.7)",
-              zIndex: 1,
-            }}
-          />
-        </Box>
+              background:
+                "linear-gradient(to bottom, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.9) 100%)",
+            },
+          }}
+        />
       )}
+
       <SearchResults query={query} movies={results} loading={isLoading} />
     </Box>
   );
