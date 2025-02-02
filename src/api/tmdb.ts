@@ -274,6 +274,8 @@ export const getMovies = {
         return await getMovies.byGenre(GENRES.DRAMA, page);
       case "war":
         return await getMovies.byGenre(GENRES.WAR, page);
+      case "historical":
+        return await getMovies.byGenre(GENRES.HISTORY, page);
       case "ru-movies":
         return await getMovies.byCountry("RU", page, sortBy);
       case "most-rated":

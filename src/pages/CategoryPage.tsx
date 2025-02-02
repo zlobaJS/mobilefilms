@@ -28,6 +28,7 @@ const CATEGORY_TITLES: { [key: string]: string } = {
   western: "Вестерны",
   drama: "Драмы",
   war: "Военные",
+  historical: "Исторические",
   "ru-movies": "Российские фильмы",
 };
 
