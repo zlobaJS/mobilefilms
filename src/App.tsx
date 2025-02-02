@@ -75,63 +75,6 @@ interface Movie {
   release_quality?: string;
 }
 
-function SplashScreen() {
-  return (
-    <Box
-      component={motion.div}
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      sx={{
-        position: "fixed",
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        backgroundColor: "#141414",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        zIndex: 9999,
-      }}
-    >
-      <Box
-        component={motion.div}
-        initial={{ scale: 0.8, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        transition={{
-          duration: 0.5,
-          repeat: Infinity,
-          repeatType: "reverse",
-        }}
-        sx={{
-          width: 120,
-          height: 120,
-          mb: 3,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
-        <HomeIcon sx={{ fontSize: 60, color: "#0686ee" }} />
-      </Box>
-      <CircularProgress size={40} sx={{ color: "#0686ee" }} />
-      <Typography
-        variant="h6"
-        sx={{
-          mt: 2,
-          color: "white",
-          fontWeight: "bold",
-          textAlign: "center",
-        }}
-      >
-        Загрузка контента...
-      </Typography>
-    </Box>
-  );
-}
-
 function MobileNavigation() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -1113,7 +1056,7 @@ function AppRoutes({ movies, isLoading }: { movies: any; isLoading: boolean }) {
 }
 
 function App() {
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [contentLoaded, setContentLoaded] = useState(false);
   const [movies, setMovies] = useState({
     watchingToday: [],
@@ -1135,7 +1078,6 @@ function App() {
     mostRated2024: [],
     historical: [],
   });
-  const startTimeRef = useRef(Date.now());
   const contentRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -1206,14 +1148,7 @@ function App() {
 
         setContentLoaded(true);
 
-        const currentTime = Date.now();
-        const elapsedTime = currentTime - startTimeRef.current;
-        const minDisplayTime = 3000;
-        const remainingTime = Math.max(minDisplayTime - elapsedTime, 500);
-
-        setTimeout(() => {
-          setIsLoading(false);
-        }, remainingTime);
+        setIsLoading(false);
       } catch (error) {
         console.error("Error initializing app:", error);
         setIsLoading(false);
@@ -1242,9 +1177,6 @@ function App() {
               >
                 <AppRoutes movies={movies} isLoading={!contentLoaded} />
               </div>
-              <AnimatePresence mode="wait">
-                {isLoading && <SplashScreen />}
-              </AnimatePresence>
             </ThemeProvider>
           </CastProvider>
         </BrowserRouter>
