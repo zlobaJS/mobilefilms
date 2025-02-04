@@ -261,6 +261,7 @@ export const CategoryPage = ({
                       display: "flex",
                       flexDirection: "row",
                       flexWrap: "wrap",
+                      backgroundColor: "transparent",
                       gap: 1,
                       mx: -1,
                       px: 1,

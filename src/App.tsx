@@ -49,6 +49,7 @@ import { InstallPWA } from "./components/InstallPWA";
 import { useAuth } from "./hooks/useAuth";
 import { AuthProvider } from "./contexts/AuthContext";
 import CloseIcon from "@mui/icons-material/Close";
+
 const darkTheme = createTheme({
   palette: {
     mode: "dark",
@@ -69,6 +70,22 @@ interface Movie {
   release_date: string;
   release_quality?: string;
 }
+
+// В начале файла добавим константы с наборами цветов
+const COLOR_SCHEMES = {
+  blue: {
+    topLeft: "#162e52",
+    topRight: "#0f35b6",
+    bottomRight: "#2b55a6",
+    bottomLeft: "#522c69",
+  },
+  red: {
+    topLeft: "#091533",
+    topRight: "#28090c",
+    bottomRight: "#972013",
+    bottomLeft: "#042660",
+  },
+};
 
 function MobileNavigation() {
   const navigate = useNavigate();
@@ -630,6 +647,11 @@ function AppRoutes({ movies, isLoading }: { movies: any; isLoading: boolean }) {
   const location = useLocation();
   const navigate = useNavigate();
 
+  // Добавляем состояние для хранения текущей цветовой схемы
+  const [currentColors] = useState(() => {
+    return Math.random() > 0.5 ? COLOR_SCHEMES.blue : COLOR_SCHEMES.red;
+  });
+
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [location.pathname]);
@@ -660,10 +682,10 @@ function AppRoutes({ movies, isLoading }: { movies: any; isLoading: boolean }) {
           inset: 0,
           zIndex: -1,
           backgroundImage: `
-            radial-gradient(circle farthest-side at top left, #162e52, transparent 70%),
-            radial-gradient(circle farthest-side at top right, #0f35b6, transparent 70%),
-            radial-gradient(circle farthest-side at bottom right, #2b55a6, transparent 70%),
-            radial-gradient(circle farthest-side at bottom left, #522c69, transparent 70%)
+            radial-gradient(circle farthest-side at top left, ${currentColors.topLeft}, transparent 70%),
+            radial-gradient(circle farthest-side at top right, ${currentColors.topRight}, transparent 70%),
+            radial-gradient(circle farthest-side at bottom right, ${currentColors.bottomRight}, transparent 70%),
+            radial-gradient(circle farthest-side at bottom left, ${currentColors.bottomLeft}, transparent 70%)
           `,
           backgroundColor: "#141414",
         }}
