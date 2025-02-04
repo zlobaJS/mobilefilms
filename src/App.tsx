@@ -6,11 +6,6 @@ import {
   createTheme,
   BottomNavigation,
   BottomNavigationAction,
-  Drawer,
-  List,
-  ListItem,
-  ListItemIcon,
-  ListItemButton,
   Typography,
   CircularProgress,
   Grid,
@@ -58,7 +53,7 @@ const darkTheme = createTheme({
   palette: {
     mode: "dark",
     background: {
-      default: "#141414",
+      default: "transparent",
       paper: "#141414",
     },
   },
@@ -297,99 +292,99 @@ function MobileNavigation() {
   );
 }
 
-function DesktopNavigation() {
-  const navigate = useNavigate();
-  const location = useLocation();
+// function DesktopNavigation() {
+//   const navigate = useNavigate();
+//   const location = useLocation();
 
-  return (
-    <Drawer
-      variant="permanent"
-      sx={{
-        display: { xs: "none", sm: "block" },
-        "& .MuiDrawer-paper": {
-          width: "72px",
-          backgroundColor: "#141414",
-          borderRight: "none",
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          pt: "env(safe-area-inset-top)",
-        },
-      }}
-    >
-      <List
-        sx={{
-          width: "100%",
-          height: "100%",
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "center",
-          alignItems: "center",
-          gap: 1,
-        }}
-      >
-        <ListItem disablePadding>
-          <ListItemButton
-            onClick={() => navigate("/")}
-            selected={location.pathname === "/"}
-            sx={{
-              minHeight: 48,
-              justifyContent: "center",
-              "&.Mui-selected": {
-                bgcolor: "rgba(255, 255, 255, 0.08)",
-              },
-              "&:hover": {
-                bgcolor: "rgba(255, 255, 255, 0.12)",
-              },
-            }}
-          >
-            <ListItemIcon
-              sx={{
-                minWidth: 0,
-                justifyContent: "center",
-                color:
-                  location.pathname === "/"
-                    ? "white"
-                    : "rgba(255, 255, 255, 0.5)",
-              }}
-            >
-              <HomeIcon />
-            </ListItemIcon>
-          </ListItemButton>
-        </ListItem>
-        <ListItem disablePadding>
-          <ListItemButton
-            onClick={() => navigate("/search")}
-            selected={location.pathname === "/search"}
-            sx={{
-              minHeight: 48,
-              justifyContent: "center",
-              "&.Mui-selected": {
-                bgcolor: "rgba(255, 255, 255, 0.08)",
-              },
-              "&:hover": {
-                bgcolor: "rgba(255, 255, 255, 0.12)",
-              },
-            }}
-          >
-            <ListItemIcon
-              sx={{
-                minWidth: 0,
-                justifyContent: "center",
-                color:
-                  location.pathname === "/search"
-                    ? "white"
-                    : "rgba(255, 255, 255, 0.5)",
-              }}
-            >
-              <SearchIcon />
-            </ListItemIcon>
-          </ListItemButton>
-        </ListItem>
-      </List>
-    </Drawer>
-  );
-}
+//   return (
+//     <Drawer
+//       variant="permanent"
+//       sx={{
+//         display: { xs: "none", sm: "block" },
+//         "& .MuiDrawer-paper": {
+//           width: "72px",
+//           backgroundColor: "#141414",
+//           borderRight: "none",
+//           display: "flex",
+//           flexDirection: "column",
+//           alignItems: "center",
+//           pt: "env(safe-area-inset-top)",
+//         },
+//       }}
+//     >
+//       <List
+//         sx={{
+//           width: "100%",
+//           height: "100%",
+//           display: "flex",
+//           flexDirection: "column",
+//           justifyContent: "center",
+//           alignItems: "center",
+//           gap: 1,
+//         }}
+//       >
+//         <ListItem disablePadding>
+//           <ListItemButton
+//             onClick={() => navigate("/")}
+//             selected={location.pathname === "/"}
+//             sx={{
+//               minHeight: 48,
+//               justifyContent: "center",
+//               "&.Mui-selected": {
+//                 bgcolor: "rgba(255, 255, 255, 0.08)",
+//               },
+//               "&:hover": {
+//                 bgcolor: "rgba(255, 255, 255, 0.12)",
+//               },
+//             }}
+//           >
+//             <ListItemIcon
+//               sx={{
+//                 minWidth: 0,
+//                 justifyContent: "center",
+//                 color:
+//                   location.pathname === "/"
+//                     ? "white"
+//                     : "rgba(255, 255, 255, 0.5)",
+//               }}
+//             >
+//               <HomeIcon />
+//             </ListItemIcon>
+//           </ListItemButton>
+//         </ListItem>
+//         <ListItem disablePadding>
+//           <ListItemButton
+//             onClick={() => navigate("/search")}
+//             selected={location.pathname === "/search"}
+//             sx={{
+//               minHeight: 48,
+//               justifyContent: "center",
+//               "&.Mui-selected": {
+//                 bgcolor: "rgba(255, 255, 255, 0.08)",
+//               },
+//               "&:hover": {
+//                 bgcolor: "rgba(255, 255, 255, 0.12)",
+//               },
+//             }}
+//           >
+//             <ListItemIcon
+//               sx={{
+//                 minWidth: 0,
+//                 justifyContent: "center",
+//                 color:
+//                   location.pathname === "/search"
+//                     ? "white"
+//                     : "rgba(255, 255, 255, 0.5)",
+//               }}
+//             >
+//               <SearchIcon />
+//             </ListItemIcon>
+//           </ListItemButton>
+//         </ListItem>
+//       </List>
+//     </Drawer>
+//   );
+// }
 
 function SearchResults({
   query,
@@ -659,26 +654,26 @@ function AppRoutes({ movies, isLoading }: { movies: any; isLoading: boolean }) {
 
   return (
     <>
-      <DesktopNavigation />
       <Box
         sx={{
-          ml: { xs: 0, sm: "72px" },
-          minHeight: "100dvh",
-          pt: "env(safe-area-inset-top)",
+          position: "fixed",
+          inset: 0,
+          zIndex: -1,
+          backgroundImage: `
+            radial-gradient(circle farthest-side at top left, #162e52, transparent 70%),
+            radial-gradient(circle farthest-side at top right, #0f35b6, transparent 70%),
+            radial-gradient(circle farthest-side at bottom right, #2b55a6, transparent 70%),
+            radial-gradient(circle farthest-side at bottom left, #522c69, transparent 70%)
+          `,
           backgroundColor: "#141414",
+        }}
+      />
+      <Box
+        className="content-container"
+        sx={{
+          minHeight: "100vh",
           position: "relative",
           zIndex: 1,
-          overflowX: "hidden",
-          overflowY: "auto",
-          height: "100dvh",
-          pb: 0,
-          WebkitOverflowScrolling: "touch",
-          scrollBehavior: "smooth",
-          "&::-webkit-scrollbar": {
-            display: "none",
-          },
-          scrollbarWidth: "none",
-          msOverflowStyle: "none",
         }}
       >
         <AnimatePresence mode="wait">
@@ -696,7 +691,8 @@ function AppRoutes({ movies, isLoading }: { movies: any; isLoading: boolean }) {
                   <Box
                     sx={{
                       minHeight: "100dvh",
-                      backgroundColor: "#141414",
+                      // backgroundColor: "#141414",
+                      backgroundColor: "transparent",
                       paddingTop: {
                         xs: "15vh",
                         // xs: "calc(100vw * 1.2 + env(safe-area-inset-top) - 16px)",
