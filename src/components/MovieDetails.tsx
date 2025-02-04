@@ -1019,14 +1019,6 @@ export const MovieDetails = ({
     return count.toString();
   };
 
-  // Добавим функцию для определения цвета рейтинга
-  const getRatingColor = (rating: number | undefined) => {
-    if (!rating) return "#888"; // серый для undefined
-    if (rating >= 7) return "#57de94";
-    if (rating >= 5.6) return "#888";
-    return "#FF5252";
-  };
-
   // Обновляем функцию calculateMetrics
   const calculateMetrics = (details: any) => {
     // Собираем только метрики с существующими значениями
@@ -1752,20 +1744,32 @@ export const MovieDetails = ({
                                 flexShrink: 0,
                               }}
                             >
-                              <Typography
-                                sx={{
-                                  fontSize: "1rem",
-                                  color: getRatingColor(
-                                    currentMovie.vote_average
-                                  ),
-                                  filter:
-                                    currentMovie.vote_average >= 7
-                                      ? "drop-shadow(2px 4px 6px #59ffa4)"
-                                      : "none",
-                                }}
-                              >
-                                {currentMovie.vote_average.toFixed(1)}
-                              </Typography>
+                              {hasValue(details?.vote_average) && (
+                                <Box
+                                  sx={{
+                                    background: (() => {
+                                      const rating = Number(
+                                        details.vote_average
+                                      );
+                                      if (rating >= 7)
+                                        return "linear-gradient(90deg, #00C9FF 0%, #3dbc49 100%)";
+                                      if (rating >= 5.6)
+                                        return "linear-gradient(90deg, #757575 0%, #9E9E9E 100%)";
+                                      return "linear-gradient(90deg, #FF5252 0%, #FF1744 100%)";
+                                    })(),
+                                    color: "#fff",
+                                    padding: { xs: "2px 6px", sm: "4px 8px" },
+                                    borderRadius: { xs: "6px", sm: "8px" },
+                                    fontSize: { xs: "12px", sm: "14px" },
+                                    fontWeight: "bold",
+                                    boxShadow: "0 2px 8px rgba(0,0,0,0.2)",
+                                    display: "inline-flex",
+                                    alignItems: "center",
+                                  }}
+                                >
+                                  {details.vote_average.toFixed(1)}
+                                </Box>
+                              )}
                               {currentMovie?.vote_count &&
                                 currentMovie.vote_count > 0 && (
                                   <>
