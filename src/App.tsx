@@ -86,6 +86,12 @@ const COLOR_SCHEMES = {
     bottomRight: "#972013",
     bottomLeft: "#042660",
   },
+  dark: {
+    topLeft: "#1d2125",
+    topRight: "#204c63",
+    bottomRight: "#193e51",
+    bottomLeft: "#1a1d20",
+  },
 };
 
 function MobileNavigation() {
@@ -650,7 +656,10 @@ function AppRoutes({ movies, isLoading }: { movies: any; isLoading: boolean }) {
 
   // Добавляем состояние для хранения текущей цветовой схемы
   const [currentColors] = useState(() => {
-    return Math.random() > 0.5 ? COLOR_SCHEMES.blue : COLOR_SCHEMES.red;
+    // Выбираем случайный набор из трех вариантов
+    const schemes = Object.values(COLOR_SCHEMES);
+    const randomIndex = Math.floor(Math.random() * schemes.length);
+    return schemes[randomIndex];
   });
 
   useEffect(() => {
