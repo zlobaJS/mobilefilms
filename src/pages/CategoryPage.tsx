@@ -13,6 +13,7 @@ import { MovieCard } from "../components/MovieCard";
 import { getMovies, getMoviesByKeyword } from "../api/tmdb";
 import { motion } from "framer-motion";
 import { MovieDetails } from "../components/MovieDetails";
+import { useColors } from "../contexts/ColorContext";
 
 const CATEGORY_TITLES: { [key: string]: string } = {
   "now-playing": "Сейчас смотрят",
@@ -56,6 +57,7 @@ export const CategoryPage = ({
 }: CategoryPageProps) => {
   const { categoryId: paramsCategoryId } = useParams();
   const navigate = useNavigate();
+  const colors = useColors();
 
   // Определяем effectiveCategoryId в начале компонента
   const effectiveCategoryId = propsCategoryId || paramsCategoryId;
@@ -226,13 +228,26 @@ export const CategoryPage = ({
           <Box
             sx={{
               minHeight: "100vh",
-              backgroundColor: "#141414",
+              backgroundColor: "transparent",
               py: 4,
               position: "relative",
               paddingTop: "max(1rem, env(safe-area-inset-top))",
               paddingBottom: "max(1rem, env(safe-area-inset-bottom))",
               paddingLeft: "env(safe-area-inset-left)",
               paddingRight: "env(safe-area-inset-right)",
+              "&::before": {
+                content: '""',
+                position: "fixed",
+                inset: 0,
+                zIndex: -1,
+                backgroundImage: `
+                  radial-gradient(circle farthest-side at top left, ${colors.topLeft}, transparent 70%),
+                  radial-gradient(circle farthest-side at top right, ${colors.topRight}, transparent 70%),
+                  radial-gradient(circle farthest-side at bottom right, ${colors.bottomRight}, transparent 70%),
+                  radial-gradient(circle farthest-side at bottom left, ${colors.bottomLeft}, transparent 70%)
+                `,
+                backgroundColor: "#141414",
+              },
             }}
           >
             <Container maxWidth="xl">

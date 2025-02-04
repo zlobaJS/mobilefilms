@@ -49,6 +49,7 @@ import { InstallPWA } from "./components/InstallPWA";
 import { useAuth } from "./hooks/useAuth";
 import { AuthProvider } from "./contexts/AuthContext";
 import CloseIcon from "@mui/icons-material/Close";
+import { ColorContext } from "./contexts/ColorContext";
 
 const darkTheme = createTheme({
   palette: {
@@ -675,7 +676,7 @@ function AppRoutes({ movies, isLoading }: { movies: any; isLoading: boolean }) {
   );
 
   return (
-    <>
+    <ColorContext.Provider value={currentColors}>
       <Box
         sx={{
           position: "fixed",
@@ -716,7 +717,7 @@ function AppRoutes({ movies, isLoading }: { movies: any; isLoading: boolean }) {
                       // backgroundColor: "#141414",
                       backgroundColor: "transparent",
                       paddingTop: {
-                        xs: "15vh",
+                        xs: "18vh",
                         // xs: "calc(100vw * 1.2 + env(safe-area-inset-top) - 16px)",
                         sm: "10vh",
                       },
@@ -1069,7 +1070,7 @@ function AppRoutes({ movies, isLoading }: { movies: any; isLoading: boolean }) {
       </Box>
       <MobileNavigation />
       <InstallPWA />
-    </>
+    </ColorContext.Provider>
   );
 }
 
