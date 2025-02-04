@@ -27,6 +27,7 @@ interface Movie {
 
 interface MovieSliderProps {
   title: string;
+  description?: string;
   movies: Movie[];
   loading?: boolean;
   categoryId: string;
@@ -42,6 +43,7 @@ interface MovieSliderProps {
 
 export const MovieSlider = ({
   title,
+  description,
   movies,
   loading = false,
   categoryId,
@@ -129,16 +131,30 @@ export const MovieSlider = ({
             zIndex: 5,
           }}
         >
-          <Typography
-            variant="h6"
-            sx={{
-              fontWeight: "bold",
-              color: "white",
-              fontSize: "1rem",
-            }}
-          >
-            {title}
-          </Typography>
+          <Box sx={{ display: "flex", flexDirection: "column", gap: 0.5 }}>
+            <Typography
+              variant="h6"
+              sx={{
+                fontWeight: "bold",
+                color: "white",
+                fontSize: "1rem",
+              }}
+            >
+              {title}
+            </Typography>
+            {description && (
+              <Typography
+                sx={{
+                  color: "rgba(255, 255, 255, 0.7)",
+                  fontSize: "0.65rem",
+                  fontWeight: 400,
+                  lineHeight: 1.3,
+                }}
+              >
+                {description}
+              </Typography>
+            )}
+          </Box>
           <Button
             disabled
             sx={{
@@ -208,16 +224,30 @@ export const MovieSlider = ({
           zIndex: 5,
         }}
       >
-        <Typography
-          variant="h6"
-          sx={{
-            fontWeight: "bold",
-            color: "white",
-            fontSize: "1rem",
-          }}
-        >
-          {title}
-        </Typography>
+        <Box sx={{ display: "flex", flexDirection: "column", gap: 0.5 }}>
+          <Typography
+            variant="h6"
+            sx={{
+              fontWeight: "bold",
+              color: "white",
+              fontSize: "1rem",
+            }}
+          >
+            {title}
+          </Typography>
+          {description && (
+            <Typography
+              sx={{
+                color: "rgba(255, 255, 255, 0.7)",
+                fontSize: "0.65rem",
+                fontWeight: 400,
+                lineHeight: 1.3,
+              }}
+            >
+              {description}
+            </Typography>
+          )}
+        </Box>
         <Button
           onClick={handleMoreClick}
           sx={{

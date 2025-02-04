@@ -760,6 +760,7 @@ function AppRoutes({ movies, isLoading }: { movies: any; isLoading: boolean }) {
                   >
                     <MovieSlider
                       title="Сейчас смотрят"
+                      description="Самые популярные фильмы среди пользователей прямо сейчас"
                       movies={movies.watchingToday}
                       loading={isLoading}
                       categoryId="now-playing"
@@ -768,6 +769,7 @@ function AppRoutes({ movies, isLoading }: { movies: any; isLoading: boolean }) {
                     />
                     <MovieSlider
                       title="Популярное"
+                      description="Топ самых популярных фильмов по оценкам зрителей"
                       movies={movies.popular}
                       loading={isLoading}
                       categoryId="popular"
@@ -777,6 +779,7 @@ function AppRoutes({ movies, isLoading }: { movies: any; isLoading: boolean }) {
                     />
                     <MovieSlider
                       title="Самые высокооцененные"
+                      description="Фильмы с самым высоким рейтингом за все время"
                       movies={movies.mostRated}
                       loading={isLoading}
                       categoryId="most-rated"
@@ -785,6 +788,7 @@ function AppRoutes({ movies, isLoading }: { movies: any; isLoading: boolean }) {
                     />
                     <MovieSlider
                       title="Лучшие фильмы 2024"
+                      description="Самые высокооцененные фильмы этого года"
                       movies={movies.mostRated2024}
                       loading={isLoading}
                       categoryId="most-rated-2024"
@@ -793,6 +797,7 @@ function AppRoutes({ movies, isLoading }: { movies: any; isLoading: boolean }) {
                     />
                     <MovieSlider
                       title="Сегодня в тренде"
+                      description="Фильмы, набирающие популярность прямо сейчас"
                       movies={movies.trendingToday}
                       loading={isLoading}
                       categoryId="trending-today"
@@ -809,6 +814,7 @@ function AppRoutes({ movies, isLoading }: { movies: any; isLoading: boolean }) {
                     />
                     <MovieSlider
                       title="Ужасы"
+                      description="Самые страшные и напряженные фильмы"
                       movies={movies.horror}
                       loading={isLoading}
                       categoryId="horror"
@@ -817,6 +823,7 @@ function AppRoutes({ movies, isLoading }: { movies: any; isLoading: boolean }) {
                     />
                     <MovieSlider
                       title="Боевики"
+                      description="Захватывающие фильмы с динамичным сюжетом"
                       movies={movies.action}
                       loading={isLoading}
                       categoryId="action"
@@ -825,6 +832,7 @@ function AppRoutes({ movies, isLoading }: { movies: any; isLoading: boolean }) {
                     />
                     <MovieSlider
                       title="Комедии"
+                      description="Лучшие комедийные фильмы для хорошего настроения"
                       movies={movies.comedy}
                       loading={isLoading}
                       categoryId="comedy"
@@ -833,6 +841,7 @@ function AppRoutes({ movies, isLoading }: { movies: any; isLoading: boolean }) {
                     />
                     <MovieSlider
                       title="Фантастика"
+                      description="Увлекательные истории о будущем и невероятных технологиях"
                       movies={movies.scifi}
                       loading={isLoading}
                       categoryId="scifi"
@@ -889,6 +898,7 @@ function AppRoutes({ movies, isLoading }: { movies: any; isLoading: boolean }) {
                     />
                     <MovieSlider
                       title="Российские фильмы"
+                      description="Лучшие фильмы российского кинематографа"
                       movies={movies.ruMovies}
                       loading={isLoading}
                       categoryId="ru-movies"
