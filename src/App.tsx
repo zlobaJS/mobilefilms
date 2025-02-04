@@ -98,6 +98,12 @@ const COLOR_SCHEMES = {
     bottomRight: "#943c0c",
     bottomLeft: "#1b52e5",
   },
+  forest: {
+    topLeft: "#1a1e26",
+    topRight: "#1c1c1c",
+    bottomRight: "#1c5947",
+    bottomLeft: "#225c43",
+  },
 };
 
 function MobileNavigation() {
@@ -662,25 +668,29 @@ function AppRoutes({ movies, isLoading }: { movies: any; isLoading: boolean }) {
 
   // Добавляем состояние для хранения текущей цветовой схемы
   const [currentColors] = useState(() => {
-    // Выбираем случайный набор из трех вариантов
     const schemes = Object.values(COLOR_SCHEMES);
     const randomIndex = Math.floor(Math.random() * schemes.length);
     return schemes[randomIndex];
   });
 
+  // Обновляем useEffect для сброса скролла
   useEffect(() => {
-    window.scrollTo(0, 0);
-  }, [location.pathname]);
-
-  useEffect(() => {
-    const contentContainer = document.querySelector(".MuiBox-root");
+    // Находим контейнер контента
+    const contentContainer = document.querySelector(".content-container");
     if (contentContainer) {
+      // Сбрасываем скролл с анимацией
       contentContainer.scrollTo({
         top: 0,
-        behavior: "instant",
+        behavior: "instant", // используем instant вместо smooth для мгновенного сброса
       });
     }
-  }, [location.pathname]);
+
+    // Также сбрасываем скролл для body
+    window.scrollTo({
+      top: 0,
+      behavior: "instant",
+    });
+  }, [location.pathname]); // Срабатывает при изменении пути
 
   const handleMovieSelect = useCallback(
     (movieOrId: Movie | number) => {
@@ -710,8 +720,18 @@ function AppRoutes({ movies, isLoading }: { movies: any; isLoading: boolean }) {
         className="content-container"
         sx={{
           minHeight: "100vh",
+          height: "100vh",
           position: "relative",
           zIndex: 1,
+          overflowY: "auto",
+          overflowX: "hidden",
+          WebkitOverflowScrolling: "touch",
+          overscrollBehavior: "contain",
+          "&::-webkit-scrollbar": {
+            display: "none",
+          },
+          msOverflowStyle: "none",
+          scrollbarWidth: "none",
         }}
       >
         <AnimatePresence mode="wait">
@@ -729,30 +749,13 @@ function AppRoutes({ movies, isLoading }: { movies: any; isLoading: boolean }) {
                   <Box
                     sx={{
                       minHeight: "100dvh",
-                      // backgroundColor: "#141414",
                       backgroundColor: "transparent",
                       paddingTop: {
                         xs: "18vh",
-                        // xs: "calc(100vw * 1.2 + env(safe-area-inset-top) - 16px)",
                         sm: "10vh",
                       },
                       position: "relative",
                       zIndex: 4,
-                      WebkitOverflowScrolling: "touch",
-                      overscrollBehavior: "contain",
-                      "&::before": {
-                        content: '""',
-                        position: "absolute",
-                        top: 0,
-                        left: 0,
-                        right: 0,
-                        // height: {
-                        //   xs: "calc(100vw * 1.2 + env(safe-area-inset-top))",
-                        //   sm: "60vh",
-                        // },
-                        pointerEvents: "none",
-                        zIndex: 1,
-                      },
                     }}
                   >
                     <MovieSlider
