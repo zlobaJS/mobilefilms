@@ -92,6 +92,12 @@ const COLOR_SCHEMES = {
     bottomRight: "#193e51",
     bottomLeft: "#1a1d20",
   },
+  ocean: {
+    topLeft: "#09314e",
+    topRight: "#22446c",
+    bottomRight: "#943c0c",
+    bottomLeft: "#1b52e5",
+  },
 };
 
 function MobileNavigation() {
